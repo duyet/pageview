@@ -6,6 +6,7 @@ import { Url } from '@prisma/client'
 import { Header } from '../components/Header'
 import styles from '../styles/Domain.module.css'
 import prisma from '../lib/prisma'
+import { cn } from '../lib/utils'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +24,12 @@ export default function Home({ domain, urlStats }: URLStatsProps) {
         {urlStats.map((row: any) => {
           return (
             <div key={row.host} className={styles.card}>
-              <h2 className={inter.className}>
+              <h2 className={cn(inter.className, 'flex')}>
+                <img
+                  src={`https://www.google.com/s2/favicons?sz=256&domain=${row.url}`}
+                  alt={row.url}
+                  className="mr-2 h-6 w-6"
+                />
                 <Link href={row.url} target="_blank">
                   {row.url}
                 </Link>
