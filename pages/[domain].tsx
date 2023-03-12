@@ -1,8 +1,8 @@
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
-import { Url } from '@prisma/client'
 
+import { Url } from '@prisma/client'
 import { Header } from '../components/Header'
 import styles from '../styles/Domain.module.css'
 import prisma from '../lib/prisma'
