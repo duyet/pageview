@@ -1,5 +1,5 @@
 import type { GetServerSideProps } from 'next'
-import Head from 'next/head'
+import Link from 'next/link'
 import { Inter } from 'next/font/google'
 
 import { Url } from '@prisma/client'
@@ -17,26 +17,24 @@ type URLStatsProps = {
 export default function Home({ domain, urlStats }: URLStatsProps) {
   return (
     <>
-      <Head>
-        <title>{domain}</title>
-      </Head>
+      <Header />
 
-      <main className={styles.main}>
-        <Header />
-
-        <div className={styles.grid}>
-          {urlStats.map((row: any) => {
-            return (
-              <div key={row.host} className={styles.card}>
-                <h2 className={inter.className}>{row.url}</h2>
-                <p className={inter.className}>
-                  Pageview: {row._count.pageViews}
-                </p>
-              </div>
-            )
-          })}
-        </div>
-      </main>
+      <div className={styles.grid}>
+        {urlStats.map((row: any) => {
+          return (
+            <div key={row.host} className={styles.card}>
+              <h2 className={inter.className}>
+                <Link href={row.url} target="_blank">
+                  {row.url}
+                </Link>
+              </h2>
+              <p className={inter.className}>
+                Pageview: {row._count.pageViews}
+              </p>
+            </div>
+          )
+        })}
+      </div>
     </>
   )
 }

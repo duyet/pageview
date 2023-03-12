@@ -1,17 +1,20 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { cn } from '../lib/utils'
+
 import styles from './Header.module.css'
 import logo from '../public/logo.png'
 
 export const Header = () => {
   return (
-    <div className={styles.description}>
+    <div className={cn(styles.header)}>
       <Link href="/">
         <p>
           <code className={styles.code}>pageview</code>
         </p>
       </Link>
+
       <div>
         <a href="https://duyet.net" target="_blank" rel="noopener noreferrer">
           <Image

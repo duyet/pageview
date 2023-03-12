@@ -1,17 +1,9 @@
-.main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6rem;
-  min-height: 100vh;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(1, minmax(100%, auto));
   width: var(--max-width);
   max-width: 100%;
+  margin-top: 2rem;
 }
 
 .card {
@@ -39,14 +31,6 @@
   font-size: 0.9rem;
   line-height: 1.5;
   max-width: 30ch;
-}
-
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 4rem 0;
 }
 
 .center::before {

@@ -1,5 +1,4 @@
 import type { GetServerSideProps } from 'next'
-import Head from 'next/head'
 import Link from 'next/link'
 import { Inter } from 'next/font/google'
 
@@ -20,34 +19,35 @@ type Props = {
 export default function Home({ domainStats, currentHost }: Props) {
   return (
     <>
-      <Head>
-        <title>Pageview</title>
-      </Head>
+      <Header />
 
-      <main className={cn(styles.main)}>
-        <Header />
+      <div className="text-center p-10">
+        <pre>GET https://{currentHost}/api/pageview?url=&lt;url&gt;</pre>
+      </div>
 
-        <div className="p-10">
-          <pre>GET https://{currentHost}/api/pageview?url=&lt;url&gt;</pre>
-        </div>
-
-        <div className={styles.grid}>
-          {domainStats.map((row: any) => {
-            return (
-              <Link
-                href={`/` + row.host}
-                key={row.host}
-                className={cn(styles.card, 'mb-4')}
-              >
-                <>
-                  <h2 className={inter.className}>{row.host}</h2>
-                  <p className={inter.className}>Pageview: {row._count.urls}</p>
-                </>
-              </Link>
-            )
-          })}
-        </div>
-      </main>
+      <div className="grid">
+        {domainStats.map((row: any) => {
+          return (
+            <Link
+              href={`/` + row.host}
+              key={row.host}
+              className={cn(styles.card, 'mb-4')}
+            >
+              <>
+                <h2 className={cn(inter.className, 'flex')}>
+                  <img
+                    src={`https://www.google.com/s2/favicons?sz=256&domain=${row.host}`}
+                    alt={row.host}
+                    className="mr-2 h-6 w-6"
+                  />
+                  {row.host}
+                </h2>
+                <p className={inter.className}>Pageview: {row._count.urls}</p>
+              </>
+            </Link>
+          )
+        })}
+      </div>
     </>
   )
 }
