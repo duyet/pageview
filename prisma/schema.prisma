@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  relationMode      = "prisma"
+}
+
+model PageView {
+  id Int @id @default(autoincrement())
+
+  urlId Int
+  url   Url @relation(fields: [urlId], references: [id])
+
+  // Request info
+  ip        String?
+  countryId Int?
+  country   Country? @relation(fields: [countryId], references: [id])
+  cityId    Int?
+  city      City?    @relation(fields: [cityId], references: [id])
+  uAId      Int?
+  ua        UA?      @relation(fields: [uAId], references: [id])
+
+  // Metadata
+  createdAt DateTime @default(now())
+}
+
+model Url {
+  id  Int    @id @default(autoincrement())
+  url String @unique
+
+  hostId Int
+  host   Host @relation(fields: [hostId], references: [id])
+
+  slugId Int
+  slug   Slug @relation(fields: [slugId], references: [id])
+
+  pageViews PageView[]
+}
+
+model Host {
+  id   Int    @id @default(autoincrement())
+  host String @unique
+  urls  Url[]
+}
+
+model Slug {
+  id   Int    @id @default(autoincrement())
+  slug String @unique
+  urls  Url[]
+}
+
+model UA {
+  id        Int        @id @default(autoincrement())
+  ua        String
+  os        String?
+  browser   String?
+  device    String?
+  engine    String?
+  pageViews PageView[]
+}
+
+model Country {
+  id        Int        @id @default(autoincrement())
+  country   String     @unique
+  pageViews PageView[]
+}
+
+model City {
+  id        Int        @id @default(autoincrement())
+  city      String     @unique
+  pageViews PageView[]
+}
