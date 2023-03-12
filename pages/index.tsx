@@ -14,9 +14,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 type Props = {
   domainStats: Host[]
+  currentHost: string
 }
 
-export default function Home({ domainStats }: Props) {
+export default function Home({ domainStats, currentHost }: Props) {
   return (
     <>
       <Head>
@@ -25,6 +26,10 @@ export default function Home({ domainStats }: Props) {
 
       <main className={cn(styles.main)}>
         <Header />
+
+        <div className="p-10">
+          <pre>GET https://{currentHost}/api/pageview?url=&lt;url&gt;</pre>
+        </div>
 
         <div className={styles.grid}>
           {domainStats.map((row: any) => {
@@ -47,7 +52,9 @@ export default function Home({ domainStats }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const currentHost = req.headers.host as string
+
   const domainStats = await prisma.host.findMany({
     select: {
       host: true,
@@ -58,6 +65,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
   })
 
   return {
-    props: { domainStats },
+    props: { domainStats, currentHost },
   }
 }
