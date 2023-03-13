@@ -23,7 +23,7 @@ export default function Home({ domain, urlStats }: URLStatsProps) {
       <div className={styles.grid}>
         {urlStats.map((row: any) => {
           return (
-            <div key={row.host} className={styles.card}>
+            <div key={row.url} className={styles.card}>
               <h2 className={cn(inter.className, 'flex')}>
                 <img
                   src={`https://www.google.com/s2/favicons?sz=256&domain=${row.url}`}

@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import normalizeUrl from 'normalize-url'
 
 import prisma from '../../lib/prisma'
 
@@ -43,8 +44,10 @@ export default async function handler(
     return res.status(400).json({ msg: 'URL is required' })
   }
 
-  const parsedUrl = new URL(url as string)
-  console.log('url', parsedUrl)
+  const normalizedUrl = normalizeUrl(url as string)
+  console.log(`Normalized URL: ${normalizedUrl}`)
+  const parsedUrl = new URL(normalizedUrl)
+  console.log('Parsed URL', parsedUrl)
 
   const parsedUAFromMiddleware = {
     ua: '' + req.query.ua,
@@ -65,9 +68,9 @@ export default async function handler(
       data: {
         url: {
           connectOrCreate: {
-            where: { url },
+            where: { url: normalizedUrl },
             create: {
-              url,
+              url: normalizedUrl,
               host: {
                 connectOrCreate: {
                   where: { host: parsedUrl.hostname },
@@ -106,9 +109,9 @@ export default async function handler(
         },
       },
     })
-    console.log('Record created', pageview)
 
-    return res.json({ msg: 'ok' })
+    console.log('Record created', pageview)
+    return res.json({ msg: 'URL created' })
   } catch (err) {
     console.error(err)
     return res.status(500).json({ msg: 'Something went wrong' })
