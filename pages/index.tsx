@@ -1,55 +1,89 @@
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { Inter } from 'next/font/google'
+import { Card, Flex, Grid } from '@tremor/react'
+import { List, ListItem, Text, Bold, Metric, Button } from '@tremor/react'
+import { ArrowNarrowRightIcon } from '@heroicons/react/solid'
 
 import { Host } from '@prisma/client'
 
-import { Header } from '../components/Header'
-import styles from '../styles/Home.module.css'
 import prisma from '../lib/prisma'
-import { cn } from '../lib/utils'
-
-const inter = Inter({ subsets: ['latin'] })
 
 type Props = {
   domainStats: Host[]
+  hosts: Record<string, string>
   currentHost: string
+  totalPageViews: number
+  totalUrls: number
 }
 
-export default function Home({ domainStats, currentHost }: Props) {
+export default function Home({
+  domainStats,
+  hosts,
+  currentHost,
+  totalPageViews,
+  totalUrls,
+}: Props) {
   return (
     <>
-      <Header />
+      <Grid numColsMd={2} numColsLg={3} className="mt-6 gap-6">
+        <Card>
+          <Text>Total Pageview</Text>
+          <Metric>{totalPageViews}</Metric>
+        </Card>
+        <Card>
+          <Flex alignItems="start">
+            <Text>Domain</Text>
+          </Flex>
+          <Metric>{Object.keys(hosts).length}</Metric>
+        </Card>
+        <Card>
+          <Text>URL</Text>
+          <Metric>{totalUrls}</Metric>
+        </Card>
+      </Grid>
 
-      <div className="p-10 text-center">
-        <pre>GET https://{currentHost}/api/pageview?url=&lt;url&gt;</pre>
-      </div>
+      <Card className="mt-6">
+        <Text>Usage</Text>
+        <pre className="truncate">
+          GET https://{currentHost}/api/pageview?url=&lt;url&gt;
+        </pre>
+      </Card>
 
-      <div className="grid">
-        {domainStats.map((row: any) => {
-          return (
-            <Link
-              href={`/` + row.host.host}
-              key={row.host.host}
-              className={cn(styles.card, 'mb-4')}
-            >
-              <>
-                <h2 className={cn(inter.className, 'flex')}>
-                  <img
-                    src={`https://www.google.com/s2/favicons?sz=256&domain=${row.host.host}`}
-                    alt={row.host.host}
-                    className="mr-2 h-6 w-6"
-                  />
-                  {row.host.host}
-                </h2>
-                <p className={inter.className}>
-                  Pageview: {row._count.pageViews}
-                </p>
-              </>
-            </Link>
-          )
-        })}
-      </div>
+      <Card className="mt-6">
+        <List>
+          {domainStats.map((row: any) => {
+            const hostName = hosts[row.hostId]
+
+            return (
+              <Link href={`/` + hostName} key={row.hostId}>
+                <ListItem key={row.hostId} className="mb-4">
+                  <Flex justifyContent="start" className="space-x-4 truncate">
+                    <img
+                      src={`https://www.google.com/s2/favicons?sz=256&domain=${hostName}`}
+                      alt={hostName}
+                      className="mr-2 h-6 w-6"
+                    />
+
+                    <div>
+                      <Text className="truncate">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          icon={ArrowNarrowRightIcon}
+                          iconPosition="right"
+                        >
+                          <Bold>{hostName}</Bold>
+                        </Button>
+                      </Text>
+                      <Text>URLs: {row._count}</Text>
+                    </div>
+                  </Flex>
+                </ListItem>
+              </Link>
+            )
+          })}
+        </List>
+      </Card>
     </>
   )
 }
@@ -57,18 +91,21 @@ export default function Home({ domainStats, currentHost }: Props) {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const currentHost = req.headers.host as string
 
-  const domainStats = await prisma.url.findMany({
-    select: {
-      host: true,
-      _count: {
-        select: {
-          pageViews: true,
-        },
-      },
-    },
+  const domainStats = await prisma.url.groupBy({
+    by: ['hostId'],
+    _count: true,
   })
 
+  const hosts: Props['hosts'] = {}
+  const _ = (await prisma.host.findMany()).forEach((row) => {
+    hosts[row.id] = row.host
+  })
+
+  const totalPageViews = await prisma.pageView.count()
+
+  const totalUrls = await prisma.url.count()
+
   return {
-    props: { domainStats, currentHost },
+    props: { domainStats, hosts, currentHost, totalPageViews, totalUrls },
   }
 }
