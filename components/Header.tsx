@@ -1,32 +1,23 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Flex, Title } from '@tremor/react'
 
-import { cn } from '../lib/utils'
-
-import styles from './Header.module.css'
 import logo from '../public/logo.png'
 
 export const Header = () => {
   return (
-    <div className={cn(styles.header)}>
-      <Link href="/">
-        <p>
-          <code className={styles.code}>pageview</code>
-        </p>
-      </Link>
+    <Flex justifyContent="between" alignItems="center" className={'mb-10'}>
+      <Flex justifyContent="start">
+        <Link href={'/'}>
+          <Title className={'text-pre'}>pageview</Title>
+        </Link>
+      </Flex>
 
       <div>
         <a href="https://duyet.net" target="_blank" rel="noopener noreferrer">
-          <Image
-            src={logo}
-            alt="Logo"
-            className={styles.vercelLogo}
-            width={50}
-            height={50}
-            priority
-          />
+          <Image src={logo} alt="Logo" width={50} height={50} priority />
         </a>
       </div>
-    </div>
+    </Flex>
   )
 }

@@ -16,7 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Contribute and deployment
 
-To contribute to the project, push any changes to the `dev` branch and create a PR to merge the changes into the `main` branch. 
+To contribute to the project, push any changes to the `dev` branch and create a PR to merge the changes into the `main` branch.
 Preview deployment can be seen on the `dev` branch.
 
 For deployment on Vercel, follow these links for instructions:
