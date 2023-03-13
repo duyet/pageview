@@ -46,6 +46,20 @@ export default async function handler(
   const parsedUrl = new URL(url as string)
   console.log('url', parsedUrl)
 
+  const parsedUAFromMiddleware = {
+    ua: '' + req.query.ua,
+    browser: '' + req.query.browser,
+    browserVersion: '' + req.query.browserVersion,
+    os: '' + req.query.os,
+    osVersion: '' + req.query.osVersion,
+    engine: '' + req.query.engine,
+    engineVersion: '' + req.query.engineVersion,
+    device: '' + req.query.device,
+    deviceModel: '' + req.query.deviceModel,
+    deviceType: '' + req.query.deviceType,
+    isBot: req.query.isBot === 'true',
+  }
+
   try {
     const pageview = await prisma.pageView.create({
       data: {
@@ -67,6 +81,27 @@ export default async function handler(
                 },
               },
             },
+          },
+        },
+        ua: {
+          connectOrCreate: {
+            where: { ua: parsedUAFromMiddleware.ua },
+            create: {
+              ...parsedUAFromMiddleware,
+            },
+          },
+        },
+        ip: req.query.ip ? '' + req.query.ip : null,
+        country: {
+          connectOrCreate: {
+            where: { country: '' + req.query.country },
+            create: { country: '' + req.query.country },
+          },
+        },
+        city: {
+          connectOrCreate: {
+            where: { city: '' + req.query.city },
+            create: { city: '' + req.query.city },
           },
         },
       },
