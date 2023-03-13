@@ -13,7 +13,7 @@
     "fmt": "prettier --write ."
   },
   "dependencies": {
-    "@heroicons/react": "^1.0.6",
+    "@heroicons/react": "^2.0.0",
     "@prisma/client": "^4.11.0",
     "@tremor/react": "^2.0.0",
     "class-variance-authority": "^0.4.0",
