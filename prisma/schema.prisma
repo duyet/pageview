@@ -47,23 +47,29 @@ model Url {
 model Host {
   id   Int    @id @default(autoincrement())
   host String @unique
-  urls  Url[]
+  urls Url[]
 }
 
 model Slug {
   id   Int    @id @default(autoincrement())
   slug String @unique
-  urls  Url[]
+  urls Url[]
 }
 
 model UA {
-  id        Int        @id @default(autoincrement())
-  ua        String
-  os        String?
-  browser   String?
-  device    String?
-  engine    String?
-  pageViews PageView[]
+  id             Int        @id @default(autoincrement())
+  ua             String     @unique
+  browser        String?
+  browserVersion String?
+  engine         String?
+  engineVersion  String?
+  os             String?
+  osVersion      String?
+  device         String?
+  deviceModel    String?
+  deviceType     String?
+  isBot          Boolean?
+  pageViews      PageView[]
 }
 
 model Country {
