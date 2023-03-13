@@ -21,7 +21,7 @@ export default function Home({ domainStats, currentHost }: Props) {
     <>
       <Header />
 
-      <div className="text-center p-10">
+      <div className="p-10 text-center">
         <pre>GET https://{currentHost}/api/pageview?url=&lt;url&gt;</pre>
       </div>
 
@@ -29,20 +29,22 @@ export default function Home({ domainStats, currentHost }: Props) {
         {domainStats.map((row: any) => {
           return (
             <Link
-              href={`/` + row.host}
-              key={row.host}
+              href={`/` + row.host.host}
+              key={row.host.host}
               className={cn(styles.card, 'mb-4')}
             >
               <>
                 <h2 className={cn(inter.className, 'flex')}>
                   <img
-                    src={`https://www.google.com/s2/favicons?sz=256&domain=${row.host}`}
-                    alt={row.host}
+                    src={`https://www.google.com/s2/favicons?sz=256&domain=${row.host.host}`}
+                    alt={row.host.host}
                     className="mr-2 h-6 w-6"
                   />
-                  {row.host}
+                  {row.host.host}
                 </h2>
-                <p className={inter.className}>Pageview: {row._count.urls}</p>
+                <p className={inter.className}>
+                  Pageview: {row._count.pageViews}
+                </p>
               </>
             </Link>
           )
@@ -55,11 +57,13 @@ export default function Home({ domainStats, currentHost }: Props) {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const currentHost = req.headers.host as string
 
-  const domainStats = await prisma.host.findMany({
+  const domainStats = await prisma.url.findMany({
     select: {
       host: true,
       _count: {
-        select: { urls: true },
+        select: {
+          pageViews: true,
+        },
       },
     },
   })
