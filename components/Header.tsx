@@ -9,7 +9,7 @@ export const Header = () => {
     <Flex justifyContent="between" alignItems="center" className={'mb-10'}>
       <Flex justifyContent="start">
         <Link href={'/'}>
-          <Title className={'text-pre'}>pageview</Title>
+          <Title>pageview</Title>
         </Link>
       </Flex>
 

@@ -1,16 +1,17 @@
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { Card, Flex, Grid, Col, Button } from '@tremor/react'
-import { List, ListItem, Badge, Title, AreaChart } from '@tremor/react'
+import { List, ListItem, Badge, Title } from '@tremor/react'
 import { ArrowNarrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 
-import prisma from '../lib/prisma'
+import prisma from '../../lib/prisma'
 
 type Count = {
   pageViews: number
 }
 
 type UrlStat = {
+  id: number
   url: string
   _count: Count
 }
@@ -19,21 +20,6 @@ type URLStatsProps = {
   domain: String
   urlStats: UrlStat[]
 }
-
-const data = [
-  {
-    Month: 'Jan 21',
-    PageView: 1245,
-  },
-  {
-    Month: 'Feb 21',
-    PageView: 2938,
-  },
-  {
-    Month: 'Jul 21',
-    PageView: 2345,
-  },
-]
 
 export default function Home({ domain, urlStats }: URLStatsProps) {
   return (
@@ -56,32 +42,25 @@ export default function Home({ domain, urlStats }: URLStatsProps) {
             <ListItem key={row.url}>
               <Grid numCols={1} numColsSm={4} className="mt-6">
                 <Col>
-                  <Flex className="space-x-5" alignItems="start">
-                    <Link href={row.url} target="_blank">
-                      <Button
-                        size="sm"
-                        variant="light"
-                        icon={ExternalLinkIcon}
-                        iconPosition="right"
-                      >
-                        {row.url}
-                      </Button>
-                    </Link>
-                    <Badge>PageView: {row._count.pageViews}</Badge>
-                  </Flex>
-                </Col>
-                <Col numColSpanSm={3}>
-                  <AreaChart
-                    className="mt-6 ml-0 h-24 md:mt-0 md:ml-6"
-                    data={data}
-                    index="Month"
-                    categories={['PageView']}
-                    colors={['blue']}
-                    showGridLines={false}
-                    showYAxis={false}
-                    showLegend={false}
-                    showTooltip={true}
-                  />
+                  <div>
+                    <Flex className="space-x-5" alignItems="start">
+                      <Link href={`/url/${row.id}`}>{row.url}</Link>
+                      <Badge>PageView: {row._count.pageViews}</Badge>
+
+                      <Link href={row.url} target="_blank">
+                        <Badge>
+                          <Button
+                            size="sm"
+                            variant="light"
+                            icon={ExternalLinkIcon}
+                            iconPosition="right"
+                          >
+                            Visit URL
+                          </Button>
+                        </Badge>
+                      </Link>
+                    </Flex>
+                  </div>
                 </Col>
               </Grid>
             </ListItem>
@@ -104,6 +83,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       },
     },
     select: {
+      id: true,
       url: true,
       _count: true,
     },

@@ -32,6 +32,12 @@ export default function App({ Component, pageProps }: AppProps) {
           gtag('config', '${GA_MEASUREMENT_ID}');
         `}
       </Script>
+      <Script id="pageview" strategy="afterInteractive">
+        {`
+          !(function(d,src){let s=d.createElement('script');
+          s.src=src;d.body.appendChild(s)})(document,'/pageview.js')
+        `}
+      </Script>
     </main>
   )
 }

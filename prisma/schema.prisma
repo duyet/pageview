@@ -42,6 +42,8 @@ model Url {
   slug   Slug @relation(fields: [slugId], references: [id])
 
   pageViews PageView[]
+
+  createdAt DateTime @default(now())
 }
 
 model Host {
