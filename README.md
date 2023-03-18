@@ -1,5 +1,7 @@
 # `pageview`
 
+![](https://api.checklyhq.com/v1/badges/checks/7da0b0e8-698c-4264-86b5-4b45a139c37e?style=flat&theme=dark)
+
 ![](https://screenshotter.vercel.app/screenshot?url=https://pageview.duyet.net&viewport=1728,1117)
 
 Add this snippet to your website:
