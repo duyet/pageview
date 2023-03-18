@@ -214,18 +214,20 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 }
 
 function groupByFromUA(array: any[], key: string) {
-  return array.reduce((acc: any, row: any) => {
-    // Attention: this is not a deep search. Harded coded to row.ua.<key>
-    const keyValue = row.ua[key] || 'N/A'
-    const count = row._count
+  return array
+    .reduce((acc: any, row: any) => {
+      // Attention: this is not a deep search. Harded coded to row.ua.<key>
+      const keyValue = row.ua[key] || 'N/A'
+      const count = row._count
 
-    const index = acc.findIndex((row: any) => row[key] === keyValue)
-    if (index === -1) {
-      acc.push({ [key]: keyValue, _count: count })
-    } else {
-      acc[index]._count += count
-    }
+      const index = acc.findIndex((row: any) => row[key] === keyValue)
+      if (index === -1) {
+        acc.push({ [key]: keyValue, _count: count })
+      } else {
+        acc[index]._count += count
+      }
 
-    return acc
-  }, [])
+      return acc
+    }, [])
+    .sort((a: any, b: any) => b._count - a._count)
 }

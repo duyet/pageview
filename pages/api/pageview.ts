@@ -44,7 +44,9 @@ export default async function handler(
     return res.status(400).json({ msg: 'URL is required' })
   }
 
-  const normalizedUrl = normalizeUrl(url as string)
+  const normalizedUrl = normalizeUrl(url as string, {
+    removeQueryParameters: [/^utm_\w+/i, 'fbclid', 'ref', 'ref_src'],
+  })
   console.log(`Normalized URL: ${normalizedUrl}`)
   const parsedUrl = new URL(normalizedUrl)
   console.log('Parsed URL', parsedUrl)
