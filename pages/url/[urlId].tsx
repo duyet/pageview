@@ -24,6 +24,11 @@ type TopBrowser = {
   _count: number
 }
 
+type TopEngine = {
+  engine: string
+  _count: number
+}
+
 type TopDevice = {
   device: string
   _count: number
@@ -35,6 +40,7 @@ type Props = {
   topUA: TopUA[]
   topOS: TopOS[]
   topBrowser: TopBrowser[]
+  topEngine: TopEngine[]
   topDevice: TopDevice[]
 }
 
@@ -43,6 +49,7 @@ export default function Home({
   topCountry,
   topOS,
   topBrowser,
+  topEngine,
   topDevice,
 }: Props) {
   return (
@@ -90,6 +97,18 @@ export default function Home({
             className="mt-6"
             data={topBrowser.map((row: TopBrowser) => ({
               name: row.browser,
+              value: row._count,
+            }))}
+          />
+        </Card>
+
+        <Card>
+          <Title>Top Engine</Title>
+          {!topEngine.length && <Text>N/A</Text>}
+          <BarList
+            className="mt-6"
+            data={topEngine.map((row: TopEngine) => ({
+              name: row.engine,
               value: row._count,
             }))}
           />
@@ -205,6 +224,10 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const topBrowser = groupByFromUA(topUA, 'browser')
   console.log('topBrowser', topBrowser)
 
+  // Top Browser Engine
+  const topEngine = groupByFromUA(topUA, 'engine')
+  console.log('topEngine', topEngine)
+
   // Top Device
   const topDevice = groupByFromUA(topUA, 'device')
   console.log('topDevice', topDevice)
@@ -216,6 +239,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
       topUA,
       topOS,
       topBrowser,
+      topEngine,
       topDevice,
     },
   }
@@ -225,7 +249,7 @@ function groupByFromUA(array: any[], key: string) {
   return array
     .reduce((acc: any, row: any) => {
       // Attention: this is not a deep search. Harded coded to row.ua.<key>
-      const keyValue = row.ua[key] || 'N/A'
+      const keyValue = row[key] || 'N/A'
       const count = row._count
 
       const index = acc.findIndex((row: any) => row[key] === keyValue)
