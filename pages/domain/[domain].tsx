@@ -4,16 +4,13 @@ import { Card, Flex, Button, Divider, Title } from '@tremor/react'
 import { BarList, Text, Bold } from '@tremor/react'
 import { ArrowNarrowLeftIcon } from '@heroicons/react/solid'
 
+import { Prisma, Url } from '@prisma/client'
 import prisma from '../../lib/prisma'
-
-type Count = {
-  pageViews: number
-}
 
 type UrlStat = {
   id: number
   url: string
-  _count: Count
+  _count: Prisma.UrlCountOutputType
 }
 
 type URLStatsProps = {
