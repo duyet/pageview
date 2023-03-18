@@ -1,5 +1,7 @@
 # `pageview`
 
+![](https://screenshotter.vercel.app/screenshot?url=https://pageview.duyet.net&viewport=1728,1117)
+
 ## Development
 
 To run the development server, execute the following command:
