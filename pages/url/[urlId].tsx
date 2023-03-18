@@ -146,18 +146,20 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
   // TODO: low performance
   const topCountry = await Promise.all(
-    topCountryId.map(async (row: any) => {
-      const country = await prisma.country.findUnique({
-        where: {
-          id: row.countryId as unknown as number,
-        },
-      })
+    topCountryId
+      .sort((a: any, b: any) => b._count - a._count)
+      .map(async (row: any) => {
+        const country = await prisma.country.findUnique({
+          where: {
+            id: row.countryId as unknown as number,
+          },
+        })
 
-      return {
-        ...row,
-        country,
-      }
-    })
+        return {
+          ...row,
+          country,
+        }
+      })
   )
   console.log('topCountry', topCountry)
 
