@@ -7,6 +7,7 @@ import { ArrowNarrowRightIcon } from '@heroicons/react/solid'
 import { Host } from '@prisma/client'
 
 import prisma from '../lib/prisma'
+import { Usage } from '../components/Usage'
 
 type Props = {
   domainStats: Host[]
@@ -43,10 +44,14 @@ export default function Home({
       </Grid>
 
       <Card className="mt-6">
-        <Text>Usage</Text>
+        <Text>API Usage</Text>
         <pre className="truncate">
           GET https://{currentHost}/api/pageview?url=&lt;url&gt;
         </pre>
+      </Card>
+
+      <Card className="mt-6">
+        <Usage currentHost={currentHost} />
       </Card>
 
       <Card className="mt-6">
@@ -55,7 +60,7 @@ export default function Home({
             const hostName = hosts[row.hostId]
 
             return (
-              <Link href={`/` + hostName} key={row.hostId}>
+              <Link href={`/domain/` + hostName} key={row.hostId}>
                 <ListItem key={row.hostId} className="mb-4">
                   <Flex justifyContent="start" className="space-x-4 truncate">
                     <img

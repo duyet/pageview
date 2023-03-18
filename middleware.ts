@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server'
 
+import { genScript } from './pageview'
+
 export async function middleware(req: NextRequest) {
   const { nextUrl: url, geo, ip } = req
 
@@ -22,9 +24,20 @@ export async function middleware(req: NextRequest) {
   url.searchParams.set('deviceType', parsedUA.device.type || '')
   url.searchParams.set('isBot', parsedUA.isBot.toString())
 
-  return NextResponse.rewrite(url)
+  if (url.pathname.startsWith('/pageview.js')) {
+    // Get content from public/pageview.js
+    const content = genScript(`${url.protocol}//${url.host}/api/pageview`)
+
+    return new NextResponse(content, {
+      headers: { 'Content-Type': 'text/javascript' },
+    })
+  }
+
+  if (url.pathname.startsWith('/api')) {
+    return NextResponse.rewrite(url)
+  }
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: ['/pageview.js', '/api/:path*'],
 }
