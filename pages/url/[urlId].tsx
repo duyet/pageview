@@ -1,10 +1,10 @@
 import type { GetServerSideProps } from 'next'
-import { Prisma, Country, Url, UA } from '@prisma/client'
 import Link from 'next/link'
 import { Card, Text, Grid, Button } from '@tremor/react'
 import { Title, BarList } from '@tremor/react'
 import { ArrowNarrowLeftIcon } from '@heroicons/react/solid'
 
+import { Prisma, Country, Url, Host, UA } from '@prisma/client'
 import prisma from '../../lib/prisma'
 
 type TopCountry = Prisma.PageViewGroupByOutputType & {
@@ -31,7 +31,7 @@ type TopDevice = {
 }
 
 type Props = {
-  url: Url
+  url: Url & { host: Host }
   topCountry: TopCountry[]
   topUA: TopUA[]
   topOS: TopOS[]
@@ -50,16 +50,20 @@ export default function Home({
     <>
       <Card>
         <Title>
-          <Link href="/">
+          <Link href={`/domain/${url.host.host}`}>
             <Button
               size="sm"
               variant="light"
               icon={ArrowNarrowLeftIcon}
               iconPosition="left"
             >
-              {url.url}
+              {url.host.host}
             </Button>
           </Link>
+        </Title>
+
+        <Title>
+          <Link href={`/url/${url.id}`}>{url.url}</Link>
         </Title>
 
         <Text>
@@ -127,6 +131,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const url = await prisma.url.findUnique({
     where: {
       id,
+    },
+    include: {
+      host: true,
     },
   })
 
