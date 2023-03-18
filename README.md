@@ -2,6 +2,20 @@
 
 ![](https://screenshotter.vercel.app/screenshot?url=https://pageview.duyet.net&viewport=1728,1117)
 
+Add this snippet to your website:
+
+```html
+<script>
+  !(function (d, src) {
+    let s = d.createElement('script')
+    s.src = src
+    d.body.appendChild(s)
+  })(document, 'https://pageview.duyet.net/pageview.js')
+</script>
+```
+
+Checkout result at: https://pageview.duyet.net
+
 ## Development
 
 To run the development server, execute the following command:
