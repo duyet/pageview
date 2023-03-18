@@ -7,13 +7,12 @@ import { ArrowNarrowLeftIcon } from '@heroicons/react/solid'
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
 import prisma from '../../lib/prisma'
 
-type TopCountry = Prisma.PageViewGroupByOutputType & {
-  country: Country
-}
+type TopCountry = Prisma.PageViewGroupByOutputType &
+  Country & {
+    _count: number
+  }
 
-type TopUA = Prisma.PageViewGroupByOutputType & {
-  ua: UA
-}
+type TopUA = Prisma.PageViewGroupByOutputType & UA
 
 type TopOS = {
   os: string
@@ -79,7 +78,7 @@ export default function Home({
             className="mt-6"
             data={topOS.map((row: TopOS) => ({
               name: row.os as unknown as string,
-              value: row._count as unknown as number,
+              value: row._count,
             }))}
           />
         </Card>
@@ -114,8 +113,8 @@ export default function Home({
           <BarList
             className="mt-6"
             data={topCountry.map((row: TopCountry) => ({
-              name: row.country.country || 'N/A',
-              value: row._count as unknown as number,
+              name: row.country || 'N/A',
+              value: row._count,
             }))}
           />
         </Card>
@@ -164,7 +163,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
         return {
           ...row,
-          country,
+          ...country,
         }
       })
   )
@@ -192,7 +191,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
       return {
         ...row,
-        ua,
+        ...ua,
       }
     })
   )

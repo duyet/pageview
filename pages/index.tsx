@@ -4,14 +4,15 @@ import { Card, Flex, Grid } from '@tremor/react'
 import { List, ListItem, Text, Bold, Metric, Button } from '@tremor/react'
 import { ArrowNarrowRightIcon } from '@heroicons/react/solid'
 
-import { Host } from '@prisma/client'
+import { Prisma, Host } from '@prisma/client'
 
 import prisma from '../lib/prisma'
 import { Usage } from '../components/Usage'
 
+type DomainStat = Prisma.UrlGroupByOutputType & Host
+
 type Props = {
-  domainStats: Host[]
-  hosts: Record<string, string>
+  domainStats: DomainStat[]
   currentHost: string
   totalPageViews: number
   totalUrls: number
@@ -19,7 +20,6 @@ type Props = {
 
 export default function Home({
   domainStats,
-  hosts,
   currentHost,
   totalPageViews,
   totalUrls,
@@ -35,7 +35,7 @@ export default function Home({
           <Flex alignItems="start">
             <Text>Domain</Text>
           </Flex>
-          <Metric>{Object.keys(hosts).length}</Metric>
+          <Metric>{domainStats.length}</Metric>
         </Card>
         <Card>
           <Text>URL</Text>
@@ -57,7 +57,7 @@ export default function Home({
       <Card className="mt-6">
         <List>
           {domainStats.map((row: any) => {
-            const hostName = hosts[row.hostId]
+            const hostName = row.host
 
             return (
               <Link href={`/domain/` + hostName} key={row.hostId}>
@@ -96,21 +96,33 @@ export default function Home({
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const currentHost = req.headers.host as string
 
-  const domainStats = await prisma.url.groupBy({
+  const hostIdCount = await prisma.url.groupBy({
     by: ['hostId'],
     _count: true,
+    orderBy: {
+      hostId: 'desc',
+    },
   })
 
-  const hosts: Props['hosts'] = {}
-  const _ = (await prisma.host.findMany()).forEach((row) => {
-    hosts[row.id] = row.host
-  })
+  const domainStats = await Promise.all(
+    hostIdCount.map(async (row) => {
+      const host = await prisma.host.findUnique({
+        where: { id: row.hostId },
+      })
+
+      return {
+        ...row,
+        ...host,
+      }
+    })
+  )
+  console.log('Domain Stats:', domainStats)
 
   const totalPageViews = await prisma.pageView.count()
 
   const totalUrls = await prisma.url.count()
 
   return {
-    props: { domainStats, hosts, currentHost, totalPageViews, totalUrls },
+    props: { domainStats, currentHost, totalPageViews, totalUrls },
   }
 }
