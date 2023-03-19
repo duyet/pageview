@@ -5,6 +5,18 @@ import { genScript } from './pageview'
 export async function middleware(req: NextRequest) {
   const { nextUrl: url, geo, ip } = req
 
+  if (url.pathname.startsWith('/pageview.js')) {
+    // Get content from public/pageview.js
+    const content = genScript(`${url.protocol}//${url.host}/api/pageview`)
+
+    return new NextResponse(content, {
+      headers: {
+        'Content-Type': 'text/javascript',
+        'Cache-Control': 'public, max-age=604800, immutable',
+      },
+    })
+  }
+
   // Geo
   url.searchParams.set('ip', ip || '')
   url.searchParams.set('country', geo?.country || '')
@@ -23,15 +35,6 @@ export async function middleware(req: NextRequest) {
   url.searchParams.set('deviceModel', parsedUA.device.model || '')
   url.searchParams.set('deviceType', parsedUA.device.type || '')
   url.searchParams.set('isBot', parsedUA.isBot.toString())
-
-  if (url.pathname.startsWith('/pageview.js')) {
-    // Get content from public/pageview.js
-    const content = genScript(`${url.protocol}//${url.host}/api/pageview`)
-
-    return new NextResponse(content, {
-      headers: { 'Content-Type': 'text/javascript' },
-    })
-  }
 
   if (url.pathname.startsWith('/api')) {
     return NextResponse.rewrite(url)
