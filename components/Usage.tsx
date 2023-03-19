@@ -7,6 +7,13 @@ type Props = {
   currentHost: string
 }
 
+const getJsSnippet = (currentHost: string) => `
+!function(e,n,t){e.onload=function(){
+let e=n.createElement("script");
+e.src=t,n.body.appendChild(e)}}
+(window,document,"//${currentHost}/pageview.js");
+`
+
 export const Usage = ({ currentHost }: Props) => {
   const [tab, setTab] = useState<UsageType>('js')
 
@@ -22,14 +29,12 @@ export const Usage = ({ currentHost }: Props) => {
       </TabList>
 
       {tab === 'js' && (
-        <pre>
-          {`
-<script>
-!(function(d,src){let s=d.createElement('script');
-s.src=src;d.body.appendChild(s)})(document,'//${currentHost}/pageview.js')
-</script>
-          `}
-        </pre>
+        <div className="mt-6">
+          <Text>
+            In your <code>HTML</code>
+          </Text>
+          <pre>{`<script>${getJsSnippet(currentHost)}</script>`}</pre>
+        </div>
       )}
 
       {tab === 'nextjs' && (
@@ -42,10 +47,7 @@ s.src=src;d.body.appendChild(s)})(document,'//${currentHost}/pageview.js')
 import Script from 'next/script'
 
 <Script id='pageview' strategy='afterInteractive'>
-  \{\`
-    !(function(d,src){let s=d.createElement('script');
-    s.src=src;d.body.appendChild(s)})(document,'//${currentHost}/pageview.js')
-  \`\}
+\{\`${getJsSnippet(currentHost)}\`\}
 </Script>
           `}
           </pre>
