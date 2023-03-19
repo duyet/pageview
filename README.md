@@ -8,11 +8,12 @@ Add this snippet to your website:
 
 ```html
 <script>
-  !(function (d, src) {
-    let s = d.createElement('script')
-    s.src = src
-    d.body.appendChild(s)
-  })(document, 'https://pageview.duyet.net/pageview.js')
+  !(function (e, n, t) {
+    e.onload = function () {
+      let e = n.createElement('script')
+      ;(e.src = t), n.body.appendChild(e)
+    }
+  })(window, document, 'https://pageview.duyet.net/pageview.js')
 </script>
 ```
 
@@ -41,6 +42,13 @@ For deployment on Vercel, follow these links for instructions:
 
 - https://www.prisma.io/docs/guides/database/using-prisma-with-planetscale
 - [Next.js deployment documentation](https://nextjs.org/docs/deployment).
+
+## Project note
+
+Disclaimer: This project is not intended for scale and is for personal usage only.
+I may consider scaling it later on.
+The main purpose of this project is to demonstrate how to use Next.js,
+PlanetScale, TurboRepo, Vercel and some modern React components.
 
 ## License
 
