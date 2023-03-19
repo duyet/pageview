@@ -34,8 +34,10 @@ export default function App({ Component, pageProps }: AppProps) {
       </Script>
       <Script id="pageview" strategy="afterInteractive">
         {`
-          !(function(d,src){let s=d.createElement('script');
-          s.src=src;d.body.appendChild(s)})(document,'/pageview.js')
+          !function(e,n,t){e.onload=function(){
+          let e=n.createElement("script");
+          e.src=t,n.body.appendChild(e)}}
+          (window,document,"/pageview.js");
         `}
       </Script>
     </main>
