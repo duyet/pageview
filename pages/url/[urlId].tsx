@@ -1,11 +1,26 @@
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { Card, Text, Grid, Button } from '@tremor/react'
+import { Card, Text, Grid, Flex, Button } from '@tremor/react'
 import { Title, BarList } from '@tremor/react'
-import { ArrowNarrowLeftIcon } from '@heroicons/react/solid'
+import { ArrowNarrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
 import prisma from '../../lib/prisma'
+import dayjs from '../../lib/dayjs'
+
+type UrlWithHost = Url & {
+  host: Host
+}
+
+type PageViewStats = Prisma.AggregatePageView & {
+  _min: {
+    createdAt: string
+  }
+  _max: {
+    createdAt: string
+  }
+  _count: number
+}
 
 type TopCountry = Prisma.PageViewGroupByOutputType &
   Country & {
@@ -35,7 +50,8 @@ type TopDevice = {
 }
 
 type Props = {
-  url: Url & { host: Host }
+  url: UrlWithHost
+  pageviewStats: PageViewStats
   topCountry: TopCountry[]
   topUA: TopUA[]
   topOS: TopOS[]
@@ -46,6 +62,7 @@ type Props = {
 
 export default function Home({
   url,
+  pageviewStats,
   topCountry,
   topOS,
   topBrowser,
@@ -68,13 +85,35 @@ export default function Home({
           </Link>
         </Title>
 
-        <Title>
-          <Link href={`/url/${url.id}`}>{url.url}</Link>
-        </Title>
+        <a href={url.url} target="_blank">
+          <Button
+            size="sm"
+            variant="light"
+            icon={ExternalLinkIcon}
+            iconPosition="right"
+          >
+            {url.url}
+          </Button>
+        </a>
 
-        <Text>
-          <>First seen: {url.createdAt}</>
-        </Text>
+        <Flex justifyContent="between" className="mt-3">
+          <div>
+            <Title title={pageviewStats._min?.createdAt}>
+              {dayjs(pageviewStats._min?.createdAt).fromNow()}
+            </Title>
+            <Text>First Seen</Text>
+          </div>
+          <div className="text-center">
+            <Title>{pageviewStats._count}</Title>
+            <Text>Total</Text>
+          </div>
+          <div className="text-right">
+            <Title title={pageviewStats._max?.createdAt}>
+              {dayjs(pageviewStats._max?.createdAt).fromNow()}
+            </Title>
+            <Text className="text-right">Last Seen</Text>
+          </div>
+        </Flex>
       </Card>
 
       <Grid numColsMd={2} className="mt-6 gap-6">
@@ -169,6 +208,21 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   })
   console.log('topCountryId', topCountryId)
 
+  // Pageview stats (first seen, last seen, total, ...)
+  const pageviewStats = await prisma.pageView.aggregate({
+    where: {
+      urlId: id,
+    },
+    _count: true,
+    _min: {
+      createdAt: true,
+    },
+    _max: {
+      createdAt: true,
+    },
+  })
+  console.log('pageviewStats', pageviewStats)
+
   // TODO: low performance
   const topCountry = await Promise.all(
     topCountryId
@@ -235,6 +289,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   return {
     props: {
       url: JSON.parse(JSON.stringify(url)),
+      pageviewStats: JSON.parse(JSON.stringify(pageviewStats)),
       topCountry,
       topUA,
       topOS,
