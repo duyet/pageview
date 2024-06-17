@@ -1,8 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", "schedule:weekly"],
-  "automerge": true,
-  "automergeType": "pr",
-  "assignAutomerge": true,
-  "assignees": ["duyetbot"]
+  "extends": [
+    "config:base",
+    "schedule:daily",
+    "group:allNonMajor",
+    "group:nextjsMonorepo",
+    "schedule:weekly",
+    "schedule:automergeWeekly",
+    "security:openssf-scorecard"
+  ],
+  "automerge": true
 }
