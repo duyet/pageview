@@ -62,10 +62,10 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
           <Line
             type="monotone"
             dataKey="views"
-            stroke="hsl(var(--primary))"
+            stroke="#f59e0b"
             strokeWidth={2}
-            dot={{ r: 3 }}
-            activeDot={{ r: 5 }}
+            dot={{ r: 3, fill: '#f59e0b' }}
+            activeDot={{ r: 5, fill: '#f59e0b' }}
           />
         </LineChart>
       </ResponsiveContainer>

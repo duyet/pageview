@@ -75,17 +75,17 @@ export function TrendsChart({ data, loading }: TrendsChartProps) {
           <Line
             type="monotone"
             dataKey="pageviews"
-            stroke="hsl(var(--primary))"
+            stroke="#3b82f6"
             strokeWidth={2}
-            dot={{ r: 4 }}
+            dot={{ r: 4, fill: '#3b82f6' }}
             name="Page Views"
           />
           <Line
             type="monotone"
             dataKey="uniqueVisitors"
-            stroke="hsl(var(--secondary))"
+            stroke="#10b981"
             strokeWidth={2}
-            dot={{ r: 4 }}
+            dot={{ r: 4, fill: '#10b981' }}
             name="Unique Visitors"
           />
         </LineChart>
