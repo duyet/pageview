@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { BarChart3, Home } from 'lucide-react'
+import { BarChart3, Home, Activity } from 'lucide-react'
 
 import logo from '../public/logo.png'
 import { Button } from '@/components/ui/button'
@@ -37,6 +37,17 @@ export const Header = () => {
             <Link href="/analytics">
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
+            </Link>
+          </Button>
+
+          <Button
+            variant={router.pathname === '/realtime' ? 'default' : 'ghost'}
+            size="sm"
+            asChild
+          >
+            <Link href="/realtime">
+              <Activity className="h-4 w-4 mr-2" />
+              Real-time
             </Link>
           </Button>
         </nav>
