@@ -44,7 +44,7 @@ yarn fmt  # Prettier formatting
 
 ## Database Management
 
-The project uses Prisma with MySQL (PlanetScale). Database schema is normalized with separate models for:
+The project uses Prisma with PostgreSQL (Neon database). Database schema is normalized with separate models for:
 
 - PageView: Main analytics record
 - Url/Host/Slug: Normalized URL components
@@ -53,7 +53,8 @@ The project uses Prisma with MySQL (PlanetScale). Database schema is normalized 
 
 Key considerations:
 
-- Uses `relationMode = "prisma"` for PlanetScale compatibility
+- Uses native PostgreSQL foreign key constraints for data integrity
+- Comprehensive indexing strategy for optimal query performance
 - `connectOrCreate` pattern used extensively to handle normalization
 - Migration files in `prisma/migrations/`
 

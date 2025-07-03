@@ -6,29 +6,34 @@ generator client {
 }
 
 datasource db {
-  provider          = "mysql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  relationMode      = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model PageView {
   id Int @id @default(autoincrement())
 
   urlId Int
-  url   Url @relation(fields: [urlId], references: [id])
+  url   Url @relation(fields: [urlId], references: [id], onDelete: Cascade)
 
   // Request info
   ip        String?
   countryId Int?
-  country   Country? @relation(fields: [countryId], references: [id])
+  country   Country? @relation(fields: [countryId], references: [id], onDelete: SetNull)
   cityId    Int?
-  city      City?    @relation(fields: [cityId], references: [id])
+  city      City?    @relation(fields: [cityId], references: [id], onDelete: SetNull)
   uAId      Int?
-  ua        UA?      @relation(fields: [uAId], references: [id])
+  ua        UA?      @relation(fields: [uAId], references: [id], onDelete: SetNull)
 
   // Metadata
   createdAt DateTime @default(now())
+
+  // Add indexes for better performance
+  @@index([urlId])
+  @@index([countryId])
+  @@index([cityId])
+  @@index([uAId])
+  @@index([createdAt])
 }
 
 model Url {
@@ -36,26 +41,35 @@ model Url {
   url String @unique
 
   hostId Int
-  host   Host @relation(fields: [hostId], references: [id])
+  host   Host @relation(fields: [hostId], references: [id], onDelete: Cascade)
 
   slugId Int
-  slug   Slug @relation(fields: [slugId], references: [id])
+  slug   Slug @relation(fields: [slugId], references: [id], onDelete: Cascade)
 
   pageViews PageView[]
 
   createdAt DateTime @default(now())
+
+  // Add indexes for better performance
+  @@index([hostId])
+  @@index([slugId])
+  @@index([createdAt])
 }
 
 model Host {
   id   Int    @id @default(autoincrement())
   host String @unique
   urls Url[]
+
+  @@index([host])
 }
 
 model Slug {
   id   Int    @id @default(autoincrement())
   slug String @unique
   urls Url[]
+
+  @@index([slug])
 }
 
 model UA {
@@ -72,16 +86,25 @@ model UA {
   deviceType     String?
   isBot          Boolean?
   pageViews      PageView[]
+
+  @@index([ua])
+  @@index([browser])
+  @@index([os])
+  @@index([isBot])
 }
 
 model Country {
   id        Int        @id @default(autoincrement())
   country   String     @unique
   pageViews PageView[]
+
+  @@index([country])
 }
 
 model City {
   id        Int        @id @default(autoincrement())
   city      String     @unique
   pageViews PageView[]
+
+  @@index([city])
 }
