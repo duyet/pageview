@@ -15,16 +15,16 @@ interface DeviceChartProps {
 }
 
 const COLORS = [
-  'hsl(var(--primary))',
-  'hsl(var(--secondary))',
-  'hsl(var(--accent))',
-  'hsl(var(--muted))',
-  '#8884d8',
-  '#82ca9d',
-  '#ffc658',
-  '#ff7c7c',
-  '#8dd1e1',
-  '#d084d0',
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#06b6d4',
+  '#84cc16',
+  '#f97316',
+  '#ec4899',
+  '#6366f1',
 ]
 
 export function DeviceChart({ data, title, loading }: DeviceChartProps) {
