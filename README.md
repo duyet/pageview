@@ -12,7 +12,7 @@ Add this snippet to your website:
   !(function (e, n, t) {
     e.onload = function () {
       let e = n.createElement('script')
-      ;(e.src = t), n.body.appendChild(e)
+      ;((e.src = t), n.body.appendChild(e))
     }
   })(window, document, 'https://pageview.duyet.net/pageview.js')
 </script>

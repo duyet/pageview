@@ -66,7 +66,7 @@ export default function Home({
                     <img
                       src={`https://www.google.com/s2/favicons?sz=256&domain=${hostName}`}
                       alt={hostName}
-                      className="mr-2 h-6 w-6"
+                      className="mr-2 size-6"
                     />
 
                     <div>
