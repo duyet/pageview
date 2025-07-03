@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { TabList, Tab, Text, Title } from '@tremor/react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export type UsageType = 'js' | 'nextjs' | 'badge'
 
@@ -15,63 +14,78 @@ e.src=t,n.body.appendChild(e)}}
 `
 
 export const Usage = ({ currentHost }: Props) => {
-  const [tab, setTab] = useState<UsageType>('js')
-
   return (
-    <>
-      <TabList
-        defaultValue="1"
-        onValueChange={(value) => setTab(value as UsageType)}
-      >
-        <Tab value="js" text="JS" />
-        <Tab value="nextjs" text="Next.js" />
-        <Tab value="badge" text="Badge" />
-      </TabList>
+    <div>
+      <h3 className="text-lg font-semibold mb-4">Integration Examples</h3>
 
-      {tab === 'js' && (
-        <div className="mt-6">
-          <Text>
-            In your <code>HTML</code>
-          </Text>
-          <pre>{`<script>${getJsSnippet(currentHost)}</script>`}</pre>
-        </div>
-      )}
+      <Tabs defaultValue="js" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="js">JavaScript</TabsTrigger>
+          <TabsTrigger value="nextjs">Next.js</TabsTrigger>
+          <TabsTrigger value="badge">Badge</TabsTrigger>
+        </TabsList>
 
-      {tab === 'nextjs' && (
-        <div className="mt-6">
-          <Text>
-            In your <code>_app.tsx</code>
-          </Text>
-          <pre>
-            {`
-import Script from 'next/script'
+        <TabsContent value="js" className="mt-6">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                Add this script to your{' '}
+                <code className="bg-muted px-1 py-0.5 rounded text-sm">
+                  HTML
+                </code>
+              </p>
+              <div className="rounded-md bg-muted p-4 font-mono text-sm overflow-x-auto">
+                <pre>{`<script>${getJsSnippet(currentHost)}</script>`}</pre>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="nextjs" className="mt-6">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">
+                Add this to your{' '}
+                <code className="bg-muted px-1 py-0.5 rounded text-sm">
+                  _app.tsx
+                </code>
+              </p>
+              <div className="rounded-md bg-muted p-4 font-mono text-sm overflow-x-auto">
+                <pre>{`import Script from 'next/script'
 
 <Script id='pageview' strategy='afterInteractive'>
-\{\`${getJsSnippet(currentHost)}\`\}
-</Script>
-          `}
-          </pre>
-        </div>
-      )}
+  {\`${getJsSnippet(currentHost)}\`}
+</Script>`}</pre>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
 
-      {tab === 'badge' && (
-        <>
-          <div className="mt-6">
-            <Title>URL</Title>
-            <Text>{`https://${currentHost}/api/badge?url=<url>`}</Text>
+        <TabsContent value="badge" className="mt-6">
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-medium mb-2">URL</h4>
+              <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                {`https://${currentHost}/api/badge?url=<url>`}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-2">HTML</h4>
+              <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                {`<img src="https://${currentHost}/api/badge?url=<url>" />`}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-2">Markdown</h4>
+              <div className="rounded-md bg-muted p-4 font-mono text-sm">
+                {`![PageView](https://${currentHost}/api/badge?url=<url>)`}
+              </div>
+            </div>
           </div>
-          <div className="mt-6">
-            <Title>HTML</Title>
-            <Text className="prose">{`<img src="https://${currentHost}/api/badge?url=<url>" />`}</Text>
-          </div>
-          <div className="mt-6">
-            <Title>Markdown</Title>
-            <Text>
-              [PageView]({`https://${currentHost}/api/badge?url=<url>`})
-            </Text>
-          </div>
-        </>
-      )}
-    </>
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }
