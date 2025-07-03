@@ -94,18 +94,21 @@ The tracking script (`pageview.ts`) implements:
 ### 🎯 High Priority Features (Implement First)
 
 #### 1. Real-time Analytics Dashboard
+
 - **Branch**: `feat/realtime-analytics`
 - **Components**: WebSocket integration, live visitor count, real-time charts
 - **Dependencies**: `ws`, `recharts`, `socket.io`
 - **Implementation**: Add WebSocket server, real-time data streaming, live dashboard updates
 
-#### 2. Interactive Charts & Visualizations  
+#### 2. Interactive Charts & Visualizations
+
 - **Branch**: `feat/interactive-charts`
 - **Components**: Time series charts, geographic maps, device breakdowns
 - **Dependencies**: `recharts`, `@tremor/react` (charts), date picker
 - **Implementation**: shadcn/ui charts, responsive data visualization, filtering
 
 #### 3. Advanced Analytics & Insights
+
 - **Branch**: `feat/advanced-analytics`
 - **Components**: Trends analysis, bounce rate, session tracking, referrer analysis
 - **Implementation**: Enhanced data collection, analytics calculations, insights dashboard
@@ -113,16 +116,19 @@ The tracking script (`pageview.ts`) implements:
 ### 🚀 Medium Priority Features
 
 #### 4. Event Tracking System
+
 - **Branch**: `feat/event-tracking`
 - **Components**: Custom event collection, goal tracking, conversion funnels
 - **Implementation**: Extend tracking script, new API endpoints, event analytics
 
 #### 5. Multi-Project Dashboard
+
 - **Branch**: `feat/multi-project`
 - **Components**: Project switching, consolidated analytics, team management
 - **Implementation**: Project model, permissions, multi-tenant architecture
 
 #### 6. Smart Alerts & Notifications
+
 - **Branch**: `feat/alerts-notifications`
 - **Components**: Traffic alerts, email reports, notification system
 - **Dependencies**: `nodemailer`, notification service integration
@@ -131,16 +137,19 @@ The tracking script (`pageview.ts`) implements:
 ### 🔧 Quick Wins & Enhancements
 
 #### 7. Enhanced Data Collection
+
 - **Branch**: `feat/enhanced-tracking`
 - **Components**: Referrer tracking, session IDs, scroll depth, time on page
 - **Implementation**: Extend pageview.js, additional data points, session management
 
 #### 8. Export & API Enhancements
+
 - **Branch**: `feat/export-api`
 - **Components**: CSV export, enhanced API endpoints, data filtering
 - **Implementation**: Export utilities, REST API extensions, data serialization
 
 #### 9. Performance Optimizations
+
 - **Branch**: `feat/performance`
 - **Components**: Caching, pagination, query optimization, CDN integration
 - **Implementation**: Redis caching, database optimization, performance monitoring
@@ -148,6 +157,7 @@ The tracking script (`pageview.ts`) implements:
 ### 📱 Future Enhancements
 
 #### 10. Mobile App (Optional)
+
 - **Branch**: `feat/mobile-app`
 - **Framework**: React Native or Flutter
 - **Components**: Mobile analytics, push notifications, offline support
