@@ -10,53 +10,76 @@ import { cn } from '@/lib/utils'
 export const Header = () => {
   const router = useRouter()
 
+  const navItems = [
+    { href: '/', icon: Home, label: 'Dashboard' },
+    { href: '/analytics', icon: BarChart3, label: 'Analytics' },
+    { href: '/realtime', icon: Activity, label: 'Real-time' },
+  ]
+
   return (
-    <header className="flex items-center justify-between mb-10">
-      <div className="flex items-center space-x-8">
-        <Link href="/" className="flex items-center space-x-2">
-          <h1 className="text-xl font-bold">pageview</h1>
-        </Link>
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">
+                P
+              </span>
+            </div>
+            <span className="font-semibold text-lg">pageview</span>
+          </Link>
 
-        <nav className="flex items-center space-x-4">
-          <Button
-            variant={router.pathname === '/' ? 'default' : 'ghost'}
-            size="sm"
-            asChild
+          <nav className="hidden md:flex items-center space-x-1">
+            {navItems.map(({ href, icon: Icon, label }) => (
+              <Button
+                key={href}
+                variant={router.pathname === href ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+                className="h-9"
+              >
+                <Link href={href} className="flex items-center space-x-2">
+                  <Icon className="h-4 w-4" />
+                  <span className="hidden lg:inline">{label}</span>
+                </Link>
+              </Button>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <nav className="md:hidden flex items-center space-x-1">
+            {navItems.map(({ href, icon: Icon, label }) => (
+              <Button
+                key={href}
+                variant={router.pathname === href ? 'default' : 'ghost'}
+                size="sm"
+                asChild
+                className="h-9 w-9 p-0"
+              >
+                <Link href={href} title={label}>
+                  <Icon className="h-4 w-4" />
+                </Link>
+              </Button>
+            ))}
+          </nav>
+
+          <a
+            href="https://duyet.net"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-2"
           >
-            <Link href="/">
-              <Home className="h-4 w-4 mr-2" />
-              Dashboard
-            </Link>
-          </Button>
-
-          <Button
-            variant={router.pathname === '/analytics' ? 'default' : 'ghost'}
-            size="sm"
-            asChild
-          >
-            <Link href="/analytics">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Link>
-          </Button>
-
-          <Button
-            variant={router.pathname === '/realtime' ? 'default' : 'ghost'}
-            size="sm"
-            asChild
-          >
-            <Link href="/realtime">
-              <Activity className="h-4 w-4 mr-2" />
-              Real-time
-            </Link>
-          </Button>
-        </nav>
-      </div>
-
-      <div>
-        <a href="https://duyet.net" target="_blank" rel="noopener noreferrer">
-          <Image src={logo} alt="Logo" width={50} height={50} priority />
-        </a>
+            <Image
+              src={logo}
+              alt="Logo"
+              width={32}
+              height={32}
+              className="rounded-full hover:opacity-80 transition-opacity"
+              priority
+            />
+          </a>
+        </div>
       </div>
     </header>
   )
