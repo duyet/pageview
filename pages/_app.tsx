@@ -1,9 +1,11 @@
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import Script from 'next/script'
+import { Toaster } from 'sonner'
 
 import '../styles/globals.css'
 import { Header } from '../components/Header'
+import { CommandPalette } from '../components/CommandPalette'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID
 
@@ -19,6 +21,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <Header />
         <Component {...pageProps} />
       </div>
+
+      <CommandPalette />
+      <Toaster position="top-right" richColors />
 
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
