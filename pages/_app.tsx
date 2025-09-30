@@ -11,16 +11,14 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <main className="bg-slate-50 p-6 sm:p-10">
+    <main className="min-h-screen bg-neutral-50">
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen">
-        <Header />
-        <Component {...pageProps} />
-      </div>
+      <Header />
+      <Component {...pageProps} />
 
       <CommandPalette />
       <Toaster position="top-right" richColors />
