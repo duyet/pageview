@@ -1,24 +1,27 @@
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import Script from 'next/script'
+import { Toaster } from 'sonner'
 
 import '../styles/globals.css'
 import { Header } from '../components/Header'
+import { CommandPalette } from '../components/CommandPalette'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <main className="bg-slate-50 p-6 sm:p-10">
+    <main className="min-h-screen bg-neutral-50">
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="min-h-screen">
-        <Header />
-        <Component {...pageProps} />
-      </div>
+      <Header />
+      <Component {...pageProps} />
+
+      <CommandPalette />
+      <Toaster position="top-right" richColors />
 
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}

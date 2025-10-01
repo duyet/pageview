@@ -1,10 +1,6 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { BarChart3, Home, Activity } from 'lucide-react'
-
-import logo from '../public/logo.png'
-import { Button } from '@/components/ui/button'
+import { BarChart3, Home, Activity, Command } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const Header = () => {
@@ -17,68 +13,71 @@ export const Header = () => {
   ]
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">
-                P
-              </span>
+    <header className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="flex items-center space-x-2 group"
+          >
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
+              <svg
+                className="h-4.5 w-4.5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
             </div>
-            <span className="font-semibold text-lg">pageview</span>
+            <span className="font-semibold text-[15px] text-foreground">
+              pageview
+            </span>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map(({ href, icon: Icon, label }) => (
-              <Button
-                key={href}
-                variant={router.pathname === href ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-                className="h-9"
-              >
-                <Link href={href} className="flex items-center space-x-2">
+          {/* Navigation */}
+          <nav className="flex items-center space-x-1">
+            {navItems.map(({ href, icon: Icon, label }) => {
+              const isActive = router.pathname === href
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all',
+                    isActive
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  )}
+                >
                   <Icon className="h-4 w-4" />
-                  <span className="hidden lg:inline">{label}</span>
+                  <span className="hidden sm:inline">{label}</span>
                 </Link>
-              </Button>
-            ))}
-          </nav>
-        </div>
+              )
+            })}
 
-        <div className="flex items-center space-x-2">
-          <nav className="md:hidden flex items-center space-x-1">
-            {navItems.map(({ href, icon: Icon, label }) => (
-              <Button
-                key={href}
-                variant={router.pathname === href ? 'default' : 'ghost'}
-                size="sm"
-                asChild
-                className="h-9 w-9 p-0"
-              >
-                <Link href={href} title={label}>
-                  <Icon className="h-4 w-4" />
-                </Link>
-              </Button>
-            ))}
+            {/* Command Palette Hint */}
+            <button
+              className="ml-2 hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+              onClick={() => {
+                const event = new KeyboardEvent('keydown', {
+                  key: 'k',
+                  metaKey: true,
+                  bubbles: true
+                })
+                document.dispatchEvent(event)
+              }}
+            >
+              <Command className="h-3.5 w-3.5" />
+              <span className="text-xs">⌘K</span>
+            </button>
           </nav>
-
-          <a
-            href="https://duyet.net"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-2"
-          >
-            <Image
-              src={logo}
-              alt="Logo"
-              width={32}
-              height={32}
-              className="rounded-full hover:opacity-80 transition-opacity"
-              priority
-            />
-          </a>
         </div>
       </div>
     </header>
