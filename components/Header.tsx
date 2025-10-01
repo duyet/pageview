@@ -13,17 +13,17 @@ export const Header = () => {
   ]
 
   return (
-    <header className="border-b border-neutral-200 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+    <header className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
             href="/"
             className="flex items-center space-x-2 group"
           >
-            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
               <svg
-                className="h-4 w-4 text-white"
+                className="h-4.5 w-4.5 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -36,7 +36,7 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="font-semibold text-[15px] text-neutral-900">
+            <span className="font-semibold text-[15px] text-foreground">
               pageview
             </span>
           </Link>
@@ -50,10 +50,10 @@ export const Header = () => {
                   key={href}
                   href={href}
                   className={cn(
-                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium transition-colors',
+                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all',
                     isActive
-                      ? 'bg-neutral-100 text-neutral-900'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -64,7 +64,7 @@ export const Header = () => {
 
             {/* Command Palette Hint */}
             <button
-              className="ml-2 hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50 transition-colors"
+              className="ml-2 hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
               onClick={() => {
                 const event = new KeyboardEvent('keydown', {
                   key: 'k',
