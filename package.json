@@ -31,7 +31,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.23.22",
-    "lucide-react": "^0.544.0",
+    "lucide-react": "^0.552.0",
     "next": "14.2.33",
     "normalize-url": "^8.0.2",
     "react": "18.3.1",
@@ -49,8 +49,8 @@
     "typescript": "5.9.3"
   },
   "devDependencies": {
-    "@types/node": "22.18.8",
-    "@types/react": "18.3.25",
+    "@types/node": "22.18.13",
+    "@types/react": "18.3.26",
     "@types/react-dom": "18.3.7",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
