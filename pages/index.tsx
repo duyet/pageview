@@ -178,7 +178,7 @@ export default function Home({
       <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
         {/* Hero Section */}
         <section className="border-b border-neutral-200 dark:border-neutral-700">
-          <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+          <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
             <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 dark:bg-neutral-800">
               <TrendingUp className="size-3 text-neutral-500 dark:text-neutral-400" />
               <span className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -218,7 +218,7 @@ export default function Home({
 
         {/* Stats Grid */}
         <section className="border-b border-neutral-200 dark:border-neutral-700">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+          <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <motion.div
               variants={container}
               initial="hidden"
@@ -272,7 +272,7 @@ export default function Home({
 
         {/* Traffic Trends Chart */}
         <section className="border-b border-neutral-200 dark:border-neutral-700">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+          <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
                 <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
@@ -289,7 +289,7 @@ export default function Home({
 
         {/* Quick Start Section */}
         <section className="border-b border-neutral-200 dark:border-neutral-700">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+          <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
                 <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
@@ -305,8 +305,8 @@ export default function Home({
         </section>
 
         {/* Tracked Domains List */}
-        <section className="pb-12">
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+        <section className="pb-8">
+          <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-base font-medium text-neutral-900 dark:text-neutral-100">
