@@ -7,6 +7,7 @@ import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import prisma from '@/lib/prisma'
+import { analyzeDomain } from '@/lib/domainGrouping'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -203,29 +204,49 @@ export default function DomainPage({
 }
 
 /**
- * Helper function to detect preview subdomains
+ * Helper function to detect preview subdomains and find related domains
+ * Uses intelligent token-based analysis instead of hardcoded patterns
  */
-function isPreviewSubdomain(hostname: string): {
-  isPreview: boolean
-  baseDomain: string | null
-} {
-  const previewPattern = /^[a-f0-9]{8}\.([\w-]+\.[\w-]+\.[\w]+)$/i
-  const match = hostname.match(previewPattern)
-  if (match) {
-    return { isPreview: true, baseDomain: match[1] }
+function findRelatedDomains(
+  targetDomain: string,
+  allDomains: string[]
+): string[] {
+  const targetAnalysis = analyzeDomain(targetDomain)
+  const related: string[] = [targetDomain]
+
+  // Find domains with similar project tokens
+  for (const domain of allDomains) {
+    if (domain === targetDomain) continue
+
+    const analysis = analyzeDomain(domain)
+
+    // Calculate token overlap
+    const targetTokens = new Set(targetAnalysis.projectTokens)
+    const domainTokens = new Set(analysis.projectTokens)
+    const targetTokensArray = Array.from(targetTokens)
+    const intersection = new Set(
+      targetTokensArray.filter((t) => domainTokens.has(t))
+    )
+
+    // If they share significant tokens, they're related
+    const similarity =
+      targetTokens.size > 0
+        ? intersection.size / Math.min(targetTokens.size, domainTokens.size)
+        : 0
+
+    if (similarity >= 0.6) {
+      related.push(domain)
+    }
   }
-  return { isPreview: false, baseDomain: null }
+
+  return related
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { domain } = query
   const requestedDomain = domain as string
 
-  // Check if this is a preview subdomain or base domain
-  const { isPreview, baseDomain } = isPreviewSubdomain(requestedDomain)
-  const targetBaseDomain = isPreview ? baseDomain : requestedDomain
-
-  // Get all hosts that match this domain or are preview subdomains
+  // Get all hosts to analyze
   const allHosts = await prisma.host.findMany({
     select: {
       id: true,
@@ -233,22 +254,23 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     },
   })
 
-  // Filter hosts that match the base domain or are its preview subdomains
-  const matchingHostIds = allHosts
-    .filter((host) => {
-      if (host.host === targetBaseDomain) return true
-      const { isPreview: hostIsPreview, baseDomain: hostBase } =
-        isPreviewSubdomain(host.host)
-      return hostIsPreview && hostBase === targetBaseDomain
-    })
-    .map((host) => host.id)
+  // Find all domains related to the requested domain
+  const allHostnames = allHosts.map((h: { id: number; host: string }) => h.host)
+  const relatedDomains = findRelatedDomains(requestedDomain, allHostnames)
 
-  // Count preview deployments
-  const previewCount = allHosts.filter((host) => {
-    if (host.host === targetBaseDomain) return false
-    const { isPreview: hostIsPreview, baseDomain: hostBase } =
-      isPreviewSubdomain(host.host)
-    return hostIsPreview && hostBase === targetBaseDomain
+  // Get IDs of all related hosts
+  const matchingHostIds = allHosts
+    .filter((host: { id: number; host: string }) =>
+      relatedDomains.includes(host.host)
+    )
+    .map((host: { id: number; host: string }) => host.id)
+
+  // Count preview deployments (all related domains except the requested one)
+  const targetAnalysis = analyzeDomain(requestedDomain)
+  const previewCount = relatedDomains.filter((d) => {
+    if (d === requestedDomain) return false
+    const analysis = analyzeDomain(d)
+    return analysis.isPreview
   }).length
 
   // Get URL stats for all matching hosts
@@ -277,7 +299,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   return {
     props: {
       urlStats,
-      domain: targetBaseDomain || requestedDomain,
+      domain: requestedDomain,
       totalPageviews,
       previewCount,
     },

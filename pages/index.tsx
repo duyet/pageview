@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 
 import prisma from '../lib/prisma'
+import { groupDomains, isPreviewDomain } from '../lib/domainGrouping'
 import { Usage } from '../components/Usage'
 import {
   Card,
@@ -457,83 +458,72 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     },
   })
 
-  // Helper function to detect preview subdomain patterns
-  // Matches patterns like: ba07956e.duyet-homelab.pages.dev, f41deecc.duyet-blog.pages.dev
-  const isPreviewSubdomain = (
-    hostname: string
-  ): { isPreview: boolean; baseDomain: string | null } => {
-    // Pattern: 8-char-hash.base-domain.tld
-    const previewPattern = /^[a-f0-9]{8}\.([\w-]+\.[\w-]+\.[\w]+)$/i
-    const match = hostname.match(previewPattern)
-
-    if (match) {
-      return { isPreview: true, baseDomain: match[1] }
-    }
-
-    return { isPreview: false, baseDomain: null }
-  }
-
-  // Group preview subdomains
-  const groupedDomains = new Map<string, any>()
-  const previewGroups = new Map<string, any[]>()
-
-  hosts.forEach((host: any) => {
-    const { isPreview, baseDomain } = isPreviewSubdomain(host.host)
-    const urlCount = host.urls.length
-    const pageViewsCount = host.urls.reduce(
+  // Build host data with stats
+  const hostData = hosts.map((host: any) => ({
+    hostId: host.id,
+    host: host.host,
+    urlCount: host.urls.length,
+    pageViews: host.urls.reduce(
       (sum: number, url: any) => sum + url._count.pageViews,
+      0
+    ),
+  }))
+
+  // Use intelligent grouping algorithm
+  const allHosts = hostData.map(
+    (h: {
+      hostId: number
+      host: string
+      urlCount: number
+      pageViews: number
+    }) => h.host
+  )
+  const domainGroups = groupDomains(allHosts)
+
+  // Build domain stats with grouping
+  const groupedDomains = new Map<string, any>()
+
+  domainGroups.forEach((groupMembers, canonical) => {
+    // Find all hosts in this group
+    const groupHosts = hostData.filter(
+      (h: {
+        hostId: number
+        host: string
+        urlCount: number
+        pageViews: number
+      }) => groupMembers.includes(h.host)
+    )
+
+    if (groupHosts.length === 0) return
+
+    // Calculate totals for the group
+    const totalUrls = groupHosts.reduce(
+      (sum: number, h: { urlCount: number }) => sum + h.urlCount,
+      0
+    )
+    const totalPageViews = groupHosts.reduce(
+      (sum: number, h: { pageViews: number }) => sum + h.pageViews,
       0
     )
 
-    if (isPreview && baseDomain) {
-      // Group preview deployments
-      if (!previewGroups.has(baseDomain)) {
-        previewGroups.set(baseDomain, [])
-      }
-      previewGroups.get(baseDomain)!.push({
-        hostId: host.id,
-        host: host.host,
-        _count: urlCount,
-        pageViews: pageViewsCount,
-      })
-    } else {
-      // Regular domain (or base domain without preview)
-      if (urlCount > 0) {
-        groupedDomains.set(host.host, {
-          hostId: host.id,
-          host: host.host,
-          _count: urlCount,
-          pageViews: pageViewsCount,
-          isGroup: false,
-        })
-      }
-    }
-  })
+    // Count preview deployments (exclude canonical)
+    const previewCount = groupHosts.filter(
+      (h: { host: string }) => h.host !== canonical && isPreviewDomain(h.host)
+    ).length
 
-  // Add grouped preview domains
-  previewGroups.forEach((previews, baseDomain) => {
-    const totalUrls = previews.reduce((sum, p) => sum + p._count, 0)
-    const totalPageViews = previews.reduce((sum, p) => sum + p.pageViews, 0)
+    // Find the main host (prefer canonical, or first one)
+    const mainHost =
+      groupHosts.find((h: { host: string }) => h.host === canonical) ||
+      groupHosts[0]
 
-    // Check if base domain exists in main domains
-    const existing = groupedDomains.get(baseDomain)
-
-    if (existing) {
-      // Merge with existing base domain
-      existing._count += totalUrls
-      existing.pageViews += totalPageViews
-      existing.previewCount = previews.length
-    } else {
-      // Create entry for preview group only
-      groupedDomains.set(baseDomain, {
-        hostId: previews[0].hostId, // Use first preview's ID
-        host: baseDomain,
-        _count: totalUrls,
-        pageViews: totalPageViews,
-        isGroup: true,
-        previewCount: previews.length,
-      })
-    }
+    groupedDomains.set(canonical, {
+      hostId: mainHost.hostId,
+      host: canonical,
+      _count: totalUrls,
+      pageViews: totalPageViews,
+      previewCount: previewCount > 0 ? previewCount : undefined,
+      isGroup: groupMembers.length > 1,
+    })
   })
 
   const domainStats = Array.from(groupedDomains.values())
