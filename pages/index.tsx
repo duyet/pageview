@@ -92,31 +92,31 @@ export default function Home({
         />
       </Head>
 
-      <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
-        {/* Claude-style Hero Section */}
-        <section className="border-b border-border/20">
-          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-2.5 py-0.5">
-              <TrendingUp className="size-3 text-foreground/40" />
-              <span className="text-xs text-muted-foreground">
+      <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+        {/* Hero Section */}
+        <section className="border-b border-neutral-200 dark:border-neutral-700">
+          <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 dark:bg-neutral-800">
+              <TrendingUp className="size-3 text-neutral-500 dark:text-neutral-400" />
+              <span className="text-xs text-neutral-600 dark:text-neutral-400">
                 <AnimatedNumber
                   value={totalPageViews}
-                  className="font-medium text-foreground/80"
+                  className="font-medium text-neutral-900 dark:text-neutral-100"
                 />{' '}
                 pageviews
               </span>
             </div>
 
-            <h1 className="mb-3 text-2xl font-normal tracking-tight text-foreground">
+            <h1 className="mb-3 text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
               Simple analytics, powerful insights
             </h1>
 
-            <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+            <p className="mb-6 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-base">
               Privacy-focused pageview tracking. No cookies, no complex setup.
             </p>
 
             {/* Features */}
-            <div className="flex gap-6 text-sm text-muted-foreground">
+            <div className="flex gap-6 text-sm text-neutral-600 dark:text-neutral-400">
               <div className="flex items-center gap-1.5">
                 <Zap className="size-4" />
                 <span>Fast</span>
@@ -134,49 +134,51 @@ export default function Home({
         </section>
 
         {/* Stats Grid */}
-        <section className="border-b border-border/20">
-          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <section className="border-b border-neutral-200 dark:border-neutral-700">
+          <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
             <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-1 gap-3 sm:grid-cols-3"
+              className="grid grid-cols-1 gap-4 sm:grid-cols-3"
             >
               <motion.div variants={item}>
-                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
                   <div className="mb-2 flex items-center gap-2">
-                    <BarChart3 className="size-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
+                    <BarChart3 className="size-4 text-neutral-500 dark:text-neutral-400" />
+                    <span className="text-sm text-neutral-600 dark:text-neutral-400">
                       Total Views
                     </span>
                   </div>
-                  <div className="text-2xl font-medium text-foreground">
+                  <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                     <AnimatedNumber value={totalPageViews} separator="," />
                   </div>
                 </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
                   <div className="mb-2 flex items-center gap-2">
-                    <Globe className="size-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
+                    <Globe className="size-4 text-neutral-500 dark:text-neutral-400" />
+                    <span className="text-sm text-neutral-600 dark:text-neutral-400">
                       Domains
                     </span>
                   </div>
-                  <div className="text-2xl font-medium text-foreground">
+                  <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                     <AnimatedNumber value={domainStats.length} />
                   </div>
                 </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
                   <div className="mb-2 flex items-center gap-2">
-                    <LinkIcon className="size-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">URLs</span>
+                    <LinkIcon className="size-4 text-neutral-500 dark:text-neutral-400" />
+                    <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                      URLs
+                    </span>
                   </div>
-                  <div className="text-2xl font-medium text-foreground">
+                  <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                     <AnimatedNumber value={totalUrls} separator="," />
                   </div>
                 </div>
@@ -186,12 +188,14 @@ export default function Home({
         </section>
 
         {/* Quick Start Section */}
-        <section className="border-b border-border/20">
-          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-            <div className="rounded-lg border border-border/40 bg-background p-6">
+        <section className="border-b border-neutral-200 dark:border-neutral-700">
+          <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
-                <h2 className="text-sm font-medium">Quick Start</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Quick Start
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Add this snippet to start tracking
                 </p>
               </div>
@@ -202,22 +206,24 @@ export default function Home({
 
         {/* Tracked Domains List */}
         <section className="pb-12">
-          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+            <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-base font-medium">Tracked Domains</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="text-base font-medium text-neutral-900 dark:text-neutral-100">
+                  Tracked Domains
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   {filteredDomains.length} domain
                   {filteredDomains.length !== 1 && 's'}
                 </p>
               </div>
               <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
                 <Input
                   placeholder="Search domains..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-9 rounded-lg border-border/40 pl-9 text-sm"
+                  className="h-9 rounded-lg border-neutral-200 pl-9 text-sm dark:border-neutral-700"
                 />
               </div>
             </div>
@@ -253,7 +259,7 @@ export default function Home({
                       transition={{ delay: index * 0.01 }}
                     >
                       <Link href={`/domain/${hostName}`}>
-                        <div className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-background p-4 transition-all hover:border-border">
+                        <div className="group flex cursor-pointer items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
                           <div className="flex items-center gap-3">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
@@ -262,15 +268,15 @@ export default function Home({
                               className="size-5 rounded"
                             />
                             <div>
-                              <div className="text-sm font-medium text-foreground">
+                              <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                                 {hostName}
                               </div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="text-sm text-neutral-600 dark:text-neutral-400">
                                 {row._count} URL{row._count !== 1 && 's'}
                               </div>
                             </div>
                           </div>
-                          <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                          <ArrowRight className="size-4 text-neutral-500 transition-transform group-hover:translate-x-0.5 dark:text-neutral-400" />
                         </div>
                       </Link>
                     </motion.div>

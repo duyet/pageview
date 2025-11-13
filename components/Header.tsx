@@ -13,14 +13,14 @@ export const Header = () => {
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-12 items-center justify-between border-b border-border/40">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-slate-900/80 dark:supports-[backdrop-filter]:bg-slate-900/60">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-12 items-center justify-between border-b border-neutral-200 dark:border-neutral-700">
           {/* Logo */}
           <Link href="/" className="group flex items-center space-x-2">
-            <div className="flex size-6 items-center justify-center rounded-md bg-foreground transition-all">
+            <div className="flex size-6 items-center justify-center rounded-md bg-neutral-900 transition-all dark:bg-neutral-100">
               <svg
-                className="size-3.5 text-background"
+                className="size-3.5 text-white dark:text-neutral-900"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -33,7 +33,7 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
               pageview
             </span>
           </Link>
@@ -49,8 +49,8 @@ export const Header = () => {
                   className={cn(
                     'inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                     isActive
-                      ? 'text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'text-neutral-900 dark:text-neutral-100'
+                      : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
                   )}
                 >
                   <Icon className="size-3.5" />

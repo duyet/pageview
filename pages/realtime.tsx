@@ -42,16 +42,16 @@ export default function RealtimePage() {
         />
       </Head>
 
-      <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-          <div className="flex flex-col space-y-6">
+      <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+        <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+          <div className="flex flex-col space-y-8">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-normal tracking-tight">
+                <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                   Real-time
                 </h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                   Last 24 hours live monitoring
                 </p>
               </div>
@@ -113,12 +113,12 @@ export default function RealtimePage() {
             </div>
 
             {/* Real-time Chart */}
-            <div className="rounded-lg border border-border/40 bg-background p-6">
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
-                <h2 className="text-sm font-medium">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
                   Hourly Traffic (Last 24h)
                 </h2>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Real-time traffic patterns
                 </p>
               </div>
@@ -141,8 +141,8 @@ export default function RealtimePage() {
             </div>
 
             {/* Status Footer */}
-            <div className="rounded-lg border border-border/40 bg-background p-4">
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
                 <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
                 <div>Auto-refresh: 30s</div>
               </div>

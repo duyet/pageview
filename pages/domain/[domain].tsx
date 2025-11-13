@@ -38,9 +38,9 @@ export default function DomainPage({
   totalPageviews,
 }: DomainPageProps) {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <div className="flex flex-col space-y-6">
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <div className="flex flex-col space-y-8">
           {/* Header */}
           <div>
             <Link href="/">
@@ -56,38 +56,46 @@ export default function DomainPage({
 
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-normal tracking-tight">
+                <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                   {domain}
                 </h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                   Domain analytics and URL breakdown
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-medium">
+                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                   {totalPageviews.toLocaleString()}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Views</div>
+                <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Total Views
+                </div>
               </div>
             </div>
           </div>
 
           {/* Stats Cards */}
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-border/40 bg-background p-4">
-              <p className="text-sm text-muted-foreground">Total URLs</p>
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Total URLs
+              </p>
               <div className="mt-2 text-2xl font-medium">{urlStats.length}</div>
             </div>
 
-            <div className="rounded-lg border border-border/40 bg-background p-4">
-              <p className="text-sm text-muted-foreground">Total Pageviews</p>
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Total Pageviews
+              </p>
               <div className="mt-2 text-2xl font-medium">
                 {totalPageviews.toLocaleString()}
               </div>
             </div>
 
-            <div className="rounded-lg border border-border/40 bg-background p-4">
-              <p className="text-sm text-muted-foreground">Avg. per URL</p>
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Avg. per URL
+              </p>
               <div className="mt-2 text-2xl font-medium">
                 {urlStats.length > 0
                   ? Math.round(
@@ -99,15 +107,17 @@ export default function DomainPage({
           </div>
 
           {/* URLs Table */}
-          <div className="rounded-lg border border-border/40 bg-background p-6">
+          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
             <div className="mb-4">
-              <h2 className="text-sm font-medium">URLs</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                URLs
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 All tracked URLs for this domain sorted by pageviews
               </p>
             </div>
             {urlStats.length === 0 ? (
-              <div className="py-12 text-center text-sm text-muted-foreground">
+              <div className="py-12 text-center text-sm text-neutral-600 dark:text-neutral-400">
                 <p>No URLs tracked yet</p>
               </div>
             ) : (
@@ -141,7 +151,7 @@ export default function DomainPage({
                             href={urlStat.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-foreground/80 hover:text-blue-600 hover:underline"
+                            className="inline-flex items-center gap-1.5 text-neutral-900 hover:text-blue-600 hover:underline dark:text-neutral-100/80"
                           >
                             {urlStat.url}
                             <ExternalLink className="size-3 opacity-40" />
