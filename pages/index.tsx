@@ -326,9 +326,17 @@ export default function Home({
                                 alt={hostName}
                                 className="size-5 rounded"
                               />
-                              <span className="text-sm font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-500">
-                                {hostName}
-                              </span>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-500">
+                                  {hostName}
+                                </span>
+                                {row.previewCount && (
+                                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                    +{row.previewCount} preview deployment
+                                    {row.previewCount > 1 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
                             </Link>
                           </TableCell>
                           <TableCell className="py-3 text-right text-sm text-neutral-600 dark:text-neutral-400">
@@ -377,18 +385,86 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     },
   })
 
-  // Calculate stats for each domain
-  const domainStats = hosts
-    .map((host: any) => ({
-      hostId: host.id,
-      host: host.host,
-      _count: host.urls.length,
-      pageViews: host.urls.reduce(
-        (sum: number, url: any) => sum + url._count.pageViews,
-        0
-      ),
-    }))
-    .filter((stat: any) => stat._count > 0) // Only show domains with URLs
+  // Helper function to detect preview subdomain patterns
+  // Matches patterns like: ba07956e.duyet-homelab.pages.dev, f41deecc.duyet-blog.pages.dev
+  const isPreviewSubdomain = (
+    hostname: string
+  ): { isPreview: boolean; baseDomain: string | null } => {
+    // Pattern: 8-char-hash.base-domain.tld
+    const previewPattern = /^[a-f0-9]{8}\.([\w-]+\.[\w-]+\.[\w]+)$/i
+    const match = hostname.match(previewPattern)
+
+    if (match) {
+      return { isPreview: true, baseDomain: match[1] }
+    }
+
+    return { isPreview: false, baseDomain: null }
+  }
+
+  // Group preview subdomains
+  const groupedDomains = new Map<string, any>()
+  const previewGroups = new Map<string, any[]>()
+
+  hosts.forEach((host: any) => {
+    const { isPreview, baseDomain } = isPreviewSubdomain(host.host)
+    const urlCount = host.urls.length
+    const pageViewsCount = host.urls.reduce(
+      (sum: number, url: any) => sum + url._count.pageViews,
+      0
+    )
+
+    if (isPreview && baseDomain) {
+      // Group preview deployments
+      if (!previewGroups.has(baseDomain)) {
+        previewGroups.set(baseDomain, [])
+      }
+      previewGroups.get(baseDomain)!.push({
+        hostId: host.id,
+        host: host.host,
+        _count: urlCount,
+        pageViews: pageViewsCount,
+      })
+    } else {
+      // Regular domain (or base domain without preview)
+      if (urlCount > 0) {
+        groupedDomains.set(host.host, {
+          hostId: host.id,
+          host: host.host,
+          _count: urlCount,
+          pageViews: pageViewsCount,
+          isGroup: false,
+        })
+      }
+    }
+  })
+
+  // Add grouped preview domains
+  previewGroups.forEach((previews, baseDomain) => {
+    const totalUrls = previews.reduce((sum, p) => sum + p._count, 0)
+    const totalPageViews = previews.reduce((sum, p) => sum + p.pageViews, 0)
+
+    // Check if base domain exists in main domains
+    const existing = groupedDomains.get(baseDomain)
+
+    if (existing) {
+      // Merge with existing base domain
+      existing._count += totalUrls
+      existing.pageViews += totalPageViews
+      existing.previewCount = previews.length
+    } else {
+      // Create entry for preview group only
+      groupedDomains.set(baseDomain, {
+        hostId: previews[0].hostId, // Use first preview's ID
+        host: baseDomain,
+        _count: totalUrls,
+        pageViews: totalPageViews,
+        isGroup: true,
+        previewCount: previews.length,
+      })
+    }
+  })
+
+  const domainStats = Array.from(groupedDomains.values())
 
   const totalPageViews = await prisma.pageView.count()
   const totalUrls = await prisma.url.count()
