@@ -78,8 +78,8 @@ export default function URLPage({
 }: Props) {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col space-y-8">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+        <div className="flex flex-col space-y-6">
           {/* Header */}
           <div>
             <Link href={`/domain/${url.host.host}`}>
@@ -183,7 +183,7 @@ export default function URLPage({
                 </p>
               </div>
               {topCountries.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   No data available
                 </p>
               ) : (
@@ -206,7 +206,7 @@ export default function URLPage({
                 </p>
               </div>
               {topBrowsers.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   No data available
                 </p>
               ) : (
@@ -229,7 +229,7 @@ export default function URLPage({
                 </p>
               </div>
               {topOS.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   No data available
                 </p>
               ) : (
@@ -252,7 +252,7 @@ export default function URLPage({
                 </p>
               </div>
               {topDevices.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   No data available
                 </p>
               ) : (
@@ -275,7 +275,7 @@ export default function URLPage({
                 </p>
               </div>
               {topEngines.length === 0 ? (
-                <p className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
                   No data available
                 </p>
               ) : (

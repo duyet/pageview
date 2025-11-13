@@ -39,8 +39,8 @@ export default function DomainPage({
 }: DomainPageProps) {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col space-y-8">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+        <div className="flex flex-col space-y-6">
           {/* Header */}
           <div>
             <Link href="/">
