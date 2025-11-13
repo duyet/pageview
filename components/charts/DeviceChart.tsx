@@ -15,23 +15,23 @@ interface DeviceChartProps {
 }
 
 const COLORS = [
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-  '#8b5cf6',
-  '#06b6d4',
-  '#84cc16',
-  '#f97316',
-  '#ec4899',
-  '#6366f1',
+  '#6366f1', // indigo
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#06b6d4', // cyan
+  '#84cc16', // lime
+  '#f97316', // orange
+  '#ec4899', // pink
+  '#14b8a6', // teal
 ]
 
 export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-muted-foreground">
+        <div className="text-neutral-600 dark:text-neutral-400">
           Loading {title.toLowerCase()}...
         </div>
       </div>
@@ -41,7 +41,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-muted-foreground">
+        <div className="text-neutral-600 dark:text-neutral-400">
           No {title.toLowerCase()} data
         </div>
       </div>
@@ -94,9 +94,11 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
               if (active && payload && payload.length) {
                 const data = payload[0].payload
                 return (
-                  <div className="rounded-lg border bg-background p-3 shadow-md">
-                    <p className="font-medium">{data.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {data.name}
+                    </p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>
