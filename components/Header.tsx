@@ -47,13 +47,13 @@ export const Header = () => {
                   key={href}
                   href={href}
                   className={cn(
-                    'inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
+                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
                     isActive
                       ? 'text-neutral-900 dark:text-neutral-100'
                       : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
                   )}
                 >
-                  <Icon className="size-3.5" />
+                  <Icon className="size-4" />
                   <span className="hidden sm:inline">{label}</span>
                 </Link>
               )

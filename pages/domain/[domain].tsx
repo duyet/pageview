@@ -30,12 +30,14 @@ type DomainPageProps = {
   domain: string
   urlStats: UrlStat[]
   totalPageviews: number
+  previewCount: number
 }
 
 export default function DomainPage({
   domain,
   urlStats,
   totalPageviews,
+  previewCount,
 }: DomainPageProps) {
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -59,9 +61,17 @@ export default function DomainPage({
                 <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
                   {domain}
                 </h1>
-                <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                  Domain analytics and URL breakdown
-                </p>
+                <div className="mt-1 flex flex-col gap-1">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Domain analytics and URL breakdown
+                  </p>
+                  {previewCount > 0 && (
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                      Including {previewCount} preview deployment
+                      {previewCount > 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
@@ -192,16 +202,60 @@ export default function DomainPage({
   )
 }
 
+/**
+ * Helper function to detect preview subdomains
+ */
+function isPreviewSubdomain(hostname: string): {
+  isPreview: boolean
+  baseDomain: string | null
+} {
+  const previewPattern = /^[a-f0-9]{8}\.([\w-]+\.[\w-]+\.[\w]+)$/i
+  const match = hostname.match(previewPattern)
+  if (match) {
+    return { isPreview: true, baseDomain: match[1] }
+  }
+  return { isPreview: false, baseDomain: null }
+}
+
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { domain } = query
+  const requestedDomain = domain as string
 
-  // Get URL stats for this domain
+  // Check if this is a preview subdomain or base domain
+  const { isPreview, baseDomain } = isPreviewSubdomain(requestedDomain)
+  const targetBaseDomain = isPreview ? baseDomain : requestedDomain
+
+  // Get all hosts that match this domain or are preview subdomains
+  const allHosts = await prisma.host.findMany({
+    select: {
+      id: true,
+      host: true,
+    },
+  })
+
+  // Filter hosts that match the base domain or are its preview subdomains
+  const matchingHostIds = allHosts
+    .filter((host) => {
+      if (host.host === targetBaseDomain) return true
+      const { isPreview: hostIsPreview, baseDomain: hostBase } =
+        isPreviewSubdomain(host.host)
+      return hostIsPreview && hostBase === targetBaseDomain
+    })
+    .map((host) => host.id)
+
+  // Count preview deployments
+  const previewCount = allHosts.filter((host) => {
+    if (host.host === targetBaseDomain) return false
+    const { isPreview: hostIsPreview, baseDomain: hostBase } =
+      isPreviewSubdomain(host.host)
+    return hostIsPreview && hostBase === targetBaseDomain
+  }).length
+
+  // Get URL stats for all matching hosts
   const urlStats: UrlStat[] = await prisma.url.findMany({
     where: {
-      host: {
-        is: {
-          host: domain as string,
-        },
+      hostId: {
+        in: matchingHostIds,
       },
     },
     select: {
@@ -223,8 +277,9 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   return {
     props: {
       urlStats,
-      domain,
+      domain: targetBaseDomain || requestedDomain,
       totalPageviews,
+      previewCount,
     },
   }
 }
