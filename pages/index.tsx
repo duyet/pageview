@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
@@ -30,6 +30,16 @@ import { AnimatedNumber } from '../components/AnimatedNumber'
 import { TrendBadge } from '../components/TrendBadge'
 import { Sparkline } from '../components/Sparkline'
 import { EmptyState } from '../components/EmptyState'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { TrendsChart } from '../components/charts/TrendsChart'
+import { TrendData } from './api/analytics/trends'
 
 type DomainStat = {
   hostId: number
@@ -67,6 +77,27 @@ export default function Home({
   totalUrls,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [loadingTrends, setLoadingTrends] = useState(true)
+
+  // Fetch trends data for last 30 days
+  useEffect(() => {
+    const fetchTrends = async () => {
+      try {
+        const response = await fetch('/api/analytics/trends?days=30')
+        if (response.ok) {
+          const result = await response.json()
+          setTrendsData(result.trends)
+        }
+      } catch (error) {
+        console.error('Error fetching trends:', error)
+      } finally {
+        setLoadingTrends(false)
+      }
+    }
+
+    fetchTrends()
+  }, [])
 
   // Mock sparkline data - in production, fetch from API
   const mockSparklineData = [12, 19, 15, 25, 22, 30, 28]
@@ -187,6 +218,23 @@ export default function Home({
           </div>
         </section>
 
+        {/* Traffic Trends Chart */}
+        <section className="border-b border-neutral-200 dark:border-neutral-700">
+          <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Traffic Trends
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Page views and unique visitors over the last 30 days
+                </p>
+              </div>
+              <TrendsChart data={trendsData} loading={loadingTrends} />
+            </div>
+          </div>
+        </section>
+
         {/* Quick Start Section */}
         <section className="border-b border-neutral-200 dark:border-neutral-700">
           <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -247,41 +295,58 @@ export default function Home({
                 }
               />
             ) : (
-              <div className="space-y-2">
-                {filteredDomains.map((row: any, index) => {
-                  const hostName = row.host
+              <div className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800/50">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="h-10 text-sm">Domain</TableHead>
+                      <TableHead className="h-10 text-right text-sm">
+                        URLs
+                      </TableHead>
+                      <TableHead className="h-10 text-right text-sm">
+                        Pageviews
+                      </TableHead>
+                      <TableHead className="h-10 w-[80px]"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredDomains.map((row: any, index) => {
+                      const hostName = row.host
 
-                  return (
-                    <motion.div
-                      key={row.hostId}
-                      initial={{ opacity: 0, y: 2 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.01 }}
-                    >
-                      <Link href={`/domain/${hostName}`}>
-                        <div className="group flex cursor-pointer items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
-                          <div className="flex items-center gap-3">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
-                              alt={hostName}
-                              className="size-5 rounded"
-                            />
-                            <div>
-                              <div className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      return (
+                        <TableRow key={row.hostId} className="group">
+                          <TableCell className="py-3">
+                            <Link
+                              href={`/domain/${hostName}`}
+                              className="flex items-center gap-3"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
+                                alt={hostName}
+                                className="size-5 rounded"
+                              />
+                              <span className="text-sm font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-500">
                                 {hostName}
-                              </div>
-                              <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                                {row._count} URL{row._count !== 1 && 's'}
-                              </div>
-                            </div>
-                          </div>
-                          <ArrowRight className="size-4 text-neutral-500 transition-transform group-hover:translate-x-0.5 dark:text-neutral-400" />
-                        </div>
-                      </Link>
-                    </motion.div>
-                  )
-                })}
+                              </span>
+                            </Link>
+                          </TableCell>
+                          <TableCell className="py-3 text-right text-sm text-neutral-600 dark:text-neutral-400">
+                            {row._count}
+                          </TableCell>
+                          <TableCell className="py-3 text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                            {row.pageViews?.toLocaleString() || 0}
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <Link href={`/domain/${hostName}`}>
+                              <ArrowRight className="size-4 text-neutral-500 transition-transform group-hover:translate-x-0.5 dark:text-neutral-400" />
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </div>
