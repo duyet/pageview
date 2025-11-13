@@ -37,7 +37,10 @@ export class AppError extends Error {
  * Validation Error (400)
  */
 export class ValidationError extends AppError {
-  constructor(message: string = 'Validation failed', details?: Record<string, unknown>) {
+  constructor(
+    message: string = 'Validation failed',
+    details?: Record<string, unknown>
+  ) {
     super(message, ErrorCode.VALIDATION_ERROR, 400, details)
     this.name = 'ValidationError'
   }
@@ -105,7 +108,10 @@ export class RateLimitError extends AppError {
  * Database Error (500)
  */
 export class DatabaseError extends AppError {
-  constructor(message: string = 'Database operation failed', originalError?: unknown) {
+  constructor(
+    message: string = 'Database operation failed',
+    originalError?: unknown
+  ) {
     super(
       message,
       ErrorCode.DATABASE_ERROR,
@@ -149,7 +155,12 @@ export class ExternalServiceError extends AppError {
  */
 export class TimeoutError extends AppError {
   constructor(message: string = 'Request timeout', operation?: string) {
-    super(message, ErrorCode.TIMEOUT, 504, operation ? { operation } : undefined)
+    super(
+      message,
+      ErrorCode.TIMEOUT,
+      504,
+      operation ? { operation } : undefined
+    )
     this.name = 'TimeoutError'
   }
 }
@@ -158,7 +169,10 @@ export class TimeoutError extends AppError {
  * Bad Request Error (400)
  */
 export class BadRequestError extends AppError {
-  constructor(message: string = 'Bad request', details?: Record<string, unknown>) {
+  constructor(
+    message: string = 'Bad request',
+    details?: Record<string, unknown>
+  ) {
     super(message, ErrorCode.BAD_REQUEST, 400, details)
     this.name = 'BadRequestError'
   }
@@ -195,7 +209,9 @@ export function normalizeError(error: unknown): AppError {
       error.message,
       ErrorCode.INTERNAL_ERROR,
       500,
-      process.env.NODE_ENV === 'development' ? { stack: error.stack } : undefined,
+      process.env.NODE_ENV === 'development'
+        ? { stack: error.stack }
+        : undefined,
       false
     )
   }
@@ -212,7 +228,10 @@ export function normalizeError(error: unknown): AppError {
 /**
  * Log error with appropriate severity
  */
-export function logError(error: unknown, context?: Record<string, unknown>): void {
+export function logError(
+  error: unknown,
+  context?: Record<string, unknown>
+): void {
   const normalizedError = normalizeError(error)
 
   const logData = {

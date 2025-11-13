@@ -4,7 +4,10 @@
  */
 
 import { NextApiRequest } from 'next'
-import { getSocketServer, type NextApiResponseServerIO } from '@/lib/socket/server'
+import {
+  getSocketServer,
+  type NextApiResponseServerIO,
+} from '@/lib/socket/server'
 
 export default async function handler(
   req: NextApiRequest,

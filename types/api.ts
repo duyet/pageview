@@ -79,7 +79,10 @@ export interface FilterParams {
  * Common Query Parameters
  * Extends pagination, sorting, and filtering
  */
-export interface QueryParams extends PaginationParams, SortParams, FilterParams {}
+export interface QueryParams
+  extends PaginationParams,
+    SortParams,
+    FilterParams {}
 
 /**
  * Pageview Tracking Request

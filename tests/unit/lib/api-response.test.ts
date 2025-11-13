@@ -33,7 +33,16 @@ describe('API Response Utilities', () => {
     })
 
     it('should merge additional metadata', () => {
-      const meta = createApiMeta({ page: { total: 100, page: 1, pageSize: 20, totalPages: 5, hasNextPage: true, hasPreviousPage: false } })
+      const meta = createApiMeta({
+        page: {
+          total: 100,
+          page: 1,
+          pageSize: 20,
+          totalPages: 5,
+          hasNextPage: true,
+          hasPreviousPage: false,
+        },
+      })
 
       expect(meta.page).toBeDefined()
       expect(meta.page?.total).toBe(100)

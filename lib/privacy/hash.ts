@@ -9,7 +9,8 @@ import { createHash } from 'crypto'
  * Salt for IP hashing (should be in environment variable in production)
  * Generate with: openssl rand -hex 32
  */
-const IP_SALT = process.env.IP_HASH_SALT || 'default-salt-please-change-in-production'
+const IP_SALT =
+  process.env.IP_HASH_SALT || 'default-salt-please-change-in-production'
 
 /**
  * Hash IP address for privacy compliance

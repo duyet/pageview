@@ -64,7 +64,10 @@ const postHandlerBase = async (req: NextApiRequest, res: NextApiResponse) => {
   const url = extractUrl(req)
 
   if (!url) {
-    return badRequestResponse(res, 'URL is required (provide via body, query, or referer header)')
+    return badRequestResponse(
+      res,
+      'URL is required (provide via body, query, or referer header)'
+    )
   }
 
   // Validate URL format
@@ -75,18 +78,32 @@ const postHandlerBase = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // Check if bot (optional filtering)
-  const userAgentString = String(req.query.ua || req.headers['user-agent'] || '')
+  const userAgentString = String(
+    req.query.ua || req.headers['user-agent'] || ''
+  )
   const isBot = isBotUserAgent(userAgentString)
 
   if (isBot) {
     console.log('[Tracking] Bot detected, skipping:', userAgentString)
     // Still return success to not break the tracking script
-    return successResponse(res, { id: 'bot-filtered', timestamp: new Date().toISOString() }, 201)
+    return successResponse(
+      res,
+      { id: 'bot-filtered', timestamp: new Date().toISOString() },
+      201
+    )
   }
 
   // Normalize URL (remove tracking parameters)
   const normalizedUrl = normalizeUrl(url, {
-    removeQueryParameters: [/^utm_\w+/i, 'fbclid', 'ref', 'ref_src', 'gclid', 'mc_', 'source'],
+    removeQueryParameters: [
+      /^utm_\w+/i,
+      'fbclid',
+      'ref',
+      'ref_src',
+      'gclid',
+      'mc_',
+      'source',
+    ],
   })
 
   console.log(`[Tracking] Normalized: ${url} -> ${normalizedUrl}`)
@@ -98,7 +115,9 @@ const postHandlerBase = async (req: NextApiRequest, res: NextApiResponse) => {
   const rawIp = req.query.ip ? String(req.query.ip) : null
   const ipHash = hashIp(rawIp)
 
-  console.log(`[Tracking] IP hashed: ${rawIp?.substring(0, 8)}... -> ${ipHash?.substring(0, 16)}...`)
+  console.log(
+    `[Tracking] IP hashed: ${rawIp?.substring(0, 8)}... -> ${ipHash?.substring(0, 16)}...`
+  )
 
   // Create pageview record with normalized relationships
   try {

@@ -25,7 +25,9 @@ export function TrendBadge({
 
   return (
     <Badge
-      variant={isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'}
+      variant={
+        isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'
+      }
       className={cn(
         'gap-1 font-medium',
         isNeutral && 'bg-muted text-muted-foreground',

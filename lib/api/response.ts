@@ -264,21 +264,16 @@ export function paginatedResponse<T>(
 ): void {
   const totalPages = Math.ceil(pagination.total / pagination.pageSize)
 
-  successResponse(
-    res,
-    data,
-    200,
-    {
-      page: {
-        total: pagination.total,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-        totalPages,
-        hasNextPage: pagination.page < totalPages,
-        hasPreviousPage: pagination.page > 1,
-      },
-    }
-  )
+  successResponse(res, data, 200, {
+    page: {
+      total: pagination.total,
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      totalPages,
+      hasNextPage: pagination.page < totalPages,
+      hasPreviousPage: pagination.page > 1,
+    },
+  })
 }
 
 /**
@@ -335,7 +330,10 @@ export function setCorsHeaders(
   const origin = allowedOrigins.includes('*') ? '*' : allowedOrigins.join(', ')
 
   res.setHeader('Access-Control-Allow-Origin', origin)
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, OPTIONS'
+  )
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.setHeader('Access-Control-Max-Age', '86400') // 24 hours
 }

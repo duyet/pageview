@@ -18,7 +18,10 @@ import { AppError, isAppError, logError } from '../errors/AppError'
 /**
  * API Handler Type
  */
-export type ApiHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>
+export type ApiHandler = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<void>
 
 /**
  * Middleware Function Type
@@ -56,7 +59,9 @@ export function createApiHandler(handlers: MethodHandlers): ApiHandler {
     const handler = handlers[method as keyof MethodHandlers]
 
     if (!handler) {
-      const allowedMethods = Object.keys(handlers).filter((m) => m !== 'OPTIONS')
+      const allowedMethods = Object.keys(handlers).filter(
+        (m) => m !== 'OPTIONS'
+      )
       return methodNotAllowedResponse(res, allowedMethods)
     }
 
@@ -79,19 +84,28 @@ export function withValidation<T extends z.ZodTypeAny>(
     return async (req, res) => {
       try {
         const data =
-          source === 'body' ? req.body : source === 'query' ? req.query : req.query
+          source === 'body'
+            ? req.body
+            : source === 'query'
+              ? req.query
+              : req.query
 
         const validated = schema.parse(data)
 
         // Attach validated data to request
-        ;(req as any)[`validated${source.charAt(0).toUpperCase() + source.slice(1)}`] =
-          validated
+        ;(req as any)[
+          `validated${source.charAt(0).toUpperCase() + source.slice(1)}`
+        ] = validated
 
         await handler(req, res)
       } catch (error) {
         if (error instanceof ZodError) {
           const formatted = formatZodError(error)
-          return validationErrorResponse(res, formatted.message, formatted.details)
+          return validationErrorResponse(
+            res,
+            formatted.message,
+            formatted.details
+          )
         }
         throw error
       }
@@ -244,7 +258,8 @@ export function withRateLimit(
     const identifier = getRateLimitIdentifier(req)
 
     try {
-      const { success, limit, remaining, reset } = await rateLimiter.limit(identifier)
+      const { success, limit, remaining, reset } =
+        await rateLimiter.limit(identifier)
 
       // Set rate limit headers
       res.setHeader('X-RateLimit-Limit', limit.toString())

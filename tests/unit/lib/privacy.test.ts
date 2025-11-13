@@ -82,7 +82,8 @@ describe('Privacy Utilities', () => {
     })
 
     it('should not flag normal browsers', () => {
-      const chromeUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      const chromeUA =
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       expect(isBotUserAgent(chromeUA)).toBe(false)
     })
 

@@ -76,7 +76,10 @@ export async function invalidateCache(pattern: string): Promise<void> {
 /**
  * Generate cache key
  */
-export function cacheKey(prefix: string, ...parts: (string | number)[]): string {
+export function cacheKey(
+  prefix: string,
+  ...parts: (string | number)[]
+): string {
   return `pageview:${prefix}:${parts.join(':')}`
 }
 
