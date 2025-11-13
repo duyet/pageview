@@ -60,7 +60,7 @@ export const pageviewTrackingSchema = z.object({
 export const eventTrackingSchema = z.object({
   name: z.string().min(1).max(100),
   url: urlSchema,
-  properties: z.record(z.unknown()).optional(),
+  properties: z.record(z.string(), z.unknown()).optional(),
 })
 
 /**
