@@ -5,6 +5,9 @@ import Head from 'next/head'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   BarChart3,
   Globe,
   Link as LinkIcon,
@@ -70,6 +73,9 @@ const item = {
   show: { opacity: 1, y: 0 },
 }
 
+type SortColumn = 'domain' | 'urls' | 'pageviews'
+type SortDirection = 'asc' | 'desc'
+
 export default function Home({
   domainStats,
   currentHost,
@@ -79,6 +85,8 @@ export default function Home({
   const [searchQuery, setSearchQuery] = useState('')
   const [trendsData, setTrendsData] = useState<TrendData[]>([])
   const [loadingTrends, setLoadingTrends] = useState(true)
+  const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   // Fetch trends data for last 30 days
   useEffect(() => {
@@ -102,16 +110,60 @@ export default function Home({
   // Mock sparkline data - in production, fetch from API
   const mockSparklineData = [12, 19, 15, 25, 22, 30, 28]
 
-  // Filter domains
+  // Handle sort toggle
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      // Toggle direction if same column
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new column with desc as default
+      setSortColumn(column)
+      setSortDirection('desc')
+    }
+  }
+
+  // Filter and sort domains
   const filteredDomains = domainStats
     .filter((domain) =>
       domain.host.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
-      const countA = typeof a._count === 'number' ? a._count : 0
-      const countB = typeof b._count === 'number' ? b._count : 0
-      return countB - countA
+      let compareA: string | number
+      let compareB: string | number
+
+      switch (sortColumn) {
+        case 'domain':
+          compareA = a.host.toLowerCase()
+          compareB = b.host.toLowerCase()
+          break
+        case 'urls':
+          compareA = typeof a._count === 'number' ? a._count : 0
+          compareB = typeof b._count === 'number' ? b._count : 0
+          break
+        case 'pageviews':
+          compareA = a.pageViews || 0
+          compareB = b.pageViews || 0
+          break
+        default:
+          return 0
+      }
+
+      if (compareA < compareB) return sortDirection === 'asc' ? -1 : 1
+      if (compareA > compareB) return sortDirection === 'asc' ? 1 : -1
+      return 0
     })
+
+  // Render sort icon
+  const SortIcon = ({ column }: { column: SortColumn }) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown className="ml-1 size-3.5 opacity-40" />
+    }
+    return sortDirection === 'asc' ? (
+      <ArrowUp className="ml-1 size-3.5" />
+    ) : (
+      <ArrowDown className="ml-1 size-3.5" />
+    )
+  }
 
   return (
     <>
@@ -299,12 +351,32 @@ export default function Home({
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
-                      <TableHead className="h-10 text-sm">Domain</TableHead>
-                      <TableHead className="h-10 text-right text-sm">
-                        URLs
+                      <TableHead className="h-10 text-sm">
+                        <button
+                          onClick={() => handleSort('domain')}
+                          className="inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        >
+                          Domain
+                          <SortIcon column="domain" />
+                        </button>
                       </TableHead>
                       <TableHead className="h-10 text-right text-sm">
-                        Pageviews
+                        <button
+                          onClick={() => handleSort('urls')}
+                          className="ml-auto inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        >
+                          URLs
+                          <SortIcon column="urls" />
+                        </button>
+                      </TableHead>
+                      <TableHead className="h-10 text-right text-sm">
+                        <button
+                          onClick={() => handleSort('pageviews')}
+                          className="ml-auto inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        >
+                          Pageviews
+                          <SortIcon column="pageviews" />
+                        </button>
                       </TableHead>
                       <TableHead className="h-10 w-[80px]"></TableHead>
                     </TableRow>
