@@ -92,33 +92,31 @@ export default function Home({
         />
       </Head>
 
-      <div className="min-h-screen bg-background">
-        {/* Compact Hero Section */}
-        <section className="border-b border-border/50">
+      <div className="min-h-screen">
+        {/* Minimal Hero Section */}
+        <section className="border-b border-border/30">
           <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
             <div className="max-w-4xl">
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200/60 bg-blue-50/50 px-2.5 py-1">
-                <TrendingUp className="size-3 text-blue-600" />
-                <span className="text-[11px] font-medium text-blue-900">
+              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-muted/40 px-2.5 py-1">
+                <TrendingUp className="size-3 text-foreground/50" />
+                <span className="text-[11px] font-medium text-muted-foreground">
                   <AnimatedNumber
                     value={totalPageViews}
-                    className="font-semibold"
+                    className="font-semibold text-foreground"
                   />{' '}
-                  pageviews tracked
+                  pageviews
                 </span>
               </div>
 
-              <h1 className="mb-2 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                Simple analytics,{' '}
-                <span className="text-blue-600">powerful insights</span>
+              <h1 className="mb-2 font-serif text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
+                Simple analytics, powerful insights
               </h1>
 
               <p className="mb-5 text-sm text-muted-foreground sm:text-base">
-                Privacy-focused pageview tracking for modern websites. No
-                cookies, no complex setup.
+                Privacy-focused pageview tracking. No cookies, no complex setup.
               </p>
 
-              {/* Compact Features */}
+              {/* Minimal Features */}
               <div className="flex gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                   <Zap className="size-3.5" />
@@ -137,8 +135,8 @@ export default function Home({
           </div>
         </section>
 
-        {/* Compact Stats Grid */}
-        <section className="border-b border-border/50">
+        {/* Borderless Stats Grid */}
+        <section className="border-b border-border/30">
           <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <motion.div
               variants={container}
@@ -147,191 +145,173 @@ export default function Home({
               className="grid grid-cols-1 gap-3 md:grid-cols-3"
             >
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none transition-all hover:border-border">
-                  <CardContent className="p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="size-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-muted-foreground">
-                          Total Views
-                        </span>
-                      </div>
-                      <TrendBadge value={12.5} />
-                    </div>
-                    <div className="mb-2 text-2xl font-semibold text-foreground">
-                      <AnimatedNumber value={totalPageViews} separator="," />
-                    </div>
-                    <div className="h-10">
-                      <Sparkline data={mockSparklineData} color="#3b82f6" />
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
+                  <div className="mb-3 flex items-center gap-2">
+                    <BarChart3 className="size-3.5 text-foreground/40" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Total Views
+                    </span>
+                  </div>
+                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                    <AnimatedNumber value={totalPageViews} separator="," />
+                  </div>
+                  <div className="h-10">
+                    <Sparkline data={mockSparklineData} color="currentColor" />
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none transition-all hover:border-border">
-                  <CardContent className="p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Globe className="size-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-muted-foreground">
-                          Domains
-                        </span>
-                      </div>
-                      <TrendBadge value={0} showZero={false} />
-                    </div>
-                    <div className="mb-2 text-2xl font-semibold text-foreground">
-                      <AnimatedNumber value={domainStats.length} />
-                    </div>
-                    <div className="h-10">
-                      <Sparkline
-                        data={[8, 12, 10, 15, 18, 20, domainStats.length]}
-                        color="#10b981"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Globe className="size-3.5 text-foreground/40" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Domains
+                    </span>
+                  </div>
+                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                    <AnimatedNumber value={domainStats.length} />
+                  </div>
+                  <div className="h-10">
+                    <Sparkline
+                      data={[8, 12, 10, 15, 18, 20, domainStats.length]}
+                      color="currentColor"
+                    />
+                  </div>
+                </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none transition-all hover:border-border">
-                  <CardContent className="p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <LinkIcon className="size-3.5 text-muted-foreground" />
-                        <span className="text-xs font-medium text-muted-foreground">
-                          URLs
-                        </span>
-                      </div>
-                      <TrendBadge value={8.3} />
-                    </div>
-                    <div className="mb-2 text-2xl font-semibold text-foreground">
-                      <AnimatedNumber value={totalUrls} separator="," />
-                    </div>
-                    <div className="h-10">
-                      <Sparkline
-                        data={[45, 52, 48, 61, 58, 70, 65]}
-                        color="#f59e0b"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
+                  <div className="mb-3 flex items-center gap-2">
+                    <LinkIcon className="size-3.5 text-foreground/40" />
+                    <span className="text-xs font-medium text-muted-foreground">
+                      URLs
+                    </span>
+                  </div>
+                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                    <AnimatedNumber value={totalUrls} separator="," />
+                  </div>
+                  <div className="h-10">
+                    <Sparkline
+                      data={[45, 52, 48, 61, 58, 70, 65]}
+                      color="currentColor"
+                    />
+                  </div>
+                </div>
               </motion.div>
             </motion.div>
           </div>
         </section>
 
-        {/* Compact Integration Section */}
-        <section className="border-b border-border/50">
+        {/* Borderless Integration Section */}
+        <section className="border-b border-border/30">
           <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-            <Card className="border-border/50 shadow-none">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">
-                  Quick Start
-                </CardTitle>
-                <CardDescription className="text-xs">
+            <div className="rounded-2xl bg-muted/20 p-6">
+              <div className="mb-3">
+                <h2 className="text-sm font-medium">Quick Start</h2>
+                <p className="text-xs text-muted-foreground">
                   Add this snippet to start tracking
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Usage currentHost={currentHost} />
-              </CardContent>
-            </Card>
+                </p>
+              </div>
+              <Usage currentHost={currentHost} />
+            </div>
           </div>
         </section>
 
-        {/* Compact Domains List */}
+        {/* Borderless Domains List */}
         <section className="pb-6">
           <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-            <Card className="border-border/50 shadow-none">
-              <CardHeader className="pb-3">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <CardTitle className="text-sm font-semibold">
-                      Tracked Domains
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {filteredDomains.length} domain
-                      {filteredDomains.length !== 1 && 's'}
-                    </CardDescription>
-                  </div>
-                  <div className="relative w-full sm:w-56">
-                    <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Search domains..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-8 border-border/50 pl-8 text-xs"
-                    />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                {filteredDomains.length === 0 ? (
-                  <EmptyState
-                    icon={Globe}
-                    title="No domains found"
-                    description={
-                      searchQuery
-                        ? `No domains match "${searchQuery}"`
-                        : 'Add the tracking snippet to start'
-                    }
-                    action={
-                      searchQuery
-                        ? {
-                            label: 'Clear search',
-                            onClick: () => setSearchQuery(''),
-                          }
-                        : undefined
-                    }
-                  />
-                ) : (
-                  <div className="space-y-1.5">
-                    {filteredDomains.map((row: any, index) => {
-                      const hostName = row.host
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-sm font-medium">Tracked Domains</h2>
+                <p className="text-xs text-muted-foreground">
+                  {filteredDomains.length} domain
+                  {filteredDomains.length !== 1 && 's'}
+                </p>
+              </div>
+              <div className="relative w-full sm:w-56">
+                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search domains..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-8 rounded-lg border-0 bg-muted/40 pl-8 text-xs ring-0 focus-visible:ring-0"
+                />
+              </div>
+            </div>
 
-                      return (
-                        <motion.div
-                          key={row.hostId}
-                          initial={{ opacity: 0, y: 2 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.02 }}
+            {filteredDomains.length === 0 ? (
+              <EmptyState
+                icon={Globe}
+                title="No domains found"
+                description={
+                  searchQuery
+                    ? `No domains match "${searchQuery}"`
+                    : 'Add the tracking snippet to start'
+                }
+                action={
+                  searchQuery
+                    ? {
+                        label: 'Clear search',
+                        onClick: () => setSearchQuery(''),
+                      }
+                    : undefined
+                }
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+                {filteredDomains.map((row: any, index) => {
+                  const hostName = row.host
+                  const colors = [
+                    'bg-orange-50 hover:bg-orange-100',
+                    'bg-emerald-50 hover:bg-emerald-100',
+                    'bg-blue-50 hover:bg-blue-100',
+                    'bg-purple-50 hover:bg-purple-100',
+                    'bg-amber-50 hover:bg-amber-100',
+                    'bg-cyan-50 hover:bg-cyan-100',
+                  ]
+                  const colorClass = colors[index % colors.length]
+
+                  return (
+                    <motion.div
+                      key={row.hostId}
+                      initial={{ opacity: 0, y: 2 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.01 }}
+                    >
+                      <Link href={`/domain/${hostName}`}>
+                        <div
+                          className={`group cursor-pointer rounded-2xl p-4 transition-all ${colorClass}`}
                         >
-                          <Link href={`/domain/${hostName}`}>
-                            <div className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/50 bg-card px-3 py-2.5 transition-all hover:border-border hover:bg-muted/30">
-                              <div className="flex items-center space-x-2.5">
-                                <img
-                                  src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
-                                  alt={hostName}
-                                  className="size-5 rounded"
-                                />
-                                <div>
-                                  <div className="text-xs font-medium text-foreground transition-colors group-hover:text-blue-600">
-                                    {hostName}
-                                  </div>
-                                  <div className="text-[11px] text-muted-foreground">
-                                    {row._count} URL{row._count !== 1 && 's'}
-                                  </div>
-                                </div>
+                          <div className="mb-3 flex items-center gap-2">
+                            <img
+                              src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
+                              alt={hostName}
+                              className="size-6 rounded transition-transform group-hover:scale-110"
+                            />
+                            <div className="flex-1 truncate font-mono text-xs font-medium text-foreground">
+                              {hostName}
+                            </div>
+                          </div>
+                          <div className="flex items-baseline justify-between">
+                            <div>
+                              <div className="font-mono text-xl font-medium text-foreground">
+                                {row._count}
                               </div>
-                              <div className="flex items-center space-x-2">
-                                <Badge
-                                  variant="secondary"
-                                  className="h-5 px-1.5 font-mono text-[10px]"
-                                >
-                                  {row._count}
-                                </Badge>
-                                <ArrowRight className="size-3.5 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-foreground" />
+                              <div className="text-[10px] text-muted-foreground">
+                                URL{row._count !== 1 && 's'}
                               </div>
                             </div>
-                          </Link>
-                        </motion.div>
-                      )
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                            <ArrowRight className="size-4 text-foreground/40 transition-transform group-hover:translate-x-0.5" />
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </section>
       </div>

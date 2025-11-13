@@ -103,138 +103,112 @@ export default function Analytics() {
   return (
     <div className="container mx-auto px-4 py-5 sm:px-6 lg:px-8">
       <div className="flex flex-col space-y-4">
-        {/* Compact Header */}
+        {/* Minimal Header */}
         <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight">Analytics</h1>
-            <p className="text-xs text-muted-foreground">
+            <h1 className="font-serif text-xl font-normal tracking-tight">
+              Analytics
+            </h1>
+            <p className="font-mono text-xs text-muted-foreground">
               {dateRange?.from && dateRange?.to && formatDateRange()}
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
 
-        {/* Compact Trends Chart */}
-        <Card className="border-border/50 shadow-none">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">
-              Traffic Trends
-            </CardTitle>
-            <CardDescription className="text-xs">
+        {/* Borderless Trends Chart */}
+        <div className="rounded-2xl bg-muted/20 p-6">
+          <div className="mb-4">
+            <h2 className="text-sm font-medium">Traffic Trends</h2>
+            <p className="text-xs text-muted-foreground">
               Page views and unique visitors over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <TrendsChart data={trendsData} loading={loading.trends} />
-          </CardContent>
-        </Card>
+            </p>
+          </div>
+          <TrendsChart data={trendsData} loading={loading.trends} />
+        </div>
 
-        {/* Compact Device & Location Analytics */}
+        {/* Borderless Device & Location Analytics */}
         <Tabs defaultValue="devices" className="space-y-3">
-          <TabsList className="grid h-9 w-full grid-cols-2">
+          <TabsList className="grid h-9 w-full grid-cols-2 bg-muted/40">
             <TabsTrigger value="devices" className="text-xs">
-              Device Analytics
+              Devices
             </TabsTrigger>
             <TabsTrigger value="locations" className="text-xs">
-              Geographic Data
+              Locations
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="devices" className="space-y-3">
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-              <Card className="border-border/50 shadow-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">
-                    Browsers
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Most popular browsers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <DeviceChart
-                    data={devicesData.browsers}
-                    title="Browsers"
-                    loading={loading.devices}
-                  />
-                </CardContent>
-              </Card>
+              <div className="rounded-2xl bg-muted/20 p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium">Browsers</h3>
+                  <p className="text-xs text-muted-foreground">Most popular</p>
+                </div>
+                <DeviceChart
+                  data={devicesData.browsers}
+                  title="Browsers"
+                  loading={loading.devices}
+                />
+              </div>
 
-              <Card className="border-border/50 shadow-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">
-                    Operating Systems
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Device OS
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <DeviceChart
-                    data={devicesData.os}
-                    title="Operating Systems"
-                    loading={loading.devices}
-                  />
-                </CardContent>
-              </Card>
+              <div className="rounded-2xl bg-muted/20 p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium">Operating Systems</h3>
+                  <p className="text-xs text-muted-foreground">Device OS</p>
+                </div>
+                <DeviceChart
+                  data={devicesData.os}
+                  title="Operating Systems"
+                  loading={loading.devices}
+                />
+              </div>
 
-              <Card className="border-border/50 shadow-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">
-                    Device Types
-                  </CardTitle>
-                  <CardDescription className="text-xs">
+              <div className="rounded-2xl bg-muted/20 p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium">Device Types</h3>
+                  <p className="text-xs text-muted-foreground">
                     Desktop, mobile, tablet
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <DeviceChart
-                    data={devicesData.devices}
-                    title="Device Types"
-                    loading={loading.devices}
-                  />
-                </CardContent>
-              </Card>
+                  </p>
+                </div>
+                <DeviceChart
+                  data={devicesData.devices}
+                  title="Device Types"
+                  loading={loading.devices}
+                />
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="locations" className="space-y-3">
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              <Card className="border-border/50 shadow-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">
-                    Top Countries
-                  </CardTitle>
-                  <CardDescription className="text-xs">
+              <div className="rounded-2xl bg-muted/20 p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium">Top Countries</h3>
+                  <p className="text-xs text-muted-foreground">
                     Visitors by country
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <LocationChart
-                    data={locationsData.countries}
-                    title="Countries"
-                    loading={loading.locations}
-                  />
-                </CardContent>
-              </Card>
+                  </p>
+                </div>
+                <LocationChart
+                  data={locationsData.countries}
+                  title="Countries"
+                  loading={loading.locations}
+                />
+              </div>
 
-              <Card className="border-border/50 shadow-none">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold">
-                    Top Cities
-                  </CardTitle>
-                  <CardDescription className="text-xs">
+              <div className="rounded-2xl bg-muted/20 p-4">
+                <div className="mb-3">
+                  <h3 className="text-sm font-medium">Top Cities</h3>
+                  <p className="text-xs text-muted-foreground">
                     Visitors by city
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pb-4">
-                  <LocationChart
-                    data={locationsData.cities}
-                    title="Cities"
-                    loading={loading.locations}
-                  />
-                </CardContent>
-              </Card>
+                  </p>
+                </div>
+                <LocationChart
+                  data={locationsData.cities}
+                  title="Cities"
+                  loading={loading.locations}
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

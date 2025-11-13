@@ -13,14 +13,14 @@ export const Header = () => {
   ]
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-12 items-center justify-between">
+        <div className="flex h-12 items-center justify-between border-b border-border/40">
           {/* Logo */}
           <Link href="/" className="group flex items-center space-x-2">
-            <div className="flex size-6 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 transition-all group-hover:shadow-sm">
+            <div className="flex size-6 items-center justify-center rounded-md bg-foreground transition-all">
               <svg
-                className="size-3.5 text-white"
+                className="size-3.5 text-background"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -33,13 +33,13 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="text-sm font-semibold text-foreground">
+            <span className="text-sm font-medium text-foreground">
               pageview
             </span>
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center space-x-0.5">
+          <nav className="flex items-center space-x-1">
             {navItems.map(({ href, icon: Icon, label }) => {
               const isActive = router.pathname === href
               return (
@@ -49,8 +49,8 @@ export const Header = () => {
                   className={cn(
                     'inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                     isActive
-                      ? 'bg-muted text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   <Icon className="size-3.5" />
