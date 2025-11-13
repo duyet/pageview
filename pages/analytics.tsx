@@ -101,61 +101,57 @@ export default function Analytics() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col space-y-6">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+    <div className="container mx-auto px-4 py-5 sm:px-6 lg:px-8">
+      <div className="flex flex-col space-y-4">
+        {/* Compact Header */}
+        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Analytics Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Detailed insights and trends for your website traffic
+            <h1 className="text-xl font-semibold tracking-tight">Analytics</h1>
+            <p className="text-xs text-muted-foreground">
+              {dateRange?.from && dateRange?.to && formatDateRange()}
             </p>
           </div>
           <DateRangePicker value={dateRange} onChange={setDateRange} />
         </div>
 
-        {/* Date Range Display */}
-        {dateRange?.from && dateRange?.to && (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">
-                Showing data for:{' '}
-                <span className="font-medium">{formatDateRange()}</span>
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Trends Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Traffic Trends</CardTitle>
-            <CardDescription>
+        {/* Compact Trends Chart */}
+        <Card className="border-border/50 shadow-none">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold">
+              Traffic Trends
+            </CardTitle>
+            <CardDescription className="text-xs">
               Page views and unique visitors over time
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             <TrendsChart data={trendsData} loading={loading.trends} />
           </CardContent>
         </Card>
 
-        {/* Device & Location Analytics */}
-        <Tabs defaultValue="devices" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="devices">Device Analytics</TabsTrigger>
-            <TabsTrigger value="locations">Geographic Data</TabsTrigger>
+        {/* Compact Device & Location Analytics */}
+        <Tabs defaultValue="devices" className="space-y-3">
+          <TabsList className="grid h-9 w-full grid-cols-2">
+            <TabsTrigger value="devices" className="text-xs">
+              Device Analytics
+            </TabsTrigger>
+            <TabsTrigger value="locations" className="text-xs">
+              Geographic Data
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="devices" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Browsers</CardTitle>
-                  <CardDescription>Most popular browsers</CardDescription>
+          <TabsContent value="devices" className="space-y-3">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+              <Card className="border-border/50 shadow-none">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">
+                    Browsers
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Most popular browsers
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-4">
                   <DeviceChart
                     data={devicesData.browsers}
                     title="Browsers"
@@ -164,12 +160,16 @@ export default function Analytics() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Operating Systems</CardTitle>
-                  <CardDescription>Device operating systems</CardDescription>
+              <Card className="border-border/50 shadow-none">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">
+                    Operating Systems
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Device OS
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-4">
                   <DeviceChart
                     data={devicesData.os}
                     title="Operating Systems"
@@ -178,12 +178,16 @@ export default function Analytics() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Device Types</CardTitle>
-                  <CardDescription>Desktop, mobile, and tablet</CardDescription>
+              <Card className="border-border/50 shadow-none">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">
+                    Device Types
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Desktop, mobile, tablet
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-4">
                   <DeviceChart
                     data={devicesData.devices}
                     title="Device Types"
@@ -194,14 +198,18 @@ export default function Analytics() {
             </div>
           </TabsContent>
 
-          <TabsContent value="locations" className="space-y-6">
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Countries</CardTitle>
-                  <CardDescription>Visitors by country</CardDescription>
+          <TabsContent value="locations" className="space-y-3">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+              <Card className="border-border/50 shadow-none">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">
+                    Top Countries
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Visitors by country
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-4">
                   <LocationChart
                     data={locationsData.countries}
                     title="Countries"
@@ -210,12 +218,16 @@ export default function Analytics() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Cities</CardTitle>
-                  <CardDescription>Visitors by city</CardDescription>
+              <Card className="border-border/50 shadow-none">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-semibold">
+                    Top Cities
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Visitors by city
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-4">
                   <LocationChart
                     data={locationsData.cities}
                     title="Cities"

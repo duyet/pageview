@@ -13,17 +13,14 @@ export const Header = () => {
   ]
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-12 items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className="group flex items-center space-x-2"
-          >
-            <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm transition-shadow group-hover:shadow">
+          <Link href="/" className="group flex items-center space-x-2">
+            <div className="flex size-6 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 transition-all group-hover:shadow-sm">
               <svg
-                className="h-4.5 w-4.5 text-white"
+                className="size-3.5 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -36,13 +33,13 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="text-[15px] font-semibold text-foreground">
+            <span className="text-sm font-semibold text-foreground">
               pageview
             </span>
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center space-x-0.5">
             {navItems.map(({ href, icon: Icon, label }) => {
               const isActive = router.pathname === href
               return (
@@ -50,33 +47,17 @@ export const Header = () => {
                   key={href}
                   href={href}
                   className={cn(
-                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all',
+                    'inline-flex items-center space-x-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors',
                     isActive
-                      ? 'bg-card text-foreground shadow-sm'
+                      ? 'bg-muted text-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   )}
                 >
-                  <Icon className="size-4" />
+                  <Icon className="size-3.5" />
                   <span className="hidden sm:inline">{label}</span>
                 </Link>
               )
             })}
-
-            {/* Command Palette Hint */}
-            <button
-              className="ml-2 hidden items-center space-x-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground md:inline-flex"
-              onClick={() => {
-                const event = new KeyboardEvent('keydown', {
-                  key: 'k',
-                  metaKey: true,
-                  bubbles: true
-                })
-                document.dispatchEvent(event)
-              }}
-            >
-              <Command className="size-3.5" />
-              <span className="text-xs">⌘K</span>
-            </button>
           </nav>
         </div>
       </div>

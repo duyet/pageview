@@ -49,23 +49,26 @@ export default function RealtimePage() {
         />
       </Head>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Real-time Analytics</h1>
-            <p className="mt-2 text-muted-foreground">
-              Live monitoring of your website traffic and visitor behavior
+            <h1 className="text-xl font-semibold">Real-time</h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Last 24 hours live monitoring
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5">
               {isConnected ? (
-                <Wifi className="size-4 text-green-600" />
+                <Wifi className="size-3.5 text-green-600" />
               ) : (
-                <WifiOff className="size-4 text-red-600" />
+                <WifiOff className="size-3.5 text-red-600" />
               )}
-              <Badge variant={isConnected ? 'default' : 'destructive'}>
-                {isConnected ? 'Connected' : 'Disconnected'}
+              <Badge
+                variant={isConnected ? 'default' : 'destructive'}
+                className="h-5 px-1.5 text-[10px]"
+              >
+                {isConnected ? 'Live' : 'Offline'}
               </Badge>
             </div>
             <Button
@@ -73,9 +76,10 @@ export default function RealtimePage() {
               disabled={loading}
               size="sm"
               variant="outline"
+              className="h-7 px-2 text-xs"
             >
               <RefreshCw
-                className={`mr-2 size-4 ${loading ? 'animate-spin' : ''}`}
+                className={`mr-1 size-3 ${loading ? 'animate-spin' : ''}`}
               />
               Refresh
             </Button>
@@ -83,17 +87,15 @@ export default function RealtimePage() {
         </div>
 
         {error && (
-          <Card className="mb-6 border-red-200">
-            <CardContent className="pt-6">
-              <div className="text-red-600">
-                Error loading real-time data: {error}
-              </div>
+          <Card className="mb-4 border-red-200 shadow-none">
+            <CardContent className="py-3">
+              <div className="text-xs text-red-600">Error: {error}</div>
             </CardContent>
           </Card>
         )}
 
-        {/* Metrics Cards */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Compact Metrics Cards */}
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
           <PageViewsCard value={metrics?.totalViews || 0} loading={loading} />
           <UniqueVisitorsCard
             value={metrics?.uniqueVisitors || 0}
@@ -109,15 +111,17 @@ export default function RealtimePage() {
           />
         </div>
 
-        {/* Real-time Chart */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Hourly Traffic (Last 24 Hours)</CardTitle>
-            <CardDescription>
-              Real-time view of your website traffic patterns
+        {/* Compact Real-time Chart */}
+        <Card className="mb-4 border-border/50 shadow-none">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold">
+              Hourly Traffic (Last 24h)
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Real-time traffic patterns
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-4">
             <RealtimeChart
               data={metrics?.hourlyViews || []}
               loading={loading}
@@ -125,8 +129,8 @@ export default function RealtimePage() {
           </CardContent>
         </Card>
 
-        {/* Data Tables */}
-        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Compact Data Tables */}
+        <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <ActivePagesTable
             data={metrics?.activePages || []}
             loading={loading}
@@ -137,12 +141,12 @@ export default function RealtimePage() {
           />
         </div>
 
-        {/* Status Footer */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div>Last updated: {lastUpdated.toLocaleTimeString()}</div>
-              <div>Auto-refresh: Every 30 seconds</div>
+        {/* Compact Status Footer */}
+        <Card className="border-border/50 shadow-none">
+          <CardContent className="py-2.5">
+            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+              <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
+              <div>Auto-refresh: 30s</div>
             </div>
           </CardContent>
         </Card>
