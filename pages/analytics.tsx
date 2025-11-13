@@ -101,117 +101,119 @@ export default function Analytics() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-5 sm:px-6 lg:px-8">
-      <div className="flex flex-col space-y-4">
-        {/* Minimal Header */}
-        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <div>
-            <h1 className="font-serif text-xl font-normal tracking-tight">
-              Analytics
-            </h1>
-            <p className="font-mono text-xs text-muted-foreground">
-              {dateRange?.from && dateRange?.to && formatDateRange()}
-            </p>
-          </div>
-          <DateRangePicker value={dateRange} onChange={setDateRange} />
-        </div>
-
-        {/* Borderless Trends Chart */}
-        <div className="rounded-2xl bg-muted/20 p-6">
-          <div className="mb-4">
-            <h2 className="text-sm font-medium">Traffic Trends</h2>
-            <p className="text-xs text-muted-foreground">
-              Page views and unique visitors over time
-            </p>
-          </div>
-          <TrendsChart data={trendsData} loading={loading.trends} />
-        </div>
-
-        {/* Borderless Device & Location Analytics */}
-        <Tabs defaultValue="devices" className="space-y-3">
-          <TabsList className="grid h-9 w-full grid-cols-2 bg-muted/40">
-            <TabsTrigger value="devices" className="text-xs">
-              Devices
-            </TabsTrigger>
-            <TabsTrigger value="locations" className="text-xs">
-              Locations
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="devices" className="space-y-3">
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-              <div className="rounded-2xl bg-muted/20 p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-medium">Browsers</h3>
-                  <p className="text-xs text-muted-foreground">Most popular</p>
-                </div>
-                <DeviceChart
-                  data={devicesData.browsers}
-                  title="Browsers"
-                  loading={loading.devices}
-                />
-              </div>
-
-              <div className="rounded-2xl bg-muted/20 p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-medium">Operating Systems</h3>
-                  <p className="text-xs text-muted-foreground">Device OS</p>
-                </div>
-                <DeviceChart
-                  data={devicesData.os}
-                  title="Operating Systems"
-                  loading={loading.devices}
-                />
-              </div>
-
-              <div className="rounded-2xl bg-muted/20 p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-medium">Device Types</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Desktop, mobile, tablet
-                  </p>
-                </div>
-                <DeviceChart
-                  data={devicesData.devices}
-                  title="Device Types"
-                  loading={loading.devices}
-                />
-              </div>
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <div className="flex flex-col space-y-6">
+          {/* Header */}
+          <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
+            <div>
+              <h1 className="text-2xl font-normal tracking-tight">Analytics</h1>
+              <p className="text-sm text-muted-foreground">
+                {dateRange?.from && dateRange?.to && formatDateRange()}
+              </p>
             </div>
-          </TabsContent>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
+          </div>
 
-          <TabsContent value="locations" className="space-y-3">
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              <div className="rounded-2xl bg-muted/20 p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-medium">Top Countries</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Visitors by country
-                  </p>
-                </div>
-                <LocationChart
-                  data={locationsData.countries}
-                  title="Countries"
-                  loading={loading.locations}
-                />
-              </div>
-
-              <div className="rounded-2xl bg-muted/20 p-4">
-                <div className="mb-3">
-                  <h3 className="text-sm font-medium">Top Cities</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Visitors by city
-                  </p>
-                </div>
-                <LocationChart
-                  data={locationsData.cities}
-                  title="Cities"
-                  loading={loading.locations}
-                />
-              </div>
+          {/* Trends Chart */}
+          <div className="rounded-lg border border-border/40 bg-background p-6">
+            <div className="mb-4">
+              <h2 className="text-sm font-medium">Traffic Trends</h2>
+              <p className="text-sm text-muted-foreground">
+                Page views and unique visitors over time
+              </p>
             </div>
-          </TabsContent>
-        </Tabs>
+            <TrendsChart data={trendsData} loading={loading.trends} />
+          </div>
+
+          {/* Device & Location Analytics */}
+          <Tabs defaultValue="devices" className="space-y-4">
+            <TabsList className="grid h-10 w-full grid-cols-2">
+              <TabsTrigger value="devices" className="text-sm">
+                Devices
+              </TabsTrigger>
+              <TabsTrigger value="locations" className="text-sm">
+                Locations
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="devices" className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div className="rounded-lg border border-border/40 bg-background p-4">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium">Browsers</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Most popular
+                    </p>
+                  </div>
+                  <DeviceChart
+                    data={devicesData.browsers}
+                    title="Browsers"
+                    loading={loading.devices}
+                  />
+                </div>
+
+                <div className="rounded-lg border border-border/40 bg-background p-4">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium">Operating Systems</h3>
+                    <p className="text-sm text-muted-foreground">Device OS</p>
+                  </div>
+                  <DeviceChart
+                    data={devicesData.os}
+                    title="Operating Systems"
+                    loading={loading.devices}
+                  />
+                </div>
+
+                <div className="rounded-lg border border-border/40 bg-background p-4">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium">Device Types</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Desktop, mobile, tablet
+                    </p>
+                  </div>
+                  <DeviceChart
+                    data={devicesData.devices}
+                    title="Device Types"
+                    loading={loading.devices}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="locations" className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="rounded-lg border border-border/40 bg-background p-4">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium">Top Countries</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Visitors by country
+                    </p>
+                  </div>
+                  <LocationChart
+                    data={locationsData.countries}
+                    title="Countries"
+                    loading={loading.locations}
+                  />
+                </div>
+
+                <div className="rounded-lg border border-border/40 bg-background p-4">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium">Top Cities</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Visitors by city
+                    </p>
+                  </div>
+                  <LocationChart
+                    data={locationsData.cities}
+                    title="Cities"
+                    loading={loading.locations}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   )

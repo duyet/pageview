@@ -92,111 +92,92 @@ export default function Home({
         />
       </Head>
 
-      <div className="min-h-screen">
-        {/* Minimal Hero Section */}
-        <section className="border-b border-border/30">
-          <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <div className="max-w-4xl">
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-muted/40 px-2.5 py-1">
-                <TrendingUp className="size-3 text-foreground/50" />
-                <span className="text-[11px] font-medium text-muted-foreground">
-                  <AnimatedNumber
-                    value={totalPageViews}
-                    className="font-semibold text-foreground"
-                  />{' '}
-                  pageviews
-                </span>
+      <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
+        {/* Claude-style Hero Section */}
+        <section className="border-b border-border/20">
+          <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-muted/50 px-2.5 py-0.5">
+              <TrendingUp className="size-3 text-foreground/40" />
+              <span className="text-xs text-muted-foreground">
+                <AnimatedNumber
+                  value={totalPageViews}
+                  className="font-medium text-foreground/80"
+                />{' '}
+                pageviews
+              </span>
+            </div>
+
+            <h1 className="mb-3 text-2xl font-normal tracking-tight text-foreground">
+              Simple analytics, powerful insights
+            </h1>
+
+            <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+              Privacy-focused pageview tracking. No cookies, no complex setup.
+            </p>
+
+            {/* Features */}
+            <div className="flex gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Zap className="size-4" />
+                <span>Fast</span>
               </div>
-
-              <h1 className="mb-2 font-serif text-2xl font-normal tracking-tight text-foreground sm:text-3xl">
-                Simple analytics, powerful insights
-              </h1>
-
-              <p className="mb-5 text-sm text-muted-foreground sm:text-base">
-                Privacy-focused pageview tracking. No cookies, no complex setup.
-              </p>
-
-              {/* Minimal Features */}
-              <div className="flex gap-4 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <Zap className="size-3.5" />
-                  <span>Fast</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Shield className="size-3.5" />
-                  <span>Private</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Clock className="size-3.5" />
-                  <span>Real-time</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <Shield className="size-4" />
+                <span>Private</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="size-4" />
+                <span>Real-time</span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Borderless Stats Grid */}
-        <section className="border-b border-border/30">
-          <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {/* Stats Grid */}
+        <section className="border-b border-border/20">
+          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
             <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-1 gap-3 md:grid-cols-3"
+              className="grid grid-cols-1 gap-3 sm:grid-cols-3"
             >
               <motion.div variants={item}>
-                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
-                  <div className="mb-3 flex items-center gap-2">
-                    <BarChart3 className="size-3.5 text-foreground/40" />
-                    <span className="text-xs font-medium text-muted-foreground">
+                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                  <div className="mb-2 flex items-center gap-2">
+                    <BarChart3 className="size-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
                       Total Views
                     </span>
                   </div>
-                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                  <div className="text-2xl font-medium text-foreground">
                     <AnimatedNumber value={totalPageViews} separator="," />
-                  </div>
-                  <div className="h-10">
-                    <Sparkline data={mockSparklineData} color="currentColor" />
                   </div>
                 </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Globe className="size-3.5 text-foreground/40" />
-                    <span className="text-xs font-medium text-muted-foreground">
+                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Globe className="size-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
                       Domains
                     </span>
                   </div>
-                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                  <div className="text-2xl font-medium text-foreground">
                     <AnimatedNumber value={domainStats.length} />
-                  </div>
-                  <div className="h-10">
-                    <Sparkline
-                      data={[8, 12, 10, 15, 18, 20, domainStats.length]}
-                      color="currentColor"
-                    />
                   </div>
                 </div>
               </motion.div>
 
               <motion.div variants={item}>
-                <div className="rounded-2xl bg-muted/30 p-4 transition-colors hover:bg-muted/50">
-                  <div className="mb-3 flex items-center gap-2">
-                    <LinkIcon className="size-3.5 text-foreground/40" />
-                    <span className="text-xs font-medium text-muted-foreground">
-                      URLs
-                    </span>
+                <div className="rounded-lg border border-border/40 bg-background p-4 transition-colors hover:border-border">
+                  <div className="mb-2 flex items-center gap-2">
+                    <LinkIcon className="size-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">URLs</span>
                   </div>
-                  <div className="mb-2 font-mono text-2xl font-medium text-foreground">
+                  <div className="text-2xl font-medium text-foreground">
                     <AnimatedNumber value={totalUrls} separator="," />
-                  </div>
-                  <div className="h-10">
-                    <Sparkline
-                      data={[45, 52, 48, 61, 58, 70, 65]}
-                      color="currentColor"
-                    />
                   </div>
                 </div>
               </motion.div>
@@ -204,13 +185,13 @@ export default function Home({
           </div>
         </section>
 
-        {/* Borderless Integration Section */}
-        <section className="border-b border-border/30">
-          <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-            <div className="rounded-2xl bg-muted/20 p-6">
-              <div className="mb-3">
+        {/* Quick Start Section */}
+        <section className="border-b border-border/20">
+          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
                 <h2 className="text-sm font-medium">Quick Start</h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Add this snippet to start tracking
                 </p>
               </div>
@@ -219,24 +200,24 @@ export default function Home({
           </div>
         </section>
 
-        {/* Borderless Domains List */}
-        <section className="pb-6">
-          <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Tracked Domains List */}
+        <section className="pb-12">
+          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-sm font-medium">Tracked Domains</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-base font-medium">Tracked Domains</h2>
+                <p className="text-sm text-muted-foreground">
                   {filteredDomains.length} domain
                   {filteredDomains.length !== 1 && 's'}
                 </p>
               </div>
-              <div className="relative w-full sm:w-56">
-                <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search domains..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-8 rounded-lg border-0 bg-muted/40 pl-8 text-xs ring-0 focus-visible:ring-0"
+                  className="h-9 rounded-lg border-border/40 pl-9 text-sm"
                 />
               </div>
             </div>
@@ -260,18 +241,9 @@ export default function Home({
                 }
               />
             ) : (
-              <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+              <div className="space-y-2">
                 {filteredDomains.map((row: any, index) => {
                   const hostName = row.host
-                  const colors = [
-                    'bg-orange-50 hover:bg-orange-100',
-                    'bg-emerald-50 hover:bg-emerald-100',
-                    'bg-blue-50 hover:bg-blue-100',
-                    'bg-purple-50 hover:bg-purple-100',
-                    'bg-amber-50 hover:bg-amber-100',
-                    'bg-cyan-50 hover:bg-cyan-100',
-                  ]
-                  const colorClass = colors[index % colors.length]
 
                   return (
                     <motion.div
@@ -281,30 +253,24 @@ export default function Home({
                       transition={{ delay: index * 0.01 }}
                     >
                       <Link href={`/domain/${hostName}`}>
-                        <div
-                          className={`group cursor-pointer rounded-2xl p-4 transition-all ${colorClass}`}
-                        >
-                          <div className="mb-3 flex items-center gap-2">
+                        <div className="group flex cursor-pointer items-center justify-between rounded-lg border border-border/40 bg-background p-4 transition-all hover:border-border">
+                          <div className="flex items-center gap-3">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
                               alt={hostName}
-                              className="size-6 rounded transition-transform group-hover:scale-110"
+                              className="size-5 rounded"
                             />
-                            <div className="flex-1 truncate font-mono text-xs font-medium text-foreground">
-                              {hostName}
-                            </div>
-                          </div>
-                          <div className="flex items-baseline justify-between">
                             <div>
-                              <div className="font-mono text-xl font-medium text-foreground">
-                                {row._count}
+                              <div className="text-sm font-medium text-foreground">
+                                {hostName}
                               </div>
-                              <div className="text-[10px] text-muted-foreground">
-                                URL{row._count !== 1 && 's'}
+                              <div className="text-sm text-muted-foreground">
+                                {row._count} URL{row._count !== 1 && 's'}
                               </div>
                             </div>
-                            <ArrowRight className="size-4 text-foreground/40 transition-transform group-hover:translate-x-0.5" />
                           </div>
+                          <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                         </div>
                       </Link>
                     </motion.div>
