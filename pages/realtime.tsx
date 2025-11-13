@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react'
@@ -49,107 +42,113 @@ export default function RealtimePage() {
         />
       </Head>
 
-      <div className="container mx-auto px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold">Real-time</h1>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Last 24 hours live monitoring
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center space-x-1.5">
-              {isConnected ? (
-                <Wifi className="size-3.5 text-green-600" />
-              ) : (
-                <WifiOff className="size-3.5 text-red-600" />
-              )}
-              <Badge
-                variant={isConnected ? 'default' : 'destructive'}
-                className="h-5 px-1.5 text-[10px]"
-              >
-                {isConnected ? 'Live' : 'Offline'}
-              </Badge>
+      <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+          <div className="flex flex-col space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-normal tracking-tight">
+                  Real-time
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Last 24 hours live monitoring
+                </p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  {isConnected ? (
+                    <Wifi className="size-4 text-green-600" />
+                  ) : (
+                    <WifiOff className="size-4 text-red-600" />
+                  )}
+                  <Badge
+                    variant={isConnected ? 'default' : 'destructive'}
+                    className="h-6 px-2 text-xs"
+                  >
+                    {isConnected ? 'Live' : 'Offline'}
+                  </Badge>
+                </div>
+                <Button
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-3 text-sm"
+                >
+                  <RefreshCw
+                    className={`mr-1.5 size-4 ${loading ? 'animate-spin' : ''}`}
+                  />
+                  Refresh
+                </Button>
+              </div>
             </div>
-            <Button
-              onClick={handleRefresh}
-              disabled={loading}
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs"
-            >
-              <RefreshCw
-                className={`mr-1 size-3 ${loading ? 'animate-spin' : ''}`}
+
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:bg-red-950/20">
+                <div className="text-sm text-red-600 dark:text-red-400">
+                  Error: {error}
+                </div>
+              </div>
+            )}
+
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <PageViewsCard
+                value={metrics?.totalViews || 0}
+                loading={loading}
               />
-              Refresh
-            </Button>
+              <UniqueVisitorsCard
+                value={metrics?.uniqueVisitors || 0}
+                loading={loading}
+              />
+              <ActivePagesCard
+                value={metrics?.activePages?.length || 0}
+                loading={loading}
+              />
+              <CountriesCard
+                value={metrics?.recentCountries?.length || 0}
+                loading={loading}
+              />
+            </div>
+
+            {/* Real-time Chart */}
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">
+                  Hourly Traffic (Last 24h)
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Real-time traffic patterns
+                </p>
+              </div>
+              <RealtimeChart
+                data={metrics?.hourlyViews || []}
+                loading={loading}
+              />
+            </div>
+
+            {/* Data Tables */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <ActivePagesTable
+                data={metrics?.activePages || []}
+                loading={loading}
+              />
+              <RecentCountriesTable
+                data={metrics?.recentCountries || []}
+                loading={loading}
+              />
+            </div>
+
+            {/* Status Footer */}
+            <div className="rounded-lg border border-border/40 bg-background p-4">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
+                <div>Auto-refresh: 30s</div>
+              </div>
+            </div>
           </div>
         </div>
-
-        {error && (
-          <Card className="mb-4 border-red-200 shadow-none">
-            <CardContent className="py-3">
-              <div className="text-xs text-red-600">Error: {error}</div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Compact Metrics Cards */}
-        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <PageViewsCard value={metrics?.totalViews || 0} loading={loading} />
-          <UniqueVisitorsCard
-            value={metrics?.uniqueVisitors || 0}
-            loading={loading}
-          />
-          <ActivePagesCard
-            value={metrics?.activePages?.length || 0}
-            loading={loading}
-          />
-          <CountriesCard
-            value={metrics?.recentCountries?.length || 0}
-            loading={loading}
-          />
-        </div>
-
-        {/* Compact Real-time Chart */}
-        <Card className="mb-4 border-border/50 shadow-none">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold">
-              Hourly Traffic (Last 24h)
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Real-time traffic patterns
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pb-4">
-            <RealtimeChart
-              data={metrics?.hourlyViews || []}
-              loading={loading}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Compact Data Tables */}
-        <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <ActivePagesTable
-            data={metrics?.activePages || []}
-            loading={loading}
-          />
-          <RecentCountriesTable
-            data={metrics?.recentCountries || []}
-            loading={loading}
-          />
-        </div>
-
-        {/* Compact Status Footer */}
-        <Card className="border-border/50 shadow-none">
-          <CardContent className="py-2.5">
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-              <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
-              <div>Auto-refresh: 30s</div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </>
   )

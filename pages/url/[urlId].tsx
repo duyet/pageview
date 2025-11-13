@@ -11,13 +11,6 @@ import { ArrowLeft, ExternalLink, Calendar, TrendingUp } from 'lucide-react'
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import dayjs from '@/lib/dayjs'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
@@ -82,205 +75,205 @@ export default function URLPage({
   topEngines,
 }: Props) {
   return (
-    <div className="container mx-auto max-w-7xl p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <Link href={`/domain/${url.host.host}`}>
-          <Button variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="mr-2 size-4" />
-            Back to {url.host.host}
-          </Button>
-        </Link>
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-background">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <div className="flex flex-col space-y-6">
+          {/* Header */}
+          <div>
+            <Link href={`/domain/${url.host.host}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mb-4 h-8 px-2 text-sm"
+              >
+                <ArrowLeft className="mr-2 size-4" />
+                Back to {url.host.host}
+              </Button>
+            </Link>
 
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h1 className="mb-2 text-2xl font-bold tracking-tight">
-              URL Analytics
-            </h1>
-            <a
-              href={url.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 break-all font-mono text-sm text-muted-foreground hover:text-foreground"
-            >
-              {url.url}
-              <ExternalLink className="size-3 shrink-0" />
-            </a>
-          </div>
-          <div className="text-right">
-            <div className="text-4xl font-bold">
-              {pageviewStats._count.toLocaleString()}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h1 className="mb-2 text-2xl font-normal tracking-tight">
+                  URL Analytics
+                </h1>
+                <a
+                  href={url.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 break-all font-mono text-sm text-muted-foreground hover:text-foreground"
+                >
+                  {url.url}
+                  <ExternalLink className="size-3 shrink-0" />
+                </a>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-medium">
+                  {pageviewStats._count.toLocaleString()}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Total Pageviews
+                </div>
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground">Total Pageviews</div>
+          </div>
+
+          {/* Stats Summary */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-border/40 bg-background p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="size-4" />
+                First Seen
+              </div>
+              <div className="text-xl font-medium">
+                {pageviewStats._min.createdAt
+                  ? dayjs(pageviewStats._min.createdAt).fromNow()
+                  : 'N/A'}
+              </div>
+              {pageviewStats._min.createdAt && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {dayjs(pageviewStats._min.createdAt).format(
+                    'MMM D, YYYY h:mm A'
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-lg border border-border/40 bg-background p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <TrendingUp className="size-4" />
+                Total Pageviews
+              </div>
+              <div className="text-2xl font-medium">
+                {pageviewStats._count.toLocaleString()}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border/40 bg-background p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <Calendar className="size-4" />
+                Last Seen
+              </div>
+              <div className="text-xl font-medium">
+                {pageviewStats._max.createdAt
+                  ? dayjs(pageviewStats._max.createdAt).fromNow()
+                  : 'N/A'}
+              </div>
+              {pageviewStats._max.createdAt && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {dayjs(pageviewStats._max.createdAt).format(
+                    'MMM D, YYYY h:mm A'
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Analytics Grid */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Top Countries */}
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">Top Countries</h2>
+                <p className="text-sm text-muted-foreground">
+                  Geographic distribution of visitors
+                </p>
+              </div>
+              {topCountries.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topCountries.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Browsers */}
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">Top Browsers</h2>
+                <p className="text-sm text-muted-foreground">
+                  Browser distribution
+                </p>
+              </div>
+              {topBrowsers.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topBrowsers.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Operating Systems */}
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">Top Operating Systems</h2>
+                <p className="text-sm text-muted-foreground">OS distribution</p>
+              </div>
+              {topOS.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topOS.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Devices */}
+            <div className="rounded-lg border border-border/40 bg-background p-6">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">Top Devices</h2>
+                <p className="text-sm text-muted-foreground">
+                  Device type distribution
+                </p>
+              </div>
+              {topDevices.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topDevices.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Engines */}
+            <div className="rounded-lg border border-border/40 bg-background p-6 md:col-span-2">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium">Top Browser Engines</h2>
+                <p className="text-sm text-muted-foreground">
+                  Rendering engine distribution
+                </p>
+              </div>
+              {topEngines.length === 0 ? (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No data available
+                </p>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {topEngines.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Stats Summary */}
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="flex items-center gap-2">
-              <Calendar className="size-4" />
-              First Seen
-            </CardDescription>
-            <CardTitle className="text-xl">
-              {pageviewStats._min.createdAt
-                ? dayjs(pageviewStats._min.createdAt).fromNow()
-                : 'N/A'}
-            </CardTitle>
-            {pageviewStats._min.createdAt && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {dayjs(pageviewStats._min.createdAt).format(
-                  'MMM D, YYYY h:mm A'
-                )}
-              </p>
-            )}
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="flex items-center gap-2">
-              <TrendingUp className="size-4" />
-              Total Pageviews
-            </CardDescription>
-            <CardTitle className="text-3xl">
-              {pageviewStats._count.toLocaleString()}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardDescription className="flex items-center gap-2">
-              <Calendar className="size-4" />
-              Last Seen
-            </CardDescription>
-            <CardTitle className="text-xl">
-              {pageviewStats._max.createdAt
-                ? dayjs(pageviewStats._max.createdAt).fromNow()
-                : 'N/A'}
-            </CardTitle>
-            {pageviewStats._max.createdAt && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                {dayjs(pageviewStats._max.createdAt).format(
-                  'MMM D, YYYY h:mm A'
-                )}
-              </p>
-            )}
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* Analytics Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Top Countries */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Countries</CardTitle>
-            <CardDescription>
-              Geographic distribution of visitors
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topCountries.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No data available
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {topCountries.map((item, idx) => (
-                  <StatBar key={idx} {...item} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Browsers */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Browsers</CardTitle>
-            <CardDescription>Browser distribution</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topBrowsers.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No data available
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {topBrowsers.map((item, idx) => (
-                  <StatBar key={idx} {...item} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Operating Systems */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Operating Systems</CardTitle>
-            <CardDescription>OS distribution</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topOS.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No data available
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {topOS.map((item, idx) => (
-                  <StatBar key={idx} {...item} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Devices */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Devices</CardTitle>
-            <CardDescription>Device type distribution</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topDevices.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No data available
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {topDevices.map((item, idx) => (
-                  <StatBar key={idx} {...item} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Top Engines */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Top Browser Engines</CardTitle>
-            <CardDescription>Rendering engine distribution</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {topEngines.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No data available
-              </p>
-            ) : (
-              <div className="grid gap-4 md:grid-cols-2">
-                {topEngines.map((item, idx) => (
-                  <StatBar key={idx} {...item} />
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
