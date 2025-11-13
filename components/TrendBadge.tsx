@@ -32,7 +32,7 @@ export function TrendBadge({
         className
       )}
     >
-      <Icon className="h-3 w-3" />
+      <Icon className="size-3" />
       <span>
         {Math.abs(value)}
         {suffix}

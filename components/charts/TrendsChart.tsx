@@ -19,7 +19,7 @@ interface TrendsChartProps {
 export function TrendsChart({ data, loading }: TrendsChartProps) {
   if (loading) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">Loading trends...</div>
       </div>
     )
@@ -27,7 +27,7 @@ export function TrendsChart({ data, loading }: TrendsChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">No data available</div>
       </div>
     )

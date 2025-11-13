@@ -38,15 +38,15 @@ export function CommandPalette() {
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Pages">
           <CommandItem onSelect={() => navigate('/')}>
-            <Home className="mr-2 h-4 w-4" />
+            <Home className="mr-2 size-4" />
             <span>Home</span>
           </CommandItem>
           <CommandItem onSelect={() => navigate('/analytics')}>
-            <BarChart3 className="mr-2 h-4 w-4" />
+            <BarChart3 className="mr-2 size-4" />
             <span>Analytics</span>
           </CommandItem>
           <CommandItem onSelect={() => navigate('/realtime')}>
-            <Activity className="mr-2 h-4 w-4" />
+            <Activity className="mr-2 size-4" />
             <span>Real-time</span>
           </CommandItem>
         </CommandGroup>

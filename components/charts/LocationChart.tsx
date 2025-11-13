@@ -18,7 +18,7 @@ interface LocationChartProps {
 export function LocationChart({ data, title, loading }: LocationChartProps) {
   if (loading) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">
           Loading {title.toLowerCase()}...
         </div>
@@ -28,7 +28,7 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">
           No {title.toLowerCase()} data
         </div>

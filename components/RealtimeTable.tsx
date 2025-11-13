@@ -37,9 +37,9 @@ export function RealtimeTable({
         <CardContent>
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex justify-between items-center">
-                <div className="h-4 bg-muted animate-pulse rounded flex-1 mr-4"></div>
-                <div className="h-4 bg-muted animate-pulse rounded w-12"></div>
+              <div key={i} className="flex items-center justify-between">
+                <div className="mr-4 h-4 flex-1 animate-pulse rounded bg-muted"></div>
+                <div className="h-4 w-12 animate-pulse rounded bg-muted"></div>
               </div>
             ))}
           </div>
@@ -55,7 +55,7 @@ export function RealtimeTable({
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground py-8">
+          <div className="py-8 text-center text-muted-foreground">
             {emptyMessage}
           </div>
         </CardContent>

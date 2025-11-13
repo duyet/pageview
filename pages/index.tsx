@@ -92,10 +92,10 @@ export default function Home({
       <div className="min-h-screen">
         {/* Hero Section */}
         <section className="border-b border-border/40">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          <div className="container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-100/50 mb-6">
-                <TrendingUp className="h-3.5 w-3.5 text-blue-600" />
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-100/50 bg-blue-50 px-3.5 py-1.5">
+                <TrendingUp className="size-3.5 text-blue-600" />
                 <span className="text-xs font-medium text-blue-900">
                   Tracking{' '}
                   <AnimatedNumber value={totalPageViews} className="font-semibold" />{' '}
@@ -103,33 +103,33 @@ export default function Home({
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-semibold text-foreground mb-4 tracking-tight">
+              <h1 className="mb-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
                 Simple analytics,{' '}
                 <span className="text-blue-600">powerful insights</span>
               </h1>
 
-              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+              <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
                 Privacy-focused pageview tracking for modern websites. No cookies,
                 no complex setup, just clean analytics.
               </p>
 
               {/* Features */}
-              <div className="grid grid-cols-3 gap-4 max-w-lg">
+              <div className="grid max-w-lg grid-cols-3 gap-4">
                 <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-muted/50">
-                    <Zap className="h-4 w-4 text-foreground/70" />
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-muted/50">
+                    <Zap className="size-4 text-foreground/70" />
                   </div>
                   <span>Fast</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-muted/50">
-                    <Shield className="h-4 w-4 text-foreground/70" />
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-muted/50">
+                    <Shield className="size-4 text-foreground/70" />
                   </div>
                   <span>Private</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
-                  <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-muted/50">
-                    <Clock className="h-4 w-4 text-foreground/70" />
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-muted/50">
+                    <Clock className="size-4 text-foreground/70" />
                   </div>
                   <span>Real-time</span>
                 </div>
@@ -140,26 +140,26 @@ export default function Home({
 
         {/* Stats Grid */}
         <section className="border-b border-border/40">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <motion.div
               variants={container}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-1 md:grid-cols-3 gap-5"
+              className="grid grid-cols-1 gap-5 md:grid-cols-3"
             >
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none hover:shadow-sm hover:border-border transition-all">
+                <Card className="border-border/50 shadow-none transition-all hover:border-border hover:shadow-sm">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                        <BarChart3 className="size-4 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">
                           Total Views
                         </span>
                       </div>
                       <TrendBadge value={12.5} />
                     </div>
-                    <div className="text-3xl font-semibold text-foreground mb-3">
+                    <div className="mb-3 text-3xl font-semibold text-foreground">
                       <AnimatedNumber value={totalPageViews} separator="," />
                     </div>
                     <div className="h-14">
@@ -170,18 +170,18 @@ export default function Home({
               </motion.div>
 
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none hover:shadow-sm hover:border-border transition-all">
+                <Card className="border-border/50 shadow-none transition-all hover:border-border hover:shadow-sm">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <Globe className="size-4 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">
                           Domains
                         </span>
                       </div>
                       <TrendBadge value={0} showZero={false} />
                     </div>
-                    <div className="text-3xl font-semibold text-foreground mb-3">
+                    <div className="mb-3 text-3xl font-semibold text-foreground">
                       <AnimatedNumber value={domainStats.length} />
                     </div>
                     <div className="h-14">
@@ -195,18 +195,18 @@ export default function Home({
               </motion.div>
 
               <motion.div variants={item}>
-                <Card className="border-border/50 shadow-none hover:shadow-sm hover:border-border transition-all">
+                <Card className="border-border/50 shadow-none transition-all hover:border-border hover:shadow-sm">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <LinkIcon className="h-4 w-4 text-muted-foreground" />
+                        <LinkIcon className="size-4 text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">
                           URLs
                         </span>
                       </div>
                       <TrendBadge value={8.3} />
                     </div>
-                    <div className="text-3xl font-semibold text-foreground mb-3">
+                    <div className="mb-3 text-3xl font-semibold text-foreground">
                       <AnimatedNumber value={totalUrls} separator="," />
                     </div>
                     <div className="h-14">
@@ -224,7 +224,7 @@ export default function Home({
 
         {/* Integration Section */}
         <section className="border-b border-border/40">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <Card className="border-border/50 shadow-none">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-semibold">Quick Start</CardTitle>
@@ -241,10 +241,10 @@ export default function Home({
 
         {/* Domains List */}
         <section className="pb-12">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <Card className="border-border/50 shadow-none">
               <CardHeader className="pb-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <CardTitle className="text-lg font-semibold">Tracked Domains</CardTitle>
                     <CardDescription className="text-sm">
@@ -252,12 +252,12 @@ export default function Home({
                     </CardDescription>
                   </div>
                   <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 h-10 text-sm border-border/50"
+                      className="h-10 border-border/50 pl-9 text-sm"
                     />
                   </div>
                 </div>
@@ -294,15 +294,15 @@ export default function Home({
                           transition={{ delay: index * 0.03 }}
                         >
                           <Link href={`/domain/${hostName}`}>
-                            <div className="group flex items-center justify-between p-4 rounded-xl border border-border/50 hover:border-border hover:shadow-sm transition-all cursor-pointer bg-card">
+                            <div className="group flex cursor-pointer items-center justify-between rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-border hover:shadow-sm">
                               <div className="flex items-center space-x-3.5">
                                 <img
                                   src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
                                   alt={hostName}
-                                  className="h-7 w-7 rounded-lg"
+                                  className="size-7 rounded-lg"
                                 />
                                 <div>
-                                  <div className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors">
+                                  <div className="text-sm font-medium text-foreground transition-colors group-hover:text-blue-600">
                                     {hostName}
                                   </div>
                                   <div className="text-xs text-muted-foreground">
@@ -317,7 +317,7 @@ export default function Home({
                                 >
                                   {row._count}
                                 </Badge>
-                                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                                <ArrowRight className="size-4 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-foreground" />
                               </div>
                             </div>
                           </Link>
@@ -338,26 +338,31 @@ export default function Home({
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const currentHost = req.headers.host as string
 
-  const hostIdCount = await prisma.url.groupBy({
-    by: ['hostId'],
-    _count: true,
-    orderBy: {
-      hostId: 'desc',
+  // OPTIMIZED: Get domains with stats using joins (NO N+1)
+  const hosts = await prisma.host.findMany({
+    select: {
+      id: true,
+      host: true,
+      urls: {
+        select: {
+          id: true,
+          _count: {
+            select: {
+              pageViews: true,
+            },
+          },
+        },
+      },
     },
   })
 
-  const domainStats = await Promise.all(
-    hostIdCount.map(async (row) => {
-      const host = await prisma.host.findUnique({
-        where: { id: row.hostId },
-      })
-
-      return {
-        ...row,
-        ...host,
-      }
-    })
-  )
+  // Calculate stats for each domain
+  const domainStats = hosts.map((host) => ({
+    hostId: host.id,
+    host: host.host,
+    _count: host.urls.length,
+    pageViews: host.urls.reduce((sum, url) => sum + url._count.pageViews, 0),
+  })).filter((stat) => stat._count > 0) // Only show domains with URLs
 
   const totalPageViews = await prisma.pageView.count()
   const totalUrls = await prisma.url.count()

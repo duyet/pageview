@@ -17,7 +17,7 @@ interface RealtimeChartProps {
 export function RealtimeChart({ data, loading }: RealtimeChartProps) {
   if (loading) {
     return (
-      <div className="h-64 flex items-center justify-center">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-muted-foreground">Loading real-time data...</div>
       </div>
     )
@@ -25,7 +25,7 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-muted-foreground">No real-time data available</div>
       </div>
     )

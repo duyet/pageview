@@ -30,7 +30,7 @@ const COLORS = [
 export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (loading) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">
           Loading {title.toLowerCase()}...
         </div>
@@ -40,7 +40,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center">
+      <div className="flex h-80 items-center justify-center">
         <div className="text-muted-foreground">
           No {title.toLowerCase()} data
         </div>

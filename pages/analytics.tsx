@@ -149,7 +149,7 @@ export default function Analytics() {
           </TabsList>
 
           <TabsContent value="devices" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <Card>
                 <CardHeader>
                   <CardTitle>Browsers</CardTitle>
@@ -195,7 +195,7 @@ export default function Analytics() {
           </TabsContent>
 
           <TabsContent value="locations" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle>Top Countries</CardTitle>

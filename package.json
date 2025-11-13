@@ -10,9 +10,19 @@
     "vercel-build": "prisma generate && prisma db push && next build",
     "prisma:generate": "prisma generate",
     "postinstall": "prisma generate",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "type-check": "tsc --noEmit",
+    "validate": "yarn type-check && yarn lint && yarn test",
+    "prepare": "husky"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@heroicons/react": "^1.0.6",
     "@prisma/client": "^6.11.0",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -23,8 +33,10 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
-    "@tremor/react": "^2.11.0",
+    "@tanstack/react-query": "^5.90.8",
     "@types/socket.io-client": "^3.0.0",
+    "@upstash/ratelimit": "^2.0.7",
+    "@upstash/redis": "^1.35.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -32,7 +44,10 @@
     "dayjs": "^1.11.13",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.552.0",
+    "nanoid": "^5.1.6",
     "next": "14.2.33",
+    "next-auth": "^4.24.13",
+    "next-swagger-doc": "^0.4.1",
     "normalize-url": "^8.0.2",
     "react": "18.3.1",
     "react-countup": "^6.5.3",
@@ -44,23 +59,47 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "sonner": "^2.0.7",
+    "swagger-ui-react": "^5.30.2",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "22.18.13",
     "@types/react": "18.3.26",
     "@types/react-dom": "18.3.7",
+    "@types/testing-library__jest-dom": "^6.0.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/ui": "^4.0.8",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.33",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-tailwindcss": "^3.18.0",
+    "husky": "^9.1.7",
+    "jsdom": "^27.2.0",
+    "lint-staged": "^16.2.6",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prisma": "^6.11.0",
     "tailwindcss": "^3.4.17",
-    "turbo": "^1.13.4"
+    "turbo": "^1.13.4",
+    "vitest": "^4.0.8"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "vitest related --run"
+    ],
+    "*.{json,md,mdx,css,yaml,yml}": [
+      "prettier --write"
+    ]
   }
 }

@@ -50,19 +50,19 @@ export default function RealtimePage() {
       </Head>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Real-time Analytics</h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="mt-2 text-muted-foreground">
               Live monitoring of your website traffic and visitor behavior
             </p>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               {isConnected ? (
-                <Wifi className="h-4 w-4 text-green-600" />
+                <Wifi className="size-4 text-green-600" />
               ) : (
-                <WifiOff className="h-4 w-4 text-red-600" />
+                <WifiOff className="size-4 text-red-600" />
               )}
               <Badge variant={isConnected ? 'default' : 'destructive'}>
                 {isConnected ? 'Connected' : 'Disconnected'}
@@ -75,7 +75,7 @@ export default function RealtimePage() {
               variant="outline"
             >
               <RefreshCw
-                className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`}
+                className={`mr-2 size-4 ${loading ? 'animate-spin' : ''}`}
               />
               Refresh
             </Button>
@@ -93,7 +93,7 @@ export default function RealtimePage() {
         )}
 
         {/* Metrics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <PageViewsCard value={metrics?.totalViews || 0} loading={loading} />
           <UniqueVisitorsCard
             value={metrics?.uniqueVisitors || 0}
@@ -126,7 +126,7 @@ export default function RealtimePage() {
         </Card>
 
         {/* Data Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ActivePagesTable
             data={metrics?.activePages || []}
             loading={loading}

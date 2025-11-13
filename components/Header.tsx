@@ -13,15 +13,15 @@ export const Header = () => {
   ]
 
   return (
-    <header className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 group"
+            className="group flex items-center space-x-2"
           >
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
+            <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm transition-shadow group-hover:shadow">
               <svg
                 className="h-4.5 w-4.5 text-white"
                 fill="none"
@@ -36,7 +36,7 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="font-semibold text-[15px] text-foreground">
+            <span className="text-[15px] font-semibold text-foreground">
               pageview
             </span>
           </Link>
@@ -56,7 +56,7 @@ export const Header = () => {
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="size-4" />
                   <span className="hidden sm:inline">{label}</span>
                 </Link>
               )
@@ -64,7 +64,7 @@ export const Header = () => {
 
             {/* Command Palette Hint */}
             <button
-              className="ml-2 hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+              className="ml-2 hidden items-center space-x-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground md:inline-flex"
               onClick={() => {
                 const event = new KeyboardEvent('keydown', {
                   key: 'k',
@@ -74,7 +74,7 @@ export const Header = () => {
                 document.dispatchEvent(event)
               }}
             >
-              <Command className="h-3.5 w-3.5" />
+              <Command className="size-3.5" />
               <span className="text-xs">⌘K</span>
             </button>
           </nav>

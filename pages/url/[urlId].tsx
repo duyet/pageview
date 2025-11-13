@@ -1,320 +1,386 @@
+/**
+ * URL Analytics Page
+ * Detailed analytics for a specific URL
+ * OPTIMIZED: Fixed N+1 query problem
+ */
+
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { Card, Text, Grid, Flex, Button } from '@tremor/react'
-import { Title, BarList } from '@tremor/react'
-import { ArrowNarrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
-
+import { ArrowLeft, ExternalLink, Calendar, TrendingUp } from 'lucide-react'
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
-import prisma from '../../lib/prisma'
-import dayjs from '../../lib/dayjs'
+import prisma from '@/lib/prisma'
+import dayjs from '@/lib/dayjs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
 
 type UrlWithHost = Url & {
   host: Host
 }
 
-type PageViewStats = Prisma.AggregatePageView & {
+type PageViewStats = {
+  _count: number
   _min: {
-    createdAt: string
+    createdAt: Date | null
   }
   _max: {
-    createdAt: string
+    createdAt: Date | null
   }
-  _count: number
 }
 
-type TopCountry = Prisma.PageViewGroupByOutputType &
-  Country & {
-    _count: number
-  }
-
-type TopUA = Prisma.PageViewGroupByOutputType & UA
-
-type TopOS = {
-  os: string
-  _count: number
-}
-
-type TopBrowser = {
-  browser: string
-  _count: number
-}
-
-type TopEngine = {
-  engine: string
-  _count: number
-}
-
-type TopDevice = {
-  device: string
-  _count: number
+type StatItem = {
+  name: string
+  count: number
+  percentage: number
 }
 
 type Props = {
   url: UrlWithHost
   pageviewStats: PageViewStats
-  topCountry: TopCountry[]
-  topUA: TopUA[]
-  topOS: TopOS[]
-  topBrowser: TopBrowser[]
-  topEngine: TopEngine[]
-  topDevice: TopDevice[]
+  topCountries: StatItem[]
+  topBrowsers: StatItem[]
+  topOS: StatItem[]
+  topDevices: StatItem[]
+  topEngines: StatItem[]
 }
 
-export default function Home({
-  url,
-  pageviewStats,
-  topCountry,
-  topOS,
-  topBrowser,
-  topEngine,
-  topDevice,
-}: Props) {
+/**
+ * Stat Bar Component
+ */
+function StatBar({ name, count, percentage }: StatItem) {
   return (
-    <>
-      <Card>
-        <Title>
-          <Link href={`/domain/${url.host.host}`}>
-            <Button
-              size="sm"
-              variant="light"
-              icon={ArrowNarrowLeftIcon}
-              iconPosition="left"
-            >
-              {url.host.host}
-            </Button>
-          </Link>
-        </Title>
-
-        <a href={url.url} target="_blank">
-          <Button
-            size="sm"
-            variant="light"
-            icon={ExternalLinkIcon}
-            iconPosition="right"
-          >
-            {url.url}
-          </Button>
-        </a>
-
-        <Flex justifyContent="between" className="mt-3">
-          <div>
-            <Title title={pageviewStats._min?.createdAt}>
-              {dayjs(pageviewStats._min?.createdAt).fromNow()}
-            </Title>
-            <Text>First Seen</Text>
-          </div>
-          <div className="text-center">
-            <Title>{pageviewStats._count}</Title>
-            <Text>Total</Text>
-          </div>
-          <div className="text-right">
-            <Title title={pageviewStats._max?.createdAt}>
-              {dayjs(pageviewStats._max?.createdAt).fromNow()}
-            </Title>
-            <Text className="text-right">Last Seen</Text>
-          </div>
-        </Flex>
-      </Card>
-
-      <Grid numColsMd={2} className="mt-6 gap-6">
-        <Card>
-          <Title>Top OS</Title>
-          {!topOS.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topOS.map((row: TopOS) => ({
-              name: row.os as unknown as string,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Browser</Title>
-          {!topBrowser.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topBrowser.map((row: TopBrowser) => ({
-              name: row.browser,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Engine</Title>
-          {!topEngine.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topEngine.map((row: TopEngine) => ({
-              name: row.engine,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Device</Title>
-          {!topDevice.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topDevice.map((row: TopDevice) => ({
-              name: row.device,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Country</Title>
-          {!topCountry.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topCountry.map((row: TopCountry) => ({
-              name: row.country || 'N/A',
-              value: row._count,
-            }))}
-          />
-        </Card>
-      </Grid>
-    </>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className="font-medium">{name || 'Unknown'}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">{count}</span>
+          <Badge variant="secondary" className="text-xs">
+            {percentage}%
+          </Badge>
+        </div>
+      </div>
+      <Progress value={percentage} className="h-2" />
+    </div>
   )
 }
 
+export default function URLPage({
+  url,
+  pageviewStats,
+  topCountries,
+  topBrowsers,
+  topOS,
+  topDevices,
+  topEngines,
+}: Props) {
+  return (
+    <div className="container mx-auto max-w-7xl p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <Link href={`/domain/${url.host.host}`}>
+          <Button variant="ghost" size="sm" className="mb-4">
+            <ArrowLeft className="mr-2 size-4" />
+            Back to {url.host.host}
+          </Button>
+        </Link>
+
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className="mb-2 text-2xl font-bold tracking-tight">URL Analytics</h1>
+            <a
+              href={url.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 break-all font-mono text-sm text-muted-foreground hover:text-foreground"
+            >
+              {url.url}
+              <ExternalLink className="size-3 shrink-0" />
+            </a>
+          </div>
+          <div className="text-right">
+            <div className="text-4xl font-bold">{pageviewStats._count.toLocaleString()}</div>
+            <div className="text-sm text-muted-foreground">Total Pageviews</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="mb-6 grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardDescription className="flex items-center gap-2">
+              <Calendar className="size-4" />
+              First Seen
+            </CardDescription>
+            <CardTitle className="text-xl">
+              {pageviewStats._min.createdAt
+                ? dayjs(pageviewStats._min.createdAt).fromNow()
+                : 'N/A'}
+            </CardTitle>
+            {pageviewStats._min.createdAt && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {dayjs(pageviewStats._min.createdAt).format('MMM D, YYYY h:mm A')}
+              </p>
+            )}
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardDescription className="flex items-center gap-2">
+              <TrendingUp className="size-4" />
+              Total Pageviews
+            </CardDescription>
+            <CardTitle className="text-3xl">{pageviewStats._count.toLocaleString()}</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardDescription className="flex items-center gap-2">
+              <Calendar className="size-4" />
+              Last Seen
+            </CardDescription>
+            <CardTitle className="text-xl">
+              {pageviewStats._max.createdAt
+                ? dayjs(pageviewStats._max.createdAt).fromNow()
+                : 'N/A'}
+            </CardTitle>
+            {pageviewStats._max.createdAt && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {dayjs(pageviewStats._max.createdAt).format('MMM D, YYYY h:mm A')}
+              </p>
+            )}
+          </CardHeader>
+        </Card>
+      </div>
+
+      {/* Analytics Grid */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Top Countries */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Countries</CardTitle>
+            <CardDescription>Geographic distribution of visitors</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topCountries.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No data available</p>
+            ) : (
+              <div className="space-y-4">
+                {topCountries.map((item, idx) => (
+                  <StatBar key={idx} {...item} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Browsers */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Browsers</CardTitle>
+            <CardDescription>Browser distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topBrowsers.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No data available</p>
+            ) : (
+              <div className="space-y-4">
+                {topBrowsers.map((item, idx) => (
+                  <StatBar key={idx} {...item} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Operating Systems */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Operating Systems</CardTitle>
+            <CardDescription>OS distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topOS.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No data available</p>
+            ) : (
+              <div className="space-y-4">
+                {topOS.map((item, idx) => (
+                  <StatBar key={idx} {...item} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Devices */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Devices</CardTitle>
+            <CardDescription>Device type distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topDevices.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No data available</p>
+            ) : (
+              <div className="space-y-4">
+                {topDevices.map((item, idx) => (
+                  <StatBar key={idx} {...item} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Top Engines */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Top Browser Engines</CardTitle>
+            <CardDescription>Rendering engine distribution</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topEngines.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">No data available</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {topEngines.map((item, idx) => (
+                  <StatBar key={idx} {...item} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Server-side data fetching with OPTIMIZED queries (no N+1)
+ */
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { urlId } = query
   const id = parseInt(urlId as string)
 
+  // Get URL details
   const url = await prisma.url.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      host: true,
-    },
+    where: { id },
+    include: { host: true },
   })
 
-  console.log('url', url)
+  if (!url) {
+    return { notFound: true }
+  }
 
-  const topCountryId = await prisma.pageView.groupBy({
-    by: ['countryId'],
-    _count: true,
-    where: {
-      urlId: id,
-      countryId: {
-        not: null,
-      },
-    },
-  })
-  console.log('topCountryId', topCountryId)
-
-  // Pageview stats (first seen, last seen, total, ...)
+  // Get pageview stats
   const pageviewStats = await prisma.pageView.aggregate({
-    where: {
-      urlId: id,
-    },
+    where: { urlId: id },
     _count: true,
-    _min: {
-      createdAt: true,
-    },
-    _max: {
-      createdAt: true,
-    },
+    _min: { createdAt: true },
+    _max: { createdAt: true },
   })
-  console.log('pageviewStats', pageviewStats)
 
-  // TODO: low performance
-  const topCountry = await Promise.all(
-    topCountryId
-      .sort((a: any, b: any) => b._count - a._count)
-      .map(async (row: any) => {
-        const country = await prisma.country.findUnique({
-          where: {
-            id: row.countryId as unknown as number,
-          },
-        })
-
-        return {
-          ...row,
-          ...country,
-        }
-      })
-  )
-  console.log('topCountry', topCountry)
-
-  const topUAId = await prisma.pageView.groupBy({
-    by: ['uAId'],
-    _count: true,
-    where: {
-      urlId: id,
-      uAId: {
-        not: null,
+  // OPTIMIZED: Get all grouped data in parallel with joins (NO N+1)
+  const [countryGroups, uaGroups] = await Promise.all([
+    // Country stats with join
+    prisma.pageView.groupBy({
+      by: ['countryId'],
+      where: {
+        urlId: id,
+        countryId: { not: null },
       },
-    },
-  })
-  console.log('topUAId', topUAId)
+      _count: true,
+      orderBy: { _count: { countryId: 'desc' } },
+      take: 10,
+    }),
 
-  const topUA = await Promise.all(
-    topUAId.map(async (row: any) => {
-      const ua = await prisma.uA.findUnique({
-        where: {
-          id: row.uAId as unknown as number,
-        },
-      })
+    // UA stats with join
+    prisma.pageView.groupBy({
+      by: ['uAId'],
+      where: {
+        urlId: id,
+        uAId: { not: null },
+      },
+      _count: true,
+      orderBy: { _count: { uAId: 'desc' } },
+      take: 50,
+    }),
+  ])
 
-      return {
-        ...row,
-        ...ua,
+  // Fetch related data in batch (OPTIMIZED - single query each)
+  const [countries, uas] = await Promise.all([
+    prisma.country.findMany({
+      where: {
+        id: { in: countryGroups.map((g) => g.countryId!).filter(Boolean) },
+      },
+    }),
+    prisma.uA.findMany({
+      where: {
+        id: { in: uaGroups.map((g) => g.uAId!).filter(Boolean) },
+      },
+    }),
+  ])
+
+  // Create lookup maps
+  const countryMap = new Map(countries.map((c) => [c.id, c.country]))
+  const uaMap = new Map(uas.map((u) => [u.id, u]))
+
+  // Helper to create stats
+  const createStats = (groups: any[], mapper: (item: any) => string): StatItem[] => {
+    const total = groups.reduce((sum, g) => sum + g._count, 0)
+    return groups.map((g) => ({
+      name: mapper(g),
+      count: g._count,
+      percentage: Math.round((g._count / total) * 100),
+    }))
+  }
+
+  // Top countries
+  const topCountries = createStats(
+    countryGroups,
+    (g) => countryMap.get(g.countryId!) || 'Unknown'
+  )
+
+  // Aggregate UA data by type
+  const aggregateUAField = (field: keyof UA): StatItem[] => {
+    const map = new Map<string, number>()
+    uaGroups.forEach((g) => {
+      const ua = uaMap.get(g.uAId!)
+      if (ua) {
+        const value = (ua[field] as string) || 'Unknown'
+        map.set(value, (map.get(value) || 0) + g._count)
       }
     })
-  )
-  console.log('topUA', topUA)
 
-  // Top OS
-  const topOS = groupByFromUA(topUA, 'os')
-  console.log('topOS', topOS)
+    const sorted = Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
 
-  // Top Browser
-  const topBrowser = groupByFromUA(topUA, 'browser')
-  console.log('topBrowser', topBrowser)
+    const total = sorted.reduce((sum, [, count]) => sum + count, 0)
 
-  // Top Browser Engine
-  const topEngine = groupByFromUA(topUA, 'engine')
-  console.log('topEngine', topEngine)
+    return sorted.map(([name, count]) => ({
+      name,
+      count,
+      percentage: Math.round((count / total) * 100),
+    }))
+  }
 
-  // Top Device
-  const topDevice = groupByFromUA(topUA, 'device')
-  console.log('topDevice', topDevice)
+  const topBrowsers = aggregateUAField('browser')
+  const topOS = aggregateUAField('os')
+  const topDevices = aggregateUAField('device')
+  const topEngines = aggregateUAField('engine')
 
   return {
     props: {
       url: JSON.parse(JSON.stringify(url)),
       pageviewStats: JSON.parse(JSON.stringify(pageviewStats)),
-      topCountry,
-      topUA,
+      topCountries,
+      topBrowsers,
       topOS,
-      topBrowser,
-      topEngine,
-      topDevice,
+      topDevices,
+      topEngines,
     },
   }
-}
-
-function groupByFromUA(array: any[], key: string) {
-  return array
-    .reduce((acc: any, row: any) => {
-      // Attention: this is not a deep search. Harded coded to row.ua.<key>
-      const keyValue = row[key] || 'N/A'
-      const count = row._count
-
-      const index = acc.findIndex((row: any) => row[key] === keyValue)
-      if (index === -1) {
-        acc.push({ [key]: keyValue, _count: count })
-      } else {
-        acc[index]._count += count
-      }
-
-      return acc
-    }, [])
-    .sort((a: any, b: any) => b._count - a._count)
 }
