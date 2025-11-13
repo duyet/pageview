@@ -177,7 +177,7 @@ export default function Home({
 
       <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
         {/* Hero Section */}
-        <section className="border-b border-neutral-200 dark:border-neutral-700">
+        <section>
           <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
             <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 dark:bg-neutral-800">
               <TrendingUp className="size-3 text-neutral-500 dark:text-neutral-400" />
@@ -217,7 +217,7 @@ export default function Home({
         </section>
 
         {/* Stats Grid */}
-        <section className="border-b border-neutral-200 dark:border-neutral-700">
+        <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <motion.div
               variants={container}
@@ -271,7 +271,7 @@ export default function Home({
         </section>
 
         {/* Traffic Trends Chart */}
-        <section className="border-b border-neutral-200 dark:border-neutral-700">
+        <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
@@ -288,7 +288,7 @@ export default function Home({
         </section>
 
         {/* Quick Start Section */}
-        <section className="border-b border-neutral-200 dark:border-neutral-700">
+        <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
               <div className="mb-4">
