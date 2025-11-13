@@ -6,9 +6,14 @@
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { Prisma } from '@prisma/client'
 import prisma from '@/lib/prisma'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -23,7 +28,9 @@ import { Badge } from '@/components/ui/badge'
 type UrlStat = {
   id: number
   url: string
-  _count: Prisma.UrlCountOutputType
+  _count: {
+    pageViews: number
+  }
 }
 
 type DomainPageProps = {
@@ -32,7 +39,11 @@ type DomainPageProps = {
   totalPageviews: number
 }
 
-export default function DomainPage({ domain, urlStats, totalPageviews }: DomainPageProps) {
+export default function DomainPage({
+  domain,
+  urlStats,
+  totalPageviews,
+}: DomainPageProps) {
   return (
     <div className="container mx-auto max-w-7xl p-6">
       {/* Header */}
@@ -52,7 +63,9 @@ export default function DomainPage({ domain, urlStats, totalPageviews }: DomainP
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{totalPageviews.toLocaleString()}</div>
+            <div className="text-3xl font-bold">
+              {totalPageviews.toLocaleString()}
+            </div>
             <div className="text-sm text-muted-foreground">Total Pageviews</div>
           </div>
         </div>
@@ -70,7 +83,9 @@ export default function DomainPage({ domain, urlStats, totalPageviews }: DomainP
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Total Pageviews</CardDescription>
-            <CardTitle className="text-3xl">{totalPageviews.toLocaleString()}</CardTitle>
+            <CardTitle className="text-3xl">
+              {totalPageviews.toLocaleString()}
+            </CardTitle>
           </CardHeader>
         </Card>
 
@@ -111,9 +126,13 @@ export default function DomainPage({ domain, urlStats, totalPageviews }: DomainP
               </TableHeader>
               <TableBody>
                 {urlStats.map((urlStat) => {
-                  const percentage = totalPageviews > 0
-                    ? ((urlStat._count.pageViews / totalPageviews) * 100).toFixed(1)
-                    : 0
+                  const percentage =
+                    totalPageviews > 0
+                      ? (
+                          (urlStat._count.pageViews / totalPageviews) *
+                          100
+                        ).toFixed(1)
+                      : 0
 
                   return (
                     <TableRow key={urlStat.id}>
@@ -176,7 +195,10 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   })
 
   // Calculate total pageviews
-  const totalPageviews = urlStats.reduce((sum, url) => sum + url._count.pageViews, 0)
+  const totalPageviews = urlStats.reduce(
+    (sum, url) => sum + url._count.pageViews,
+    0
+  )
 
   return {
     props: {

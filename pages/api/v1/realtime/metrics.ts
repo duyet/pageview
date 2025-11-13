@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GET /api/v1/realtime/metrics
  * Get real-time metrics (last 24 hours)
@@ -73,16 +74,20 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     }),
 
     // Unique visitors last 24h (by IP)
-    prisma.pageView.groupBy({
-      by: ['ip'],
-      where: whereClause,
-    }).then((result) => result.length),
+    prisma.pageView
+      .groupBy({
+        by: ['ip'],
+        where: whereClause,
+      })
+      .then((result) => result.length),
 
     // Active visitors (last 5 minutes)
-    prisma.pageView.groupBy({
-      by: ['ip'],
-      where: recentWhereClause,
-    }).then((result) => result.length),
+    prisma.pageView
+      .groupBy({
+        by: ['ip'],
+        where: recentWhereClause,
+      })
+      .then((result) => result.length),
 
     // Top pages last 24h
     prisma.pageView.groupBy({

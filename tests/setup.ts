@@ -4,7 +4,7 @@
  */
 
 import '@testing-library/jest-dom'
-import { afterEach } from 'vitest'
+import { afterEach, beforeAll, afterAll, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 // Cleanup after each test
@@ -13,7 +13,7 @@ afterEach(() => {
 })
 
 // Mock environment variables
-process.env.NODE_ENV = 'test'
+// NODE_ENV is automatically set to 'test' by Vitest
 process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 
 // Mock Next.js router

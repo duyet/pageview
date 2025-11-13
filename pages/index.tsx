@@ -15,8 +15,6 @@ import {
   Clock,
 } from 'lucide-react'
 
-import { Prisma, Host } from '@prisma/client'
-
 import prisma from '../lib/prisma'
 import { Usage } from '../components/Usage'
 import {
@@ -33,7 +31,12 @@ import { TrendBadge } from '../components/TrendBadge'
 import { Sparkline } from '../components/Sparkline'
 import { EmptyState } from '../components/EmptyState'
 
-type DomainStat = Prisma.UrlGroupByOutputType & Host
+type DomainStat = {
+  hostId: number
+  host: string
+  _count: number
+  pageViews: number
+}
 
 type Props = {
   domainStats: DomainStat[]
@@ -98,7 +101,10 @@ export default function Home({
                 <TrendingUp className="size-3.5 text-blue-600" />
                 <span className="text-xs font-medium text-blue-900">
                   Tracking{' '}
-                  <AnimatedNumber value={totalPageViews} className="font-semibold" />{' '}
+                  <AnimatedNumber
+                    value={totalPageViews}
+                    className="font-semibold"
+                  />{' '}
                   pageviews
                 </span>
               </div>
@@ -109,8 +115,8 @@ export default function Home({
               </h1>
 
               <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
-                Privacy-focused pageview tracking for modern websites. No cookies,
-                no complex setup, just clean analytics.
+                Privacy-focused pageview tracking for modern websites. No
+                cookies, no complex setup, just clean analytics.
               </p>
 
               {/* Features */}
@@ -227,7 +233,9 @@ export default function Home({
           <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <Card className="border-border/50 shadow-none">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg font-semibold">Quick Start</CardTitle>
+                <CardTitle className="text-lg font-semibold">
+                  Quick Start
+                </CardTitle>
                 <CardDescription className="text-sm">
                   Add this snippet to start tracking
                 </CardDescription>
@@ -246,9 +254,12 @@ export default function Home({
               <CardHeader className="pb-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <CardTitle className="text-lg font-semibold">Tracked Domains</CardTitle>
+                    <CardTitle className="text-lg font-semibold">
+                      Tracked Domains
+                    </CardTitle>
                     <CardDescription className="text-sm">
-                      {filteredDomains.length} domain{filteredDomains.length !== 1 && 's'}
+                      {filteredDomains.length} domain
+                      {filteredDomains.length !== 1 && 's'}
                     </CardDescription>
                   </div>
                   <div className="relative w-full sm:w-64">
@@ -357,12 +368,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   })
 
   // Calculate stats for each domain
-  const domainStats = hosts.map((host) => ({
-    hostId: host.id,
-    host: host.host,
-    _count: host.urls.length,
-    pageViews: host.urls.reduce((sum, url) => sum + url._count.pageViews, 0),
-  })).filter((stat) => stat._count > 0) // Only show domains with URLs
+  const domainStats = hosts
+    .map((host: any) => ({
+      hostId: host.id,
+      host: host.host,
+      _count: host.urls.length,
+      pageViews: host.urls.reduce(
+        (sum: number, url: any) => sum + url._count.pageViews,
+        0
+      ),
+    }))
+    .filter((stat: any) => stat._count > 0) // Only show domains with URLs
 
   const totalPageViews = await prisma.pageView.count()
   const totalUrls = await prisma.url.count()

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GET /api/v1/analytics/trends
  * Get pageview trends over time

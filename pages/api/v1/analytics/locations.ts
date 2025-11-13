@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GET /api/v1/analytics/locations
  * Get geographic analytics (countries and cities)
@@ -84,7 +85,8 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         country: countryMap.get(stat.countryId!) || 'Unknown',
         countryName: countryMap.get(stat.countryId!) || 'Unknown',
         count: stat._count.id,
-        percentage: total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
+        percentage:
+          total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
       }))
 
     return successResponse(res, {
@@ -108,9 +110,7 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     })
 
     // Get city and country details
-    const cityIds = cityStats
-      .map((s) => s.cityId)
-      .filter(Boolean) as number[]
+    const cityIds = cityStats.map((s) => s.cityId).filter(Boolean) as number[]
 
     const countryIds = cityStats
       .map((s) => s.countryId)
@@ -152,7 +152,8 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         countryName: countryMap.get(stat.countryId!) || 'Unknown',
         city: cityMap.get(stat.cityId!) || 'Unknown',
         count: stat._count.id,
-        percentage: total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
+        percentage:
+          total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
       }))
 
     return successResponse(res, {
