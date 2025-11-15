@@ -56,23 +56,18 @@ export function DeviceHorizontalChart({
 
         return (
           <div key={index} className="group">
-            <div className="mb-1 flex items-center justify-between text-xs">
-              <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                {item.name}
-              </span>
-              <span className="text-neutral-600 dark:text-neutral-400">
-                {item.percentage}%
-              </span>
-            </div>
-            <div className="relative h-8 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-800">
+            <div className="relative h-9 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-800">
               <div
                 className="flex h-full items-center justify-between px-3 text-xs font-medium text-white transition-all"
                 style={{
-                  width: `${Math.max(percentage, 5)}%`,
+                  width: `${Math.max(percentage, 20)}%`,
                   backgroundColor: color,
                 }}
               >
-                <span className="truncate">{item.value.toLocaleString()}</span>
+                <span className="truncate">{item.name}</span>
+                <span className="ml-2 shrink-0">
+                  {item.value.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
