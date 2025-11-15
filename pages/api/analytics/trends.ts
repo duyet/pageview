@@ -52,7 +52,7 @@ export default async function handler(
     }
 
     // Get daily pageviews and unique visitors using Prisma
-    const [dailyPageviews, uniqueIpsByDay] = await Promise.all([
+    const [dailyPageviews, uniqueIpsByDay, allUniqueIps] = await Promise.all([
       // Get daily pageview counts
       prisma.pageView.groupBy({
         by: ['createdAt'],
@@ -78,6 +78,20 @@ export default async function handler(
           createdAt: 'asc',
         },
       }),
+      // Get all unique IPs across the date range for total unique visitors
+      prisma.pageView.findMany({
+        where: {
+          ...whereClause,
+          ip: {
+            not: null,
+            notIn: [''],
+          },
+        },
+        select: {
+          ip: true,
+        },
+        distinct: ['ip'],
+      }),
     ])
 
     // Create maps for quick lookup
@@ -101,38 +115,22 @@ export default async function handler(
       }
     })
 
-    // Calculate total unique visitors across entire period (not sum of daily)
-    // This requires getting all unique IPs across the date range
-    const allUniqueIps = await prisma.pageView.findMany({
-      where: {
-        ...whereClause,
-        ip: {
-          not: null,
-          notIn: [''],
-        },
-      },
-      select: {
-        ip: true,
-      },
-      distinct: ['ip'],
-    })
-
     // Generate complete date range with zero-filled missing days
     const trends: TrendData[] = []
     let totalPageviews = 0
 
     for (let i = 0; i < numDays; i++) {
       const date = format(subDays(endDate, numDays - 1 - i), 'yyyy-MM-dd')
-      const pageviews = pageviewMap.get(date) || 0
-      const uniqueVisitors = visitorMap.get(date)?.size || 0
+      const pageviewsCount = pageviewMap.get(date) || 0
+      const uniqueVisitorsCount = visitorMap.get(date)?.size || 0
 
       trends.push({
         date,
-        pageviews,
-        uniqueVisitors,
+        pageviews: pageviewsCount,
+        uniqueVisitors: uniqueVisitorsCount,
       })
 
-      totalPageviews += pageviews
+      totalPageviews += pageviewsCount
     }
 
     // Total unique visitors is count of distinct IPs across entire period

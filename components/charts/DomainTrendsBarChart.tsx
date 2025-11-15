@@ -1,0 +1,109 @@
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+import { format, parseISO } from 'date-fns'
+import { TrendData } from '../../pages/api/analytics/trends'
+import { MetricView } from '../domain/DomainTrendsSection'
+
+interface DomainTrendsBarChartProps {
+  data: TrendData[]
+  loading?: boolean
+  metricView?: MetricView
+}
+
+export function DomainTrendsBarChart({
+  data,
+  loading,
+  metricView = 'pageviews',
+}: DomainTrendsBarChartProps) {
+  if (loading) {
+    return (
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-neutral-600 dark:text-neutral-400">
+          Loading trends...
+        </div>
+      </div>
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-neutral-600 dark:text-neutral-400">
+          No data available
+        </div>
+      </div>
+    )
+  }
+
+  const chartData = data.map((item) => ({
+    ...item,
+    formattedDate: format(parseISO(item.date), 'MMM dd'),
+  }))
+
+  const isPageViewsMode = metricView === 'pageviews'
+
+  return (
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={chartData}>
+          <XAxis
+            dataKey="formattedDate"
+            tick={{ fontSize: 12, fill: 'currentColor' }}
+            className="text-neutral-600 dark:text-neutral-400"
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 12, fill: 'currentColor' }}
+            className="text-neutral-600 dark:text-neutral-400"
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip
+            content={({ active, payload, label }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {label}
+                    </p>
+                    {payload.map((entry, index) => (
+                      <p
+                        key={index}
+                        className="text-xs text-neutral-600 dark:text-neutral-400"
+                      >
+                        <span
+                          className="mr-1.5 inline-block size-3 rounded-sm"
+                          style={{ backgroundColor: entry.color }}
+                        ></span>
+                        {entry.name}:{' '}
+                        <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                          {entry.value?.toLocaleString()}
+                        </span>
+                      </p>
+                    ))}
+                  </div>
+                )
+              }
+              return null
+            }}
+            animationDuration={0}
+          />
+          <Bar
+            dataKey={isPageViewsMode ? 'pageviews' : 'uniqueVisitors'}
+            fill={isPageViewsMode ? '#6366f1' : '#10b981'}
+            radius={[4, 4, 0, 0]}
+            name={isPageViewsMode ? 'Page Views' : 'Unique Visitors'}
+            isAnimationActive={false}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}

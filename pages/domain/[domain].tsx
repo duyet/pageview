@@ -3,21 +3,17 @@
  * Shows all URLs for a specific domain with pageview counts
  */
 
+import { useState, useEffect } from 'react'
 import type { GetServerSideProps } from 'next'
-import Link from 'next/link'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { subDays } from 'date-fns'
+import { DateRange } from 'react-day-picker'
 import prisma from '@/lib/prisma'
 import { analyzeDomain } from '@/lib/domainGrouping'
-import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import { DomainHeader } from '@/components/domain/DomainHeader'
+import { DomainTrendsSection } from '@/components/domain/DomainTrendsSection'
+import { DomainAnalyticsSection } from '@/components/domain/DomainAnalyticsSection'
+import { DomainUrlTable } from '@/components/domain/DomainUrlTable'
+import { TrendData } from '../api/analytics/trends'
 
 type UrlStat = {
   id: number
@@ -40,163 +36,64 @@ export default function DomainPage({
   totalPageviews,
   previewCount,
 }: DomainPageProps) {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  })
+  const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTrendsData = async () => {
+      if (!dateRange?.from || !dateRange?.to) return
+
+      const days = Math.ceil(
+        (dateRange.to.getTime() - dateRange.from.getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+
+      setLoading(true)
+
+      try {
+        const response = await fetch(
+          `/api/analytics/trends?days=${days}&host=${encodeURIComponent(domain)}`
+        )
+        if (response.ok) {
+          const result = await response.json()
+          setTrendsData(result.trends)
+        }
+      } catch (error) {
+        console.error('Error fetching trends data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTrendsData()
+  }, [dateRange, domain])
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
-          {/* Header */}
-          <div>
-            <Link href="/">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mb-4 h-8 px-2 text-sm"
-              >
-                <ArrowLeft className="mr-2 size-4" />
-                Back
-              </Button>
-            </Link>
+          <DomainHeader
+            domain={domain}
+            totalPageviews={totalPageviews}
+            totalUrls={urlStats.length}
+            previewCount={previewCount}
+          />
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
-                  {domain}
-                </h1>
-                <div className="mt-1 flex flex-col gap-1">
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Domain analytics and URL breakdown
-                  </p>
-                  {previewCount > 0 && (
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                      Including {previewCount} preview deployment
-                      {previewCount > 1 ? 's' : ''}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
-                  {totalPageviews.toLocaleString()}
-                </div>
-                <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                  Total Views
-                </div>
-              </div>
-            </div>
-          </div>
+          <DomainTrendsSection
+            domain={domain}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            trendsData={trendsData}
+            loading={loading}
+          />
 
-          {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Total URLs
-              </p>
-              <div className="mt-2 text-2xl font-medium">{urlStats.length}</div>
-            </div>
+          <DomainAnalyticsSection domain={domain} dateRange={dateRange} />
 
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Total Pageviews
-              </p>
-              <div className="mt-2 text-2xl font-medium">
-                {totalPageviews.toLocaleString()}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Avg. per URL
-              </p>
-              <div className="mt-2 text-2xl font-medium">
-                {urlStats.length > 0
-                  ? Math.round(
-                      totalPageviews / urlStats.length
-                    ).toLocaleString()
-                  : 0}
-              </div>
-            </div>
-          </div>
-
-          {/* URLs Table */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-            <div className="mb-4">
-              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-                URLs
-              </h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                All tracked URLs for this domain sorted by pageviews
-              </p>
-            </div>
-            {urlStats.length === 0 ? (
-              <div className="py-12 text-center text-sm text-neutral-600 dark:text-neutral-400">
-                <p>No URLs tracked yet</p>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="h-10 text-sm">URL</TableHead>
-                    <TableHead className="h-10 text-right text-sm">
-                      Pageviews
-                    </TableHead>
-                    <TableHead className="h-10 text-right text-sm">
-                      Share
-                    </TableHead>
-                    <TableHead className="h-10 w-[80px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {urlStats.map((urlStat) => {
-                    const percentage =
-                      totalPageviews > 0
-                        ? (
-                            (urlStat._count.pageViews / totalPageviews) *
-                            100
-                          ).toFixed(1)
-                        : 0
-
-                    return (
-                      <TableRow key={urlStat.id} className="group">
-                        <TableCell className="max-w-[500px] truncate py-3 font-mono text-sm">
-                          <a
-                            href={urlStat.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-neutral-900 hover:text-blue-600 hover:underline dark:text-neutral-100/80"
-                          >
-                            {urlStat.url}
-                            <ExternalLink className="size-3 opacity-40" />
-                          </a>
-                        </TableCell>
-                        <TableCell className="py-3 text-right text-sm font-medium">
-                          {urlStat._count.pageViews.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="py-3 text-right">
-                          <Badge
-                            variant="secondary"
-                            className="h-5 px-2 text-xs"
-                          >
-                            {percentage}%
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="py-3 text-right">
-                          <Link href={`/url/${urlStat.id}`}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 px-3 text-xs"
-                            >
-                              View
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            )}
-          </div>
+          <DomainUrlTable urlStats={urlStats} totalPageviews={totalPageviews} />
         </div>
       </div>
     </div>
