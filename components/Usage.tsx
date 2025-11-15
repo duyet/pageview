@@ -86,8 +86,6 @@ fetch('https://${currentHost}/api/pageview', {
 export const Usage = ({ currentHost }: Props) => {
   return (
     <div>
-      <h3 className="mb-4 text-lg font-semibold">Integration Examples</h3>
-
       <Tabs defaultValue="js" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="js">Script</TabsTrigger>
