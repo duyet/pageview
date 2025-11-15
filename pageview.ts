@@ -1,76 +1,158 @@
-// TODO: better way to handle this shit
+// Modern pageview tracking script inspired by Plausible/Fathom best practices
 export const genScript = (endpoint: string) => `
 ;(function (window, document) {
-  console.debug('pageview.js loaded')
+  'use strict'
+
+  const ENDPOINT = '${endpoint}'
   const COOKIE_TIMEOUT = 10 * 60 * 1000 // 10 minutes
+  const DEBOUNCE_DELAY = 300 // ms - prevent rapid-fire duplicate events
 
-  function pageview() {
-    console.log('pageview: pageview function called')
-    const endpoint = '${endpoint}'
-    const url = endpoint + '?url=' + encodeURIComponent(window.location.href)
+  let lastTrackedUrl = null
+  let debounceTimer = null
 
-    const cookieName = \`pv-$\{hash(url)\}\`
+  // Core tracking function with deduplication and error handling
+  function track() {
+    const currentUrl = window.location.href
+
+    // Skip if same URL (debouncing)
+    if (currentUrl === lastTrackedUrl) {
+      console.debug('pageview: skipping duplicate URL', currentUrl)
+      return
+    }
+
+    // Check cookie-based deduplication
+    const cookieName = 'pv-' + hash(currentUrl)
     const pageviewId = getCookie(cookieName)
-    console.log('pageview: cookieName', cookieName, pageviewId)
 
-    if (!pageviewId) {
-      console.debug('pageview: beacon trigger')
-      const pageviewId = generatePageviewId() // generate a unique identifier
-      setCookie(cookieName, pageviewId) // set the cookie with the identifier
+    if (pageviewId) {
+      console.debug('pageview: skipping (cookie exists)', cookieName)
+      return
+    }
 
-      navigator.sendBeacon(url)
+    // Track this pageview
+    console.debug('pageview: tracking', currentUrl)
+    lastTrackedUrl = currentUrl
+
+    // Set cookie to prevent duplicate tracking
+    const newPageviewId = generatePageviewId()
+    setCookie(cookieName, newPageviewId)
+
+    // Send beacon with fallback
+    sendBeaconWithFallback(ENDPOINT + '?url=' + encodeURIComponent(currentUrl))
+  }
+
+  // Debounced tracking to prevent rapid-fire events
+  function debouncedTrack() {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+    debounceTimer = setTimeout(track, DEBOUNCE_DELAY)
+  }
+
+  // Send beacon with XMLHttpRequest fallback for older browsers
+  function sendBeaconWithFallback(url) {
+    try {
+      if (navigator.sendBeacon && navigator.sendBeacon(url)) {
+        console.debug('pageview: beacon sent successfully')
+        return
+      }
+    } catch (e) {
+      console.warn('pageview: beacon failed, using fallback', e)
+    }
+
+    // Fallback to XMLHttpRequest
+    try {
+      const xhr = new XMLHttpRequest()
+      xhr.open('GET', url, true)
+      xhr.send()
+      console.debug('pageview: fallback XHR sent')
+    } catch (e) {
+      console.error('pageview: all tracking methods failed', e)
+    }
+  }
+
+  // Intercept History API for SPA support (React Router, Next.js, etc.)
+  function interceptHistory() {
+    const originalPushState = history.pushState
+    const originalReplaceState = history.replaceState
+
+    history.pushState = function() {
+      originalPushState.apply(this, arguments)
+      debouncedTrack()
+    }
+
+    history.replaceState = function() {
+      originalReplaceState.apply(this, arguments)
+      debouncedTrack()
+    }
+  }
+
+  // Setup event listeners for all navigation types
+  function setupListeners() {
+    // SPA navigation (back/forward buttons)
+    window.addEventListener('popstate', debouncedTrack)
+
+    // Hash-based routing (legacy SPAs)
+    window.addEventListener('hashchange', debouncedTrack)
+
+    // Intercept pushState/replaceState for modern SPAs
+    interceptHistory()
+
+    // Optional: Track when user returns to tab (commented out by default)
+    // document.addEventListener('visibilitychange', function() {
+    //   if (document.visibilityState === 'visible') {
+    //     debouncedTrack()
+    //   }
+    // })
+  }
+
+  // Initial page load tracking
+  function init() {
+    console.debug('pageview.js loaded and initialized')
+
+    // Setup all navigation listeners
+    setupListeners()
+
+    // Track initial pageview
+    if (document.readyState === 'loading') {
+      // DOM still loading, wait for DOMContentLoaded
+      document.addEventListener('DOMContentLoaded', track)
     } else {
-      // Skip sending the beacon if the cookie is already set
+      // DOM already loaded, track immediately
+      track()
     }
   }
 
-  // Listen for page visibility changes
-  document.addEventListener('visibilitychange', function change() {
-    if (document.visibilityState === 'hidden') {
-      pageview()
-    }
-  })
-
-  // Listen for URL changes using the History API
-  window.addEventListener('locationchange', pageview)
-  window.addEventListener('popstate', pageview)
-
-  // First load
-  window.addEventListener('DOMContentLoaded', pageview)
-
-  // helper function to generate a unique identifier
+  // Helper: Generate unique pageview ID
   function generatePageviewId() {
-    return Math.random().toString(36).substr(2, 9)
+    return Math.random().toString(36).substring(2, 11)
   }
 
-  // helper function to set a cookie with a given name and value
+  // Helper: Set cookie with expiration
   function setCookie(name, value) {
-    const expires = new Date()
-    expires.setTime(expires.getTime() + COOKIE_TIMEOUT)
-    document.cookie = \`$\{name\}=$\{value\};expires=$\{expires.toUTCString()\};path=/\`
-    console.debug('pageview: cookie set', name, value)
+    const expires = new Date(Date.now() + COOKIE_TIMEOUT).toUTCString()
+    document.cookie = name + '=' + value + ';expires=' + expires + ';path=/;SameSite=Lax'
+    console.debug('pageview: cookie set', name)
   }
 
-  // helper function to get a cookie value by name
+  // Helper: Get cookie value by name
   function getCookie(name) {
-    const match = document.cookie.match(new RegExp(\`(^| )$\{name\}=([^;]+)\`))
-    if (match) {
-      return match[2]
-    }
-    return null
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+    return match ? match[2] : null
   }
 
-  // helper function to generate a hash from a string
+  // Helper: Generate hash from string (simple but effective)
   function hash(str) {
-    let hash = 0
-    if (str.length == 0) {
-      return hash
-    }
+    let h = 0
+    if (str.length === 0) return h
     for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i)
-      hash = (hash << 5) - hash + char
-      hash = hash & hash // Convert to 32bit integer
+      h = ((h << 5) - h) + str.charCodeAt(i)
+      h = h & h // Convert to 32-bit integer
     }
-    return Math.abs(hash).toString(36).substr(0, 5) // return a 5-character string
+    return Math.abs(h).toString(36).substring(0, 8)
   }
-})(window, document)`
+
+  // Start tracking
+  init()
+})(window, document)
+`
