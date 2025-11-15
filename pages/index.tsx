@@ -44,7 +44,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { TrendsChart } from '../components/charts/TrendsChart'
+import {
+  TrendsChart,
+  MetricToggle,
+} from '../components/charts/TrendsChart'
 import { TrendData } from './api/analytics/trends'
 
 type DomainStat = {
@@ -87,7 +90,14 @@ export default function Home({
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
   const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [trendsTotals, setTrendsTotals] = useState<{
+    totalPageviews: number
+    totalUniqueVisitors: number
+  }>({ totalPageviews: 0, totalUniqueVisitors: 0 })
   const [loadingTrends, setLoadingTrends] = useState(true)
+  const [activeMetric, setActiveMetric] = useState<
+    'pageviews' | 'uniqueVisitors'
+  >('pageviews')
   const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [isIntegrationOpen, setIsIntegrationOpen] = useState(true)
@@ -100,6 +110,10 @@ export default function Home({
         if (response.ok) {
           const result = await response.json()
           setTrendsData(result.trends)
+          setTrendsTotals({
+            totalPageviews: result.totalPageviews || 0,
+            totalUniqueVisitors: result.totalUniqueVisitors || 0,
+          })
         }
       } catch (error) {
         console.error('Error fetching trends:', error)
@@ -302,15 +316,29 @@ export default function Home({
         <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-                  Traffic Trends
-                </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  Page views and unique visitors over the last 30 days
-                </p>
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                    Traffic Trends
+                  </h2>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Page views and unique visitors over the last 30 days
+                  </p>
+                </div>
+                <MetricToggle
+                  activeMetric={activeMetric}
+                  onMetricChange={setActiveMetric}
+                  totalPageviews={trendsTotals.totalPageviews}
+                  totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+                />
               </div>
-              <TrendsChart data={trendsData} loading={loadingTrends} />
+              <TrendsChart
+                data={trendsData}
+                loading={loadingTrends}
+                totalPageviews={trendsTotals.totalPageviews}
+                totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+                activeMetric={activeMetric}
+              />
             </div>
           </div>
         </section>

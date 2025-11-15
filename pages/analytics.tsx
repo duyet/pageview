@@ -11,7 +11,10 @@ import {
 } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DateRangePicker } from '@/components/DateRangePicker'
-import { TrendsChart } from '@/components/charts/TrendsChart'
+import {
+  TrendsChart,
+  MetricToggle,
+} from '@/components/charts/TrendsChart'
 import { DeviceChart } from '@/components/charts/DeviceChart'
 import { LocationChart } from '@/components/charts/LocationChart'
 import { TrendData } from './api/analytics/trends'
@@ -25,6 +28,13 @@ export default function Analytics() {
   })
 
   const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [trendsTotals, setTrendsTotals] = useState<{
+    totalPageviews: number
+    totalUniqueVisitors: number
+  }>({ totalPageviews: 0, totalUniqueVisitors: 0 })
+  const [activeMetric, setActiveMetric] = useState<
+    'pageviews' | 'uniqueVisitors'
+  >('pageviews')
   const [devicesData, setDevicesData] = useState<{
     browsers: DeviceData[]
     os: DeviceData[]
@@ -58,6 +68,10 @@ export default function Analytics() {
         if (trendsResponse.ok) {
           const trendsResult = await trendsResponse.json()
           setTrendsData(trendsResult.trends)
+          setTrendsTotals({
+            totalPageviews: trendsResult.totalPageviews || 0,
+            totalUniqueVisitors: trendsResult.totalUniqueVisitors || 0,
+          })
         }
         setLoading((prev) => ({ ...prev, trends: false }))
 
@@ -137,15 +151,29 @@ export default function Analytics() {
 
           {/* Trends Chart */}
           <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-            <div className="mb-4">
-              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-                Traffic Trends
-              </h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Page views and unique visitors over time
-              </p>
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Traffic Trends
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Page views and unique visitors over time
+                </p>
+              </div>
+              <MetricToggle
+                activeMetric={activeMetric}
+                onMetricChange={setActiveMetric}
+                totalPageviews={trendsTotals.totalPageviews}
+                totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+              />
             </div>
-            <TrendsChart data={trendsData} loading={loading.trends} />
+            <TrendsChart
+              data={trendsData}
+              loading={loading.trends}
+              totalPageviews={trendsTotals.totalPageviews}
+              totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+              activeMetric={activeMetric}
+            />
           </div>
 
           {/* Device & Location Analytics */}
