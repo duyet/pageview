@@ -91,12 +91,16 @@ model UA {
   deviceModel    String?
   deviceType     String?
   isBot          Boolean?
+  botType        String?    // Category: search-crawler, ai-scraper, monitoring, social-media, seo-tool, etc.
+  botName        String?    // Specific bot name: Googlebot, GPTBot, ClaudeBot, etc.
   pageViews      PageView[]
 
   @@index([ua])
   @@index([browser])
   @@index([os])
   @@index([isBot])
+  @@index([botType])
+  @@index([botName])
 }
 
 model Country {

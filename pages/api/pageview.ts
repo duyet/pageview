@@ -22,6 +22,8 @@ type CustomPageviewData = {
   deviceModel?: string
   deviceType?: string
   isBot?: boolean
+  botType?: string
+  botName?: string
   country?: string
   city?: string
   ip?: string
@@ -128,6 +130,8 @@ export default async function handler(
         deviceModel: customData.deviceModel || '',
         deviceType: customData.deviceType || '',
         isBot: customData.isBot || false,
+        botType: customData.botType || null,
+        botName: customData.botName || null,
       }
     : {
         ua: uaString,
@@ -141,11 +145,19 @@ export default async function handler(
         deviceModel: String(req.query.deviceModel || ''),
         deviceType: String(req.query.deviceType || ''),
         isBot: req.query.isBot === 'true',
+        botType:
+          req.query.botType && String(req.query.botType).trim() !== ''
+            ? String(req.query.botType)
+            : null,
+        botName:
+          req.query.botName && String(req.query.botName).trim() !== ''
+            ? String(req.query.botName)
+            : null,
       }
 
   try {
     // Use a transaction to batch the lookups/creates for better performance
-    const pageview = await prisma.$transaction(async (tx) => {
+    const pageview = await prisma.$transaction(async (tx: any) => {
       // First, ensure all referenced entities exist
       // This reduces the number of round trips by doing lookups in parallel
       const [host, slug, ua, country, city] = await Promise.all([

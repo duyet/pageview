@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, userAgent } from 'next/server'
 
 import { genScript } from './pageview'
+import { classifyBot } from './lib/botDetection'
 
 export async function middleware(req: NextRequest) {
   const { nextUrl: url, geo, ip } = req
@@ -34,7 +35,12 @@ export async function middleware(req: NextRequest) {
   url.searchParams.set('device', parsedUA.device.vendor || '')
   url.searchParams.set('deviceModel', parsedUA.device.model || '')
   url.searchParams.set('deviceType', parsedUA.device.type || '')
-  url.searchParams.set('isBot', parsedUA.isBot.toString())
+
+  // Enhanced bot detection
+  const botClassification = classifyBot(parsedUA.ua)
+  url.searchParams.set('isBot', botClassification.isBot.toString())
+  url.searchParams.set('botType', botClassification.botType || '')
+  url.searchParams.set('botName', botClassification.botName || '')
 
   if (url.pathname.startsWith('/api')) {
     return NextResponse.rewrite(url)

@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   try {
-    const { days = '30', host, urlId } = req.query
+    const { days = '30', host, urlId, excludeBots } = req.query
     const numDays = parseInt(days as string, 10)
 
     if (isNaN(numDays) || numDays < 1 || numDays > 365) {
@@ -50,6 +50,13 @@ export default async function handler(
         host: {
           host: host,
         },
+      }
+    }
+
+    // Filter out bots if requested
+    if (excludeBots === 'true') {
+      whereClause.ua = {
+        isBot: false,
       }
     }
 
