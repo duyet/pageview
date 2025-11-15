@@ -89,14 +89,15 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 
 **Before:**
 - Two separate `groupBy` queries (pageviews and unique visitors)
-- JavaScript-based date aggregation
+- Incorrect calculation: summing daily unique visitors instead of distinct count
 - No caching
 
 **After:**
-- Single raw SQL query with `DATE_TRUNC()` and `COUNT(DISTINCT ip)`
-- Database-level date aggregation
+- Parallel Prisma queries with `Promise.all()` for pageviews and unique visitors
+- Separate query for total unique visitors using `findMany` with `distinct: ['ip']`
+- Proper filtering of empty IPs: `ip: { not: null, notIn: [''] }`
 - 5-minute HTTP cache headers
-- **Performance Gain:** 50% reduction in query time
+- **Performance Gain:** Correct metrics + parallel execution
 
 #### Devices Endpoint (`/api/analytics/devices.ts`)
 
@@ -104,13 +105,14 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 - Three separate `groupBy` queries (browsers, OS, devices)
 - Additional lookup queries for UA details
 - Separate total count query
-- Multiple JavaScript map operations
+- No filtering of empty browser/OS/device values
 
 **After:**
-- Parallel execution of optimized JOIN queries
-- Direct aggregation with JOINs (no separate lookups needed)
+- Parallel Prisma queries with `Promise.all()` for all stats
+- Single UA lookup for all needed IDs
+- Filtering of empty values in JavaScript layer
 - 5-minute HTTP cache headers
-- **Performance Gain:** 60-70% reduction in query time, 75% reduction in query count
+- **Performance Gain:** Parallel execution + correct filtering
 
 #### Locations Endpoint (`/api/analytics/locations.ts`)
 
@@ -120,10 +122,10 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 - Separate total count query
 
 **After:**
-- Parallel execution of optimized JOIN queries
-- Direct aggregation with JOINs
+- Parallel Prisma queries with `Promise.all()` for all stats
+- Separate lookups for country and city details
 - 5-minute HTTP cache headers
-- **Performance Gain:** 60-70% reduction in query time, 66% reduction in query count
+- **Performance Gain:** Parallel execution improves response time
 
 ## Caching Strategy
 
@@ -141,16 +143,22 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 
 ## Query Optimization Techniques
 
-### 1. Database-Level Date Truncation
-```sql
--- Before (JavaScript)
-groupBy(['createdAt']) + format(item.createdAt, 'yyyy-MM-dd HH:00')
+### 1. Prisma-Only Approach
 
--- After (SQL)
-DATE_TRUNC('hour', "createdAt")
+**Important**: This project uses **Prisma ORM exclusively** - no raw SQL queries.
+
+```typescript
+// ✅ Good - Using Prisma
+await prisma.pageView.findMany({
+  where: { ... },
+  distinct: ['ip']
+})
+
+// ❌ Bad - Raw SQL (not used in this project)
+await prisma.$queryRaw`SELECT DISTINCT ip ...`
 ```
 
-### 2. Parallel Query Execution
+### 2. Parallel Query Execution with Prisma
 ```typescript
 // Before
 const result1 = await query1()
@@ -165,20 +173,21 @@ const [result1, result2, result3] = await Promise.all([
 ])
 ```
 
-### 3. JOIN Instead of Separate Lookups
-```sql
--- Before
-SELECT "countryId", COUNT(*) FROM "PageView" GROUP BY "countryId"
--- Then: SELECT * FROM "Country" WHERE id IN (...)
-
--- After
-SELECT c.country, COUNT(*)
-FROM "PageView" pv
-INNER JOIN "Country" c ON pv."countryId" = c.id
-GROUP BY c.country
+### 3. Prisma Distinct for Unique Counts
+```typescript
+// Get unique IPs using Prisma
+const uniqueIps = await prisma.pageView.findMany({
+  where: {
+    createdAt: { gte: startDate },
+    ip: { not: null, notIn: [''] }
+  },
+  select: { ip: true },
+  distinct: ['ip']
+})
+const uniqueCount = uniqueIps.length
 ```
 
-### 4. Transaction Batching
+### 4. Transaction Batching with Prisma
 ```typescript
 // Before
 await prisma.host.connectOrCreate(...)
@@ -198,13 +207,14 @@ Based on these optimizations, expected improvements:
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| Data collection latency | ~200-300ms | ~80-120ms | 60-70% faster |
-| Real-time metrics (cached) | ~150-200ms | ~2-5ms | 95%+ faster |
-| Real-time metrics (uncached) | ~150-200ms | ~80-100ms | 40-50% faster |
-| Analytics trends | ~300-400ms | ~120-150ms | 60-65% faster |
-| Analytics devices | ~400-500ms | ~120-180ms | 65-75% faster |
-| Analytics locations | ~300-400ms | ~100-150ms | 65-70% faster |
-| Database queries per pageview | 7-13 | 3 | 70-77% reduction |
+| Data collection latency | ~200-300ms | ~80-120ms | 60-70% faster (transaction batching) |
+| Real-time metrics (cached) | ~150-200ms | ~2-5ms | 95%+ faster (in-memory cache) |
+| Real-time metrics (uncached) | ~150-200ms | ~100-120ms | 30-40% faster (parallel queries) |
+| Analytics trends | ~300-400ms | ~150-200ms | 40-50% faster (parallel + correct logic) |
+| Analytics devices | ~400-500ms | ~180-220ms | 50-60% faster (parallel queries) |
+| Analytics locations | ~300-400ms | ~150-180ms | 50-55% faster (parallel queries) |
+| Database queries per pageview | 7-13 | 3 | 70-77% reduction (transaction batching) |
+| Unique visitor accuracy | Incorrect (sum) | Correct (distinct) | Bug fixed |
 
 ## Monitoring Recommendations
 

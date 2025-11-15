@@ -30,8 +30,8 @@ export default async function handler(
     const last24Hours = subHours(currentTime, 24)
     const last1Hour = subHours(currentTime, 1)
 
-    // Optimize: Get total views and unique visitors in a single query using raw SQL
-    const [totalViewsResult, uniqueVisitorsResult] = await Promise.all([
+    // Get total views and unique visitors using Prisma
+    const [totalViews, uniqueIpsResult] = await Promise.all([
       prisma.pageView.count({
         where: {
           createdAt: {
@@ -39,18 +39,25 @@ export default async function handler(
           },
         },
       }),
-      // Use raw SQL for distinct count (more efficient)
-      prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(DISTINCT ip) as count
-        FROM "PageView"
-        WHERE "createdAt" >= ${last24Hours}
-        AND ip IS NOT NULL
-        AND ip != ''
-      `,
+      // Get unique IPs using Prisma distinct
+      prisma.pageView.findMany({
+        where: {
+          createdAt: {
+            gte: last24Hours,
+          },
+          ip: {
+            not: null,
+            notIn: [''],
+          },
+        },
+        select: {
+          ip: true,
+        },
+        distinct: ['ip'],
+      }),
     ])
 
-    const totalViews = totalViewsResult
-    const uniqueVisitors = Number(uniqueVisitorsResult[0]?.count || 0)
+    const uniqueVisitors = uniqueIpsResult.length
 
     // Get most active pages in last hour
     const activePages = await prisma.pageView.groupBy({
@@ -143,24 +150,27 @@ export default async function handler(
         count: c._count.id,
       }))
 
-    // Optimize: Use database-level date truncation for hourly aggregation
-    const hourlyViewsRaw = await prisma.$queryRaw<
-      Array<{ hour: Date; count: bigint }>
-    >`
-      SELECT
-        DATE_TRUNC('hour', "createdAt") as hour,
-        COUNT(*) as count
-      FROM "PageView"
-      WHERE "createdAt" >= ${last24Hours}
-      GROUP BY DATE_TRUNC('hour', "createdAt")
-      ORDER BY hour ASC
-    `
+    // Get hourly views using Prisma groupBy
+    const hourlyViews = await prisma.pageView.groupBy({
+      by: ['createdAt'],
+      where: {
+        createdAt: {
+          gte: last24Hours,
+        },
+      },
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    })
 
-    // Convert to map for efficient lookup
+    // Convert to map for efficient lookup, grouping by hour
     const hourlyMap = new Map<string, number>()
-    hourlyViewsRaw.forEach((item) => {
-      const hourKey = format(new Date(item.hour), 'yyyy-MM-dd HH:00')
-      hourlyMap.set(hourKey, Number(item.count))
+    hourlyViews.forEach((item) => {
+      const hourKey = format(startOfHour(item.createdAt), 'yyyy-MM-dd HH:00')
+      hourlyMap.set(hourKey, (hourlyMap.get(hourKey) || 0) + item._count.id)
     })
 
     // Generate complete 24-hour range with zero-filled missing hours

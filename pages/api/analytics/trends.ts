@@ -51,78 +51,71 @@ export default async function handler(
       }
     }
 
-    // Optimize: Use raw SQL with date truncation and CTE to combine queries
-    let dailyStats: Array<{
-      date: Date
-      pageviews: bigint
-      uniqueVisitors: bigint
-    }>
-
-    if (host && typeof host === 'string') {
-      // With host filter
-      dailyStats = await prisma.$queryRaw`
-        SELECT
-          DATE_TRUNC('day', pv."createdAt") as date,
-          COUNT(*) as pageviews,
-          COUNT(DISTINCT pv.ip) as "uniqueVisitors"
-        FROM "PageView" pv
-        INNER JOIN "Url" u ON pv."urlId" = u.id
-        INNER JOIN "Host" h ON u."hostId" = h.id
-        WHERE pv."createdAt" >= ${startDate}
-          AND pv."createdAt" <= ${endDate}
-          AND h.host = ${host}
-        GROUP BY DATE_TRUNC('day', pv."createdAt")
-        ORDER BY date ASC
-      `
-    } else {
-      // Without host filter
-      dailyStats = await prisma.$queryRaw`
-        SELECT
-          DATE_TRUNC('day', "createdAt") as date,
-          COUNT(*) as pageviews,
-          COUNT(DISTINCT ip) as "uniqueVisitors"
-        FROM "PageView"
-        WHERE "createdAt" >= ${startDate}
-          AND "createdAt" <= ${endDate}
-        GROUP BY DATE_TRUNC('day', "createdAt")
-        ORDER BY date ASC
-      `
-    }
+    // Get daily pageviews and unique visitors using Prisma
+    const [dailyPageviews, uniqueIpsByDay] = await Promise.all([
+      // Get daily pageview counts
+      prisma.pageView.groupBy({
+        by: ['createdAt'],
+        where: whereClause,
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+      // Get unique IPs by day for daily unique visitor count
+      prisma.pageView.groupBy({
+        by: ['createdAt', 'ip'],
+        where: {
+          ...whereClause,
+          ip: {
+            not: null,
+            notIn: [''],
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+    ])
 
     // Create maps for quick lookup
     const pageviewMap = new Map<string, number>()
-    const visitorMap = new Map<string, number>()
+    const visitorMap = new Map<string, Set<string>>()
 
-    dailyStats.forEach((item) => {
-      const date = format(new Date(item.date), 'yyyy-MM-dd')
-      pageviewMap.set(date, Number(item.pageviews))
-      visitorMap.set(date, Number(item.uniqueVisitors))
+    // Process pageviews
+    dailyPageviews.forEach((item) => {
+      const date = format(startOfDay(item.createdAt), 'yyyy-MM-dd')
+      pageviewMap.set(date, (pageviewMap.get(date) || 0) + item._count.id)
+    })
+
+    // Process unique visitors by day
+    uniqueIpsByDay.forEach((item) => {
+      const date = format(startOfDay(item.createdAt), 'yyyy-MM-dd')
+      if (!visitorMap.has(date)) {
+        visitorMap.set(date, new Set())
+      }
+      if (item.ip) {
+        visitorMap.get(date)!.add(item.ip)
+      }
     })
 
     // Calculate total unique visitors across entire period (not sum of daily)
-    let totalUniqueVisitorsQuery: [{ count: bigint }]
-    if (host && typeof host === 'string') {
-      totalUniqueVisitorsQuery = await prisma.$queryRaw`
-        SELECT COUNT(DISTINCT pv.ip) as count
-        FROM "PageView" pv
-        INNER JOIN "Url" u ON pv."urlId" = u.id
-        INNER JOIN "Host" h ON u."hostId" = h.id
-        WHERE pv."createdAt" >= ${startDate}
-          AND pv."createdAt" <= ${endDate}
-          AND h.host = ${host}
-          AND pv.ip IS NOT NULL
-          AND pv.ip != ''
-      `
-    } else {
-      totalUniqueVisitorsQuery = await prisma.$queryRaw`
-        SELECT COUNT(DISTINCT ip) as count
-        FROM "PageView"
-        WHERE "createdAt" >= ${startDate}
-          AND "createdAt" <= ${endDate}
-          AND ip IS NOT NULL
-          AND ip != ''
-      `
-    }
+    // This requires getting all unique IPs across the date range
+    const allUniqueIps = await prisma.pageView.findMany({
+      where: {
+        ...whereClause,
+        ip: {
+          not: null,
+          notIn: [''],
+        },
+      },
+      select: {
+        ip: true,
+      },
+      distinct: ['ip'],
+    })
 
     // Generate complete date range with zero-filled missing days
     const trends: TrendData[] = []
@@ -131,7 +124,7 @@ export default async function handler(
     for (let i = 0; i < numDays; i++) {
       const date = format(subDays(endDate, numDays - 1 - i), 'yyyy-MM-dd')
       const pageviews = pageviewMap.get(date) || 0
-      const uniqueVisitors = visitorMap.get(date) || 0
+      const uniqueVisitors = visitorMap.get(date)?.size || 0
 
       trends.push({
         date,
@@ -142,7 +135,8 @@ export default async function handler(
       totalPageviews += pageviews
     }
 
-    const totalUniqueVisitors = Number(totalUniqueVisitorsQuery[0]?.count || 0)
+    // Total unique visitors is count of distinct IPs across entire period
+    const totalUniqueVisitors = allUniqueIps.length
 
     // Set cache headers for CDN/client-side caching (5 minutes)
     res.setHeader(
