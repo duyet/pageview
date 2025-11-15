@@ -25,6 +25,10 @@ export default function Analytics() {
   })
 
   const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [trendsTotals, setTrendsTotals] = useState<{
+    totalPageviews: number
+    totalUniqueVisitors: number
+  }>({ totalPageviews: 0, totalUniqueVisitors: 0 })
   const [devicesData, setDevicesData] = useState<{
     browsers: DeviceData[]
     os: DeviceData[]
@@ -58,6 +62,10 @@ export default function Analytics() {
         if (trendsResponse.ok) {
           const trendsResult = await trendsResponse.json()
           setTrendsData(trendsResult.trends)
+          setTrendsTotals({
+            totalPageviews: trendsResult.totalPageviews || 0,
+            totalUniqueVisitors: trendsResult.totalUniqueVisitors || 0,
+          })
         }
         setLoading((prev) => ({ ...prev, trends: false }))
 
@@ -145,7 +153,12 @@ export default function Analytics() {
                 Page views and unique visitors over time
               </p>
             </div>
-            <TrendsChart data={trendsData} loading={loading.trends} />
+            <TrendsChart
+              data={trendsData}
+              loading={loading.trends}
+              totalPageviews={trendsTotals.totalPageviews}
+              totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+            />
           </div>
 
           {/* Device & Location Analytics */}

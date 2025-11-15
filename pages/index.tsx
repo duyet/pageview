@@ -87,6 +87,10 @@ export default function Home({
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
   const [trendsData, setTrendsData] = useState<TrendData[]>([])
+  const [trendsTotals, setTrendsTotals] = useState<{
+    totalPageviews: number
+    totalUniqueVisitors: number
+  }>({ totalPageviews: 0, totalUniqueVisitors: 0 })
   const [loadingTrends, setLoadingTrends] = useState(true)
   const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -100,6 +104,10 @@ export default function Home({
         if (response.ok) {
           const result = await response.json()
           setTrendsData(result.trends)
+          setTrendsTotals({
+            totalPageviews: result.totalPageviews || 0,
+            totalUniqueVisitors: result.totalUniqueVisitors || 0,
+          })
         }
       } catch (error) {
         console.error('Error fetching trends:', error)
@@ -310,7 +318,12 @@ export default function Home({
                   Page views and unique visitors over the last 30 days
                 </p>
               </div>
-              <TrendsChart data={trendsData} loading={loadingTrends} />
+              <TrendsChart
+                data={trendsData}
+                loading={loadingTrends}
+                totalPageviews={trendsTotals.totalPageviews}
+                totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
+              />
             </div>
           </div>
         </section>

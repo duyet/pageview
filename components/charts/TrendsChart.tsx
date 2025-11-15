@@ -14,11 +14,18 @@ import { TrendData } from '../../pages/api/analytics/trends'
 interface TrendsChartProps {
   data: TrendData[]
   loading?: boolean
+  totalPageviews?: number
+  totalUniqueVisitors?: number
 }
 
 type MetricType = 'pageviews' | 'uniqueVisitors'
 
-export function TrendsChart({ data, loading }: TrendsChartProps) {
+export function TrendsChart({
+  data,
+  loading,
+  totalPageviews,
+  totalUniqueVisitors,
+}: TrendsChartProps) {
   const [activeMetric, setActiveMetric] = useState<MetricType>('pageviews')
   if (loading) {
     return (
@@ -62,27 +69,41 @@ export function TrendsChart({ data, loading }: TrendsChartProps) {
 
   return (
     <div className="space-y-4">
-      {/* Metric Toggle */}
+      {/* Metric Toggle with Totals */}
       <div className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-1 dark:border-neutral-700 dark:bg-neutral-800/50">
         <button
           onClick={() => setActiveMetric('pageviews')}
-          className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
             activeMetric === 'pageviews'
               ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100'
               : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
           }`}
         >
-          Page Views
+          <div className="flex flex-col items-center gap-0.5">
+            <span>Page Views</span>
+            {totalPageviews !== undefined && (
+              <span className="text-xs font-semibold">
+                {totalPageviews.toLocaleString()}
+              </span>
+            )}
+          </div>
         </button>
         <button
           onClick={() => setActiveMetric('uniqueVisitors')}
-          className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
             activeMetric === 'uniqueVisitors'
               ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100'
               : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
           }`}
         >
-          Unique Visitors
+          <div className="flex flex-col items-center gap-0.5">
+            <span>Unique Visitors</span>
+            {totalUniqueVisitors !== undefined && (
+              <span className="text-xs font-semibold">
+                {totalUniqueVisitors.toLocaleString()}
+              </span>
+            )}
+          </div>
         </button>
       </div>
 
