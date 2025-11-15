@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { DateRangePicker } from '@/components/DateRangePicker'
 import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendData } from '@/pages/api/analytics/trends'
+
+export type MetricView = 'both' | 'pageviews' | 'visitors'
 
 interface DomainTrendsSectionProps {
   domain: string
@@ -19,6 +23,8 @@ export function DomainTrendsSection({
   trendsData,
   loading,
 }: DomainTrendsSectionProps) {
+  const [metricView, setMetricView] = useState<MetricView>('both')
+
   const formatDateRange = () => {
     if (!dateRange?.from || !dateRange?.to) return ''
     return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd, yyyy')}`
@@ -36,15 +42,37 @@ export function DomainTrendsSection({
       </div>
 
       <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-            Traffic Trends
-          </h2>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            Page views and unique visitors for {domain}
-          </p>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+              Traffic Trends
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Page views and unique visitors for {domain}
+            </p>
+          </div>
+          <Tabs
+            value={metricView}
+            onValueChange={(value) => setMetricView(value as MetricView)}
+          >
+            <TabsList className="h-9">
+              <TabsTrigger value="both" className="text-xs">
+                Both
+              </TabsTrigger>
+              <TabsTrigger value="pageviews" className="text-xs">
+                Page Views
+              </TabsTrigger>
+              <TabsTrigger value="visitors" className="text-xs">
+                Visitors
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-        <DomainTrendsBarChart data={trendsData} loading={loading} />
+        <DomainTrendsBarChart
+          data={trendsData}
+          loading={loading}
+          metricView={metricView}
+        />
       </div>
     </>
   )

@@ -10,15 +10,18 @@ import {
 } from 'recharts'
 import { format, parseISO } from 'date-fns'
 import { TrendData } from '../../pages/api/analytics/trends'
+import { MetricView } from '../domain/DomainTrendsSection'
 
 interface DomainTrendsBarChartProps {
   data: TrendData[]
   loading?: boolean
+  metricView?: MetricView
 }
 
 export function DomainTrendsBarChart({
   data,
   loading,
+  metricView = 'both',
 }: DomainTrendsBarChartProps) {
   if (loading) {
     return (
@@ -44,6 +47,9 @@ export function DomainTrendsBarChart({
     ...item,
     formattedDate: format(parseISO(item.date), 'MMM dd'),
   }))
+
+  const showPageViews = metricView === 'both' || metricView === 'pageviews'
+  const showVisitors = metricView === 'both' || metricView === 'visitors'
 
   return (
     <div className="h-80">
@@ -95,6 +101,7 @@ export function DomainTrendsBarChart({
               }
               return null
             }}
+            animationDuration={0}
           />
           <Legend
             wrapperStyle={{ paddingTop: '20px' }}
@@ -105,18 +112,24 @@ export function DomainTrendsBarChart({
               </span>
             )}
           />
-          <Bar
-            dataKey="pageviews"
-            fill="#6366f1"
-            radius={[4, 4, 0, 0]}
-            name="Page Views"
-          />
-          <Bar
-            dataKey="uniqueVisitors"
-            fill="#10b981"
-            radius={[4, 4, 0, 0]}
-            name="Unique Visitors"
-          />
+          {showPageViews && (
+            <Bar
+              dataKey="pageviews"
+              fill="#6366f1"
+              radius={[4, 4, 0, 0]}
+              name="Page Views"
+              isAnimationActive={false}
+            />
+          )}
+          {showVisitors && (
+            <Bar
+              dataKey="uniqueVisitors"
+              fill="#10b981"
+              radius={[4, 4, 0, 0]}
+              name="Unique Visitors"
+              isAnimationActive={false}
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
