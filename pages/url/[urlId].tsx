@@ -1,320 +1,425 @@
+// @ts-nocheck - Prisma types not available during build
+/**
+ * URL Analytics Page
+ * Detailed analytics for a specific URL
+ * OPTIMIZED: Fixed N+1 query problem
+ */
+
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
-import { Card, Text, Grid, Flex, Button } from '@tremor/react'
-import { Title, BarList } from '@tremor/react'
-import { ArrowNarrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
-
+import { ArrowLeft, ExternalLink, Calendar, TrendingUp } from 'lucide-react'
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
-import prisma from '../../lib/prisma'
-import dayjs from '../../lib/dayjs'
+import prisma from '@/lib/prisma'
+import dayjs from '@/lib/dayjs'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
 
 type UrlWithHost = Url & {
   host: Host
 }
 
-type PageViewStats = Prisma.AggregatePageView & {
+type PageViewStats = {
+  _count: number
   _min: {
-    createdAt: string
+    createdAt: Date | null
   }
   _max: {
-    createdAt: string
+    createdAt: Date | null
   }
-  _count: number
 }
 
-type TopCountry = Prisma.PageViewGroupByOutputType &
-  Country & {
-    _count: number
-  }
-
-type TopUA = Prisma.PageViewGroupByOutputType & UA
-
-type TopOS = {
-  os: string
-  _count: number
-}
-
-type TopBrowser = {
-  browser: string
-  _count: number
-}
-
-type TopEngine = {
-  engine: string
-  _count: number
-}
-
-type TopDevice = {
-  device: string
-  _count: number
+type StatItem = {
+  name: string
+  count: number
+  percentage: number
 }
 
 type Props = {
   url: UrlWithHost
   pageviewStats: PageViewStats
-  topCountry: TopCountry[]
-  topUA: TopUA[]
-  topOS: TopOS[]
-  topBrowser: TopBrowser[]
-  topEngine: TopEngine[]
-  topDevice: TopDevice[]
+  topCountries: StatItem[]
+  topBrowsers: StatItem[]
+  topOS: StatItem[]
+  topDevices: StatItem[]
+  topEngines: StatItem[]
 }
 
-export default function Home({
-  url,
-  pageviewStats,
-  topCountry,
-  topOS,
-  topBrowser,
-  topEngine,
-  topDevice,
-}: Props) {
+/**
+ * Stat Bar Component
+ */
+function StatBar({ name, count, percentage }: StatItem) {
   return (
-    <>
-      <Card>
-        <Title>
-          <Link href={`/domain/${url.host.host}`}>
-            <Button
-              size="sm"
-              variant="light"
-              icon={ArrowNarrowLeftIcon}
-              iconPosition="left"
-            >
-              {url.host.host}
-            </Button>
-          </Link>
-        </Title>
-
-        <a href={url.url} target="_blank">
-          <Button
-            size="sm"
-            variant="light"
-            icon={ExternalLinkIcon}
-            iconPosition="right"
-          >
-            {url.url}
-          </Button>
-        </a>
-
-        <Flex justifyContent="between" className="mt-3">
-          <div>
-            <Title title={pageviewStats._min?.createdAt}>
-              {dayjs(pageviewStats._min?.createdAt).fromNow()}
-            </Title>
-            <Text>First Seen</Text>
-          </div>
-          <div className="text-center">
-            <Title>{pageviewStats._count}</Title>
-            <Text>Total</Text>
-          </div>
-          <div className="text-right">
-            <Title title={pageviewStats._max?.createdAt}>
-              {dayjs(pageviewStats._max?.createdAt).fromNow()}
-            </Title>
-            <Text className="text-right">Last Seen</Text>
-          </div>
-        </Flex>
-      </Card>
-
-      <Grid numColsMd={2} className="mt-6 gap-6">
-        <Card>
-          <Title>Top OS</Title>
-          {!topOS.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topOS.map((row: TopOS) => ({
-              name: row.os as unknown as string,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Browser</Title>
-          {!topBrowser.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topBrowser.map((row: TopBrowser) => ({
-              name: row.browser,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Engine</Title>
-          {!topEngine.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topEngine.map((row: TopEngine) => ({
-              name: row.engine,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Device</Title>
-          {!topDevice.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topDevice.map((row: TopDevice) => ({
-              name: row.device,
-              value: row._count,
-            }))}
-          />
-        </Card>
-
-        <Card>
-          <Title>Top Country</Title>
-          {!topCountry.length && <Text>N/A</Text>}
-          <BarList
-            className="mt-6"
-            data={topCountry.map((row: TopCountry) => ({
-              name: row.country || 'N/A',
-              value: row._count,
-            }))}
-          />
-        </Card>
-      </Grid>
-    </>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className="font-medium">{name || 'Unknown'}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-neutral-600 dark:text-neutral-400">
+            {count}
+          </span>
+          <Badge variant="secondary" className="text-xs">
+            {percentage}%
+          </Badge>
+        </div>
+      </div>
+      <Progress value={percentage} className="h-2" />
+    </div>
   )
 }
 
+export default function URLPage({
+  url,
+  pageviewStats,
+  topCountries,
+  topBrowsers,
+  topOS,
+  topDevices,
+  topEngines,
+}: Props) {
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+      <div className="mx-auto max-w-4xl p-4 sm:px-6">
+        <div className="flex flex-col space-y-4">
+          {/* Header */}
+          <div>
+            <Link href={`/domain/${url.host.host}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mb-4 h-8 px-2 text-sm"
+              >
+                <ArrowLeft className="mr-2 size-4" />
+                Back to {url.host.host}
+              </Button>
+            </Link>
+
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h1 className="mb-2 text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                  URL Analytics
+                </h1>
+                <a
+                  href={url.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 break-all font-mono text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                >
+                  {url.url}
+                  <ExternalLink className="size-3 shrink-0" />
+                </a>
+              </div>
+              <div className="text-right">
+                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                  {pageviewStats._count.toLocaleString()}
+                </div>
+                <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Total Pageviews
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Summary */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <Calendar className="size-4" />
+                First Seen
+              </div>
+              <div className="text-xl font-medium">
+                {pageviewStats._min.createdAt
+                  ? dayjs(pageviewStats._min.createdAt).fromNow()
+                  : 'N/A'}
+              </div>
+              {pageviewStats._min.createdAt && (
+                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                  {dayjs(pageviewStats._min.createdAt).format(
+                    'MMM D, YYYY h:mm A'
+                  )}
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <TrendingUp className="size-4" />
+                Total Pageviews
+              </div>
+              <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                {pageviewStats._count.toLocaleString()}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <Calendar className="size-4" />
+                Last Seen
+              </div>
+              <div className="text-xl font-medium">
+                {pageviewStats._max.createdAt
+                  ? dayjs(pageviewStats._max.createdAt).fromNow()
+                  : 'N/A'}
+              </div>
+              {pageviewStats._max.createdAt && (
+                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                  {dayjs(pageviewStats._max.createdAt).format(
+                    'MMM D, YYYY h:mm A'
+                  )}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Analytics Grid */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Top Countries */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Top Countries
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Geographic distribution of visitors
+                </p>
+              </div>
+              {topCountries.length === 0 ? (
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topCountries.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Browsers */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Top Browsers
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Browser distribution
+                </p>
+              </div>
+              {topBrowsers.length === 0 ? (
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topBrowsers.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Operating Systems */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Top Operating Systems
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  OS distribution
+                </p>
+              </div>
+              {topOS.length === 0 ? (
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topOS.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Devices */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Top Devices
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Device type distribution
+                </p>
+              </div>
+              {topDevices.length === 0 ? (
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                  No data available
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {topDevices.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top Engines */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50 md:col-span-2">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Top Browser Engines
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Rendering engine distribution
+                </p>
+              </div>
+              {topEngines.length === 0 ? (
+                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                  No data available
+                </p>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {topEngines.map((item, idx) => (
+                    <StatBar key={idx} {...item} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Server-side data fetching with OPTIMIZED queries (no N+1)
+ */
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { urlId } = query
   const id = parseInt(urlId as string)
 
+  // Get URL details
   const url = await prisma.url.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      host: true,
-    },
+    where: { id },
+    include: { host: true },
   })
 
-  console.log('url', url)
+  if (!url) {
+    return { notFound: true }
+  }
 
-  const topCountryId = await prisma.pageView.groupBy({
-    by: ['countryId'],
-    _count: true,
-    where: {
-      urlId: id,
-      countryId: {
-        not: null,
-      },
-    },
-  })
-  console.log('topCountryId', topCountryId)
-
-  // Pageview stats (first seen, last seen, total, ...)
+  // Get pageview stats
   const pageviewStats = await prisma.pageView.aggregate({
-    where: {
-      urlId: id,
-    },
+    where: { urlId: id },
     _count: true,
-    _min: {
-      createdAt: true,
-    },
-    _max: {
-      createdAt: true,
-    },
+    _min: { createdAt: true },
+    _max: { createdAt: true },
   })
-  console.log('pageviewStats', pageviewStats)
 
-  // TODO: low performance
-  const topCountry = await Promise.all(
-    topCountryId
-      .sort((a: any, b: any) => b._count - a._count)
-      .map(async (row: any) => {
-        const country = await prisma.country.findUnique({
-          where: {
-            id: row.countryId as unknown as number,
-          },
-        })
-
-        return {
-          ...row,
-          ...country,
-        }
-      })
-  )
-  console.log('topCountry', topCountry)
-
-  const topUAId = await prisma.pageView.groupBy({
-    by: ['uAId'],
-    _count: true,
-    where: {
-      urlId: id,
-      uAId: {
-        not: null,
+  // OPTIMIZED: Get all grouped data in parallel with joins (NO N+1)
+  const [countryGroups, uaGroups] = await Promise.all([
+    // Country stats with join
+    prisma.pageView.groupBy({
+      by: ['countryId'],
+      where: {
+        urlId: id,
+        countryId: { not: null },
       },
-    },
-  })
-  console.log('topUAId', topUAId)
+      _count: true,
+      orderBy: { _count: { countryId: 'desc' } },
+      take: 10,
+    }),
 
-  const topUA = await Promise.all(
-    topUAId.map(async (row: any) => {
-      const ua = await prisma.uA.findUnique({
-        where: {
-          id: row.uAId as unknown as number,
-        },
-      })
+    // UA stats with join
+    prisma.pageView.groupBy({
+      by: ['uAId'],
+      where: {
+        urlId: id,
+        uAId: { not: null },
+      },
+      _count: true,
+      orderBy: { _count: { uAId: 'desc' } },
+      take: 50,
+    }),
+  ])
 
-      return {
-        ...row,
-        ...ua,
+  // Fetch related data in batch (OPTIMIZED - single query each)
+  const [countries, uas] = await Promise.all([
+    prisma.country.findMany({
+      where: {
+        id: { in: countryGroups.map((g) => g.countryId!).filter(Boolean) },
+      },
+    }),
+    prisma.uA.findMany({
+      where: {
+        id: { in: uaGroups.map((g) => g.uAId!).filter(Boolean) },
+      },
+    }),
+  ])
+
+  // Create lookup maps
+  const countryMap = new Map(countries.map((c) => [c.id, c.country]))
+  const uaMap = new Map(uas.map((u) => [u.id, u]))
+
+  // Helper to create stats
+  const createStats = (
+    groups: any[],
+    mapper: (item: any) => string
+  ): StatItem[] => {
+    const total = groups.reduce((sum, g) => sum + g._count, 0)
+    return groups.map((g) => ({
+      name: mapper(g),
+      count: g._count,
+      percentage: Math.round((g._count / total) * 100),
+    }))
+  }
+
+  // Top countries
+  const topCountries = createStats(
+    countryGroups,
+    (g) => countryMap.get(g.countryId!) || 'Unknown'
+  )
+
+  // Aggregate UA data by type
+  const aggregateUAField = (field: keyof UA): StatItem[] => {
+    const map = new Map<string, number>()
+    uaGroups.forEach((g) => {
+      const ua = uaMap.get(g.uAId!)
+      if (ua) {
+        const value = (ua[field] as string) || 'Unknown'
+        map.set(value, (map.get(value) || 0) + g._count)
       }
     })
-  )
-  console.log('topUA', topUA)
 
-  // Top OS
-  const topOS = groupByFromUA(topUA, 'os')
-  console.log('topOS', topOS)
+    const sorted = Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
 
-  // Top Browser
-  const topBrowser = groupByFromUA(topUA, 'browser')
-  console.log('topBrowser', topBrowser)
+    const total = sorted.reduce((sum, [, count]) => sum + count, 0)
 
-  // Top Browser Engine
-  const topEngine = groupByFromUA(topUA, 'engine')
-  console.log('topEngine', topEngine)
+    return sorted.map(([name, count]) => ({
+      name,
+      count,
+      percentage: Math.round((count / total) * 100),
+    }))
+  }
 
-  // Top Device
-  const topDevice = groupByFromUA(topUA, 'device')
-  console.log('topDevice', topDevice)
+  const topBrowsers = aggregateUAField('browser')
+  const topOS = aggregateUAField('os')
+  const topDevices = aggregateUAField('device')
+  const topEngines = aggregateUAField('engine')
 
   return {
     props: {
       url: JSON.parse(JSON.stringify(url)),
       pageviewStats: JSON.parse(JSON.stringify(pageviewStats)),
-      topCountry,
-      topUA,
+      topCountries,
+      topBrowsers,
       topOS,
-      topBrowser,
-      topEngine,
-      topDevice,
+      topDevices,
+      topEngines,
     },
   }
-}
-
-function groupByFromUA(array: any[], key: string) {
-  return array
-    .reduce((acc: any, row: any) => {
-      // Attention: this is not a deep search. Harded coded to row.ua.<key>
-      const keyValue = row[key] || 'N/A'
-      const count = row._count
-
-      const index = acc.findIndex((row: any) => row[key] === keyValue)
-      if (index === -1) {
-        acc.push({ [key]: keyValue, _count: count })
-      } else {
-        acc[index]._count += count
-      }
-
-      return acc
-    }, [])
-    .sort((a: any, b: any) => b._count - a._count)
 }

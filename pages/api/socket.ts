@@ -1,37 +1,30 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { Server as NetServer } from 'http'
-import { Server as SocketIOServer } from 'socket.io'
-import { NextApiResponseServerIO } from '../../types/socket'
+/**
+ * Socket.io Connection Endpoint
+ * Initializes the WebSocket server for real-time updates
+ */
 
-export default function handler(
+import { NextApiRequest } from 'next'
+import {
+  getSocketServer,
+  type NextApiResponseServerIO,
+} from '@/lib/socket/server'
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponseServerIO
 ) {
-  if (!res.socket.server.io) {
-    console.log('Socket is initializing')
-    const httpServer: NetServer = res.socket.server as any
-    const io = new SocketIOServer(httpServer, {
+  if (req.method === 'GET' || req.method === 'POST') {
+    // Initialize Socket.io server (singleton)
+    const io = getSocketServer(res)
+
+    // Send connection info
+    res.status(200).json({
+      success: true,
+      message: 'Socket.io server initialized',
       path: '/api/socket',
-      addTrailingSlash: false,
-      cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-      },
+      connected: io.sockets.sockets.size,
     })
-    res.socket.server.io = io
-
-    io.on('connection', (socket) => {
-      console.log('Client connected:', socket.id)
-
-      socket.on('join-analytics', () => {
-        socket.join('analytics')
-        console.log('Client joined analytics room:', socket.id)
-      })
-
-      socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id)
-      })
-    })
+  } else {
+    res.status(405).json({ error: 'Method not allowed' })
   }
-  res.end()
 }

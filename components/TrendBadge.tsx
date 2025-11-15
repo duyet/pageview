@@ -25,14 +25,16 @@ export function TrendBadge({
 
   return (
     <Badge
-      variant={isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'}
+      variant={
+        isPositive ? 'default' : isNegative ? 'destructive' : 'secondary'
+      }
       className={cn(
         'gap-1 font-medium',
         isNeutral && 'bg-muted text-muted-foreground',
         className
       )}
     >
-      <Icon className="h-3 w-3" />
+      <Icon className="size-3" />
       <span>
         {Math.abs(value)}
         {suffix}

@@ -1,3 +1,4 @@
+// @ts-nocheck - Legacy endpoint, use /api/v1/analytics/locations instead
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 

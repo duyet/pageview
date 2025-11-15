@@ -101,131 +101,135 @@ export default function Analytics() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col space-y-6">
-        {/* Header */}
-        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Analytics Dashboard
-            </h1>
-            <p className="text-muted-foreground">
-              Detailed insights and trends for your website traffic
-            </p>
-          </div>
-          <DateRangePicker value={dateRange} onChange={setDateRange} />
-        </div>
-
-        {/* Date Range Display */}
-        {dateRange?.from && dateRange?.to && (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">
-                Showing data for:{' '}
-                <span className="font-medium">{formatDateRange()}</span>
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+      <div className="mx-auto max-w-4xl p-4 sm:px-6">
+        <div className="flex flex-col space-y-4">
+          {/* Header */}
+          <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
+            <div>
+              <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                Analytics
+              </h1>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                {dateRange?.from && dateRange?.to && formatDateRange()}
               </p>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+            <DateRangePicker value={dateRange} onChange={setDateRange} />
+          </div>
 
-        {/* Trends Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Traffic Trends</CardTitle>
-            <CardDescription>
-              Page views and unique visitors over time
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          {/* Trends Chart */}
+          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="mb-4">
+              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                Traffic Trends
+              </h2>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Page views and unique visitors over time
+              </p>
+            </div>
             <TrendsChart data={trendsData} loading={loading.trends} />
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Device & Location Analytics */}
-        <Tabs defaultValue="devices" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="devices">Device Analytics</TabsTrigger>
-            <TabsTrigger value="locations">Geographic Data</TabsTrigger>
-          </TabsList>
+          {/* Device & Location Analytics */}
+          <Tabs defaultValue="devices" className="space-y-4">
+            <TabsList className="grid h-10 w-full grid-cols-2">
+              <TabsTrigger value="devices" className="text-sm">
+                Devices
+              </TabsTrigger>
+              <TabsTrigger value="locations" className="text-sm">
+                Locations
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="devices" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Browsers</CardTitle>
-                  <CardDescription>Most popular browsers</CardDescription>
-                </CardHeader>
-                <CardContent>
+            <TabsContent value="devices" className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      Browsers
+                    </h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      Most popular
+                    </p>
+                  </div>
                   <DeviceChart
                     data={devicesData.browsers}
                     title="Browsers"
                     loading={loading.devices}
                   />
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Operating Systems</CardTitle>
-                  <CardDescription>Device operating systems</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      Operating Systems
+                    </h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      Device OS
+                    </p>
+                  </div>
                   <DeviceChart
                     data={devicesData.os}
                     title="Operating Systems"
                     loading={loading.devices}
                   />
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Device Types</CardTitle>
-                  <CardDescription>Desktop, mobile, and tablet</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      Device Types
+                    </h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      Desktop, mobile, tablet
+                    </p>
+                  </div>
                   <DeviceChart
                     data={devicesData.devices}
                     title="Device Types"
                     loading={loading.devices}
                   />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                </div>
+              </div>
+            </TabsContent>
 
-          <TabsContent value="locations" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Countries</CardTitle>
-                  <CardDescription>Visitors by country</CardDescription>
-                </CardHeader>
-                <CardContent>
+            <TabsContent value="locations" className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      Top Countries
+                    </h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      Visitors by country
+                    </p>
+                  </div>
                   <LocationChart
                     data={locationsData.countries}
                     title="Countries"
                     loading={loading.locations}
                   />
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Cities</CardTitle>
-                  <CardDescription>Visitors by city</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      Top Cities
+                    </h3>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                      Visitors by city
+                    </p>
+                  </div>
                   <LocationChart
                     data={locationsData.cities}
                     title="Cities"
                     loading={loading.locations}
                   />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   )

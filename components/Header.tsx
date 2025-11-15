@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { BarChart3, Home, Activity, Command } from 'lucide-react'
+import { BarChart3, Home, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const Header = () => {
@@ -13,17 +13,17 @@ export const Header = () => {
   ]
 
   return (
-    <header className="border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-neutral-800 dark:bg-slate-900/95 dark:supports-[backdrop-filter]:bg-slate-900/80">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-14 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center space-x-2 group"
+            className="group -ml-2 flex items-center space-x-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800/50"
           >
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-900 to-neutral-700 shadow-sm transition-all group-hover:shadow-md dark:from-neutral-100 dark:to-neutral-300">
               <svg
-                className="h-4.5 w-4.5 text-white"
+                className="size-4 text-white dark:text-neutral-900"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -36,13 +36,13 @@ export const Header = () => {
                 />
               </svg>
             </div>
-            <span className="font-semibold text-[15px] text-foreground">
+            <span className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
               pageview
             </span>
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center gap-1">
             {navItems.map(({ href, icon: Icon, label }) => {
               const isActive = router.pathname === href
               return (
@@ -50,33 +50,25 @@ export const Header = () => {
                   key={href}
                   href={href}
                   className={cn(
-                    'inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all',
+                    'group relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all',
                     isActive
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      ? 'bg-neutral-100 text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-neutral-100'
+                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-100'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon
+                    className={cn(
+                      'size-4 transition-transform group-hover:scale-110',
+                      isActive && 'text-neutral-900 dark:text-neutral-100'
+                    )}
+                  />
                   <span className="hidden sm:inline">{label}</span>
+                  {isActive && (
+                    <div className="absolute -bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+                  )}
                 </Link>
               )
             })}
-
-            {/* Command Palette Hint */}
-            <button
-              className="ml-2 hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
-              onClick={() => {
-                const event = new KeyboardEvent('keydown', {
-                  key: 'k',
-                  metaKey: true,
-                  bubbles: true
-                })
-                document.dispatchEvent(event)
-              }}
-            >
-              <Command className="h-3.5 w-3.5" />
-              <span className="text-xs">⌘K</span>
-            </button>
           </nav>
         </div>
       </div>

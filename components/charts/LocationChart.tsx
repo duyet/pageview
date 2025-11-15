@@ -18,8 +18,8 @@ interface LocationChartProps {
 export function LocationChart({ data, title, loading }: LocationChartProps) {
   if (loading) {
     return (
-      <div className="h-80 flex items-center justify-center">
-        <div className="text-muted-foreground">
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-neutral-600 dark:text-neutral-400">
           Loading {title.toLowerCase()}...
         </div>
       </div>
@@ -28,8 +28,8 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-80 flex items-center justify-center">
-        <div className="text-muted-foreground">
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-neutral-600 dark:text-neutral-400">
           No {title.toLowerCase()} data
         </div>
       </div>
@@ -52,17 +52,23 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            className="stroke-neutral-200 dark:stroke-neutral-700"
+            opacity={0.5}
+          />
           <XAxis
             type="number"
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: 'currentColor' }}
+            className="text-neutral-600 dark:text-neutral-400"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             type="category"
             dataKey="name"
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: 'currentColor' }}
+            className="text-neutral-600 dark:text-neutral-400"
             tickLine={false}
             axisLine={false}
             width={80}
@@ -72,9 +78,11 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
               if (active && payload && payload.length) {
                 const data = payload[0].payload
                 return (
-                  <div className="rounded-lg border bg-background p-3 shadow-md">
-                    <p className="font-medium">{label}</p>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      {label}
+                    </p>
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>
@@ -83,7 +91,7 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
               return null
             }}
           />
-          <Bar dataKey="value" fill="#06b6d4" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="value" fill="#6366f1" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

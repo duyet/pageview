@@ -26,9 +26,9 @@ export function RealtimeMetricCard({
           {icon}
         </CardHeader>
         <CardContent>
-          <div className="h-6 bg-muted animate-pulse rounded"></div>
+          <div className="h-6 animate-pulse rounded bg-muted"></div>
           {change && (
-            <div className="h-4 bg-muted animate-pulse rounded mt-1"></div>
+            <div className="mt-1 h-4 animate-pulse rounded bg-muted"></div>
           )}
         </CardContent>
       </Card>
@@ -70,7 +70,7 @@ export function PageViewsCard({
     <RealtimeMetricCard
       title="Total Views (24h)"
       value={value}
-      icon={<Eye className="h-4 w-4 text-muted-foreground" />}
+      icon={<Eye className="size-4 text-muted-foreground" />}
       loading={loading}
     />
   )
@@ -87,7 +87,7 @@ export function UniqueVisitorsCard({
     <RealtimeMetricCard
       title="Unique Visitors (24h)"
       value={value}
-      icon={<Users className="h-4 w-4 text-muted-foreground" />}
+      icon={<Users className="size-4 text-muted-foreground" />}
       loading={loading}
     />
   )
@@ -104,7 +104,7 @@ export function ActivePagesCard({
     <RealtimeMetricCard
       title="Active Pages (1h)"
       value={value}
-      icon={<Activity className="h-4 w-4 text-muted-foreground" />}
+      icon={<Activity className="size-4 text-muted-foreground" />}
       loading={loading}
     />
   )
@@ -121,7 +121,7 @@ export function CountriesCard({
     <RealtimeMetricCard
       title="Countries (1h)"
       value={value}
-      icon={<Globe className="h-4 w-4 text-muted-foreground" />}
+      icon={<Globe className="size-4 text-muted-foreground" />}
       loading={loading}
     />
   )

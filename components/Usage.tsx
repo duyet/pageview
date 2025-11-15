@@ -16,7 +16,7 @@ e.src=t,n.body.appendChild(e)}}
 export const Usage = ({ currentHost }: Props) => {
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Integration Examples</h3>
+      <h3 className="mb-4 text-lg font-semibold">Integration Examples</h3>
 
       <Tabs defaultValue="js" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -28,13 +28,13 @@ export const Usage = ({ currentHost }: Props) => {
         <TabsContent value="js" className="mt-6">
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="mb-2 text-sm text-muted-foreground">
                 Add this script to your{' '}
-                <code className="bg-muted px-1 py-0.5 rounded text-sm">
+                <code className="rounded bg-muted px-1 py-0.5 text-sm">
                   HTML
                 </code>
               </p>
-              <div className="rounded-md bg-muted p-4 font-mono text-sm overflow-x-auto">
+              <div className="overflow-x-auto rounded-md bg-muted p-4 font-mono text-sm">
                 <pre>{`<script>${getJsSnippet(currentHost)}</script>`}</pre>
               </div>
             </div>
@@ -44,13 +44,13 @@ export const Usage = ({ currentHost }: Props) => {
         <TabsContent value="nextjs" className="mt-6">
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground mb-2">
+              <p className="mb-2 text-sm text-muted-foreground">
                 Add this to your{' '}
-                <code className="bg-muted px-1 py-0.5 rounded text-sm">
+                <code className="rounded bg-muted px-1 py-0.5 text-sm">
                   _app.tsx
                 </code>
               </p>
-              <div className="rounded-md bg-muted p-4 font-mono text-sm overflow-x-auto">
+              <div className="overflow-x-auto rounded-md bg-muted p-4 font-mono text-sm">
                 <pre>{`import Script from 'next/script'
 
 <Script id='pageview' strategy='afterInteractive'>
@@ -64,21 +64,21 @@ export const Usage = ({ currentHost }: Props) => {
         <TabsContent value="badge" className="mt-6">
           <div className="space-y-6">
             <div>
-              <h4 className="font-medium mb-2">URL</h4>
+              <h4 className="mb-2 font-medium">URL</h4>
               <div className="rounded-md bg-muted p-4 font-mono text-sm">
                 {`https://${currentHost}/api/badge?url=<url>`}
               </div>
             </div>
 
             <div>
-              <h4 className="font-medium mb-2">HTML</h4>
+              <h4 className="mb-2 font-medium">HTML</h4>
               <div className="rounded-md bg-muted p-4 font-mono text-sm">
                 {`<img src="https://${currentHost}/api/badge?url=<url>" />`}
               </div>
             </div>
 
             <div>
-              <h4 className="font-medium mb-2">Markdown</h4>
+              <h4 className="mb-2 font-medium">Markdown</h4>
               <div className="rounded-md bg-muted p-4 font-mono text-sm">
                 {`![PageView](https://${currentHost}/api/badge?url=<url>)`}
               </div>

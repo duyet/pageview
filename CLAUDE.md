@@ -16,7 +16,7 @@ This is a Next.js application that provides pageview tracking analytics. It gene
 
 ### Key Components
 
-- `middleware.ts`: Generates pageview.js script dynamically and enriches all /api/* requests with geo/UA data from Vercel Edge
+- `middleware.ts`: Generates pageview.js script dynamically and enriches all /api/\* requests with geo/UA data from Vercel Edge
 - `pages/api/pageview.ts`: Core tracking endpoint accepting URLs via body, query params, or referer header
 - `pages/api/socket.ts`: WebSocket server for real-time analytics updates
 - `pages/api/analytics/`: Analytics endpoints for trends, devices, and locations
@@ -156,6 +156,7 @@ prisma/
 ### Data Flow Architecture
 
 **Tracking Flow**:
+
 1. Website includes `<script src="https://pageview.duyet.net/pageview.js">`
 2. Middleware generates script on-the-fly from `pageview.ts` template
 3. Script uses Beacon API to send pageview to `/api/pageview?url=...`
@@ -164,6 +165,7 @@ prisma/
 6. PageView record created with foreign keys to normalized entities
 
 **Analytics Flow**:
+
 - Homepage (`/`): Aggregates by domain, shows total stats
 - Domain page (`/domain/[domain]`): Shows all URLs for a domain
 - URL page (`/url/[urlId]`): Detailed analytics for specific URL
@@ -173,6 +175,7 @@ prisma/
 ### Database Patterns
 
 The schema uses aggressive normalization to reduce redundancy:
+
 - URLs decomposed into Host + Slug
 - User agents deduplicated by full UA string
 - Geo data normalized at Country and City level
@@ -191,6 +194,7 @@ The schema uses aggressive normalization to reduce redundancy:
 ### Middleware Behavior
 
 Middleware (`middleware.ts`) intercepts:
+
 1. `/pageview.js` → generates tracking script dynamically
 2. `/api/*` → enriches with Vercel Edge geo/UA data via query params
 

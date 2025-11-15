@@ -6,7 +6,11 @@ interface SparklineProps {
   className?: string
 }
 
-export function Sparkline({ data, color = '#3b82f6', className }: SparklineProps) {
+export function Sparkline({
+  data,
+  color = '#3b82f6',
+  className,
+}: SparklineProps) {
   const chartData = data.map((value, index) => ({ value, index }))
 
   return (
