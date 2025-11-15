@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { RealtimeMetrics } from '../types/socket'
-import { useSocket } from './useSocket'
 
 export const useRealtimeMetrics = (refreshInterval = 30000) => {
   const [metrics, setMetrics] = useState<RealtimeMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { socket, isConnected } = useSocket()
+  const [isConnected, setIsConnected] = useState(false)
 
   const fetchMetrics = async () => {
     try {
@@ -17,8 +16,10 @@ export const useRealtimeMetrics = (refreshInterval = 30000) => {
       const data: RealtimeMetrics = await response.json()
       setMetrics(data)
       setError(null)
+      setIsConnected(true) // Mark as connected on successful fetch
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
+      setIsConnected(false) // Mark as disconnected on error
     } finally {
       setLoading(false)
     }
@@ -34,18 +35,5 @@ export const useRealtimeMetrics = (refreshInterval = 30000) => {
     return () => clearInterval(interval)
   }, [refreshInterval])
 
-  // Listen for real-time updates when socket is connected
-  useEffect(() => {
-    if (socket && isConnected) {
-      socket.on('metrics-update', (newMetrics: RealtimeMetrics) => {
-        setMetrics(newMetrics)
-      })
-
-      return () => {
-        socket.off('metrics-update')
-      }
-    }
-  }, [socket, isConnected])
-
-  return { metrics, loading, error, refetch: fetchMetrics }
+  return { metrics, loading, error, isConnected, refetch: fetchMetrics }
 }

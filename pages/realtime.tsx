@@ -4,8 +4,8 @@ import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { useRealtimeMetrics } from '../hooks/useRealtimeMetrics'
-import { useSocket } from '../hooks/useSocket'
 import { RealtimeChart } from '../components/charts/RealtimeChart'
+import { LocationMap } from '../components/charts/LocationMap'
 import {
   PageViewsCard,
   UniqueVisitorsCard,
@@ -19,8 +19,8 @@ import {
 
 export default function RealtimePage() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
-  const { metrics, loading, error, refetch } = useRealtimeMetrics(30000) // 30 seconds
-  const { isConnected } = useSocket()
+  const { metrics, loading, error, isConnected, refetch } =
+    useRealtimeMetrics(30000) // 30 seconds
 
   useEffect(() => {
     if (metrics) {
@@ -132,6 +132,22 @@ export default function RealtimePage() {
               </div>
               <RealtimeChart
                 data={metrics?.hourlyViews || []}
+                loading={loading}
+              />
+            </div>
+
+            {/* Location Map */}
+            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="mb-4">
+                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                  Visitor Locations (Last Hour)
+                </h2>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Geographic distribution of recent visitors
+                </p>
+              </div>
+              <LocationMap
+                data={metrics?.recentCountries || []}
                 loading={loading}
               />
             </div>
