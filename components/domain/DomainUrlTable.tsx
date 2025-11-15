@@ -78,15 +78,15 @@ export function DomainUrlTable({
 
             return (
               <TableRow key={urlStat.id} className="group">
-                <TableCell className="max-w-[500px] truncate py-3 font-mono text-sm">
+                <TableCell className="max-w-[500px] py-3 font-mono text-sm">
                   <a
                     href={urlStat.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-neutral-900 hover:text-blue-600 hover:underline dark:text-neutral-100/80"
+                    className="flex items-center gap-1.5 text-neutral-900 hover:text-blue-600 hover:underline dark:text-neutral-100/80"
                   >
-                    {urlStat.url}
-                    <ExternalLink className="size-3 opacity-40" />
+                    <span className="truncate">{urlStat.url}</span>
+                    <ExternalLink className="size-3 shrink-0 opacity-40" />
                   </a>
                 </TableCell>
                 <TableCell className="py-3 text-right text-sm font-medium">

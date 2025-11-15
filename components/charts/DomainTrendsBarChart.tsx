@@ -3,10 +3,8 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
 import { format, parseISO } from 'date-fns'
 import { TrendData } from '../../pages/api/analytics/trends'
@@ -54,11 +52,6 @@ export function DomainTrendsBarChart({
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            className="stroke-neutral-200 dark:stroke-neutral-700"
-            opacity={0.5}
-          />
           <XAxis
             dataKey="formattedDate"
             tick={{ fontSize: 12, fill: 'currentColor' }}
