@@ -57,15 +57,20 @@ export function DeviceHorizontalChart({
         return (
           <div key={index} className="group">
             <div className="relative h-9 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-800">
+              {/* Colored background bar */}
               <div
-                className="flex h-full items-center justify-between px-3 text-xs font-medium text-white transition-all"
+                className="absolute inset-0 transition-all"
                 style={{
-                  width: `${Math.max(percentage, 20)}%`,
+                  width: `${percentage}%`,
                   backgroundColor: color,
                 }}
-              >
-                <span className="truncate">{item.name}</span>
-                <span className="ml-2 shrink-0">
+              />
+              {/* Text content on top */}
+              <div className="relative flex h-full items-center justify-between px-3 text-xs font-medium">
+                <span className="truncate text-white">
+                  {item.name}
+                </span>
+                <span className="ml-2 shrink-0 text-white">
                   {item.value.toLocaleString()}
                 </span>
               </div>
