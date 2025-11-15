@@ -54,6 +54,19 @@ export function DeviceHorizontalChart({
         const percentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0
         const color = COLORS[index % COLORS.length]
 
+        // Determine text colors based on bar width
+        // If bar is too short, label will be on neutral background
+        const labelOnBar = percentage > 35
+        // If bar is wide enough, value might be on colored background
+        const valueOnBar = percentage > 75
+
+        const labelColor = labelOnBar
+          ? 'text-white'
+          : 'text-neutral-900 dark:text-neutral-100'
+        const valueColor = valueOnBar
+          ? 'text-white'
+          : 'text-neutral-900 dark:text-neutral-100'
+
         return (
           <div key={index} className="group">
             <div className="relative h-9 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-800">
@@ -67,10 +80,10 @@ export function DeviceHorizontalChart({
               />
               {/* Text content on top */}
               <div className="relative flex h-full items-center justify-between px-3 text-xs font-medium">
-                <span className="truncate text-white">
+                <span className={`truncate ${labelColor}`}>
                   {item.name || 'Unknown'}
                 </span>
-                <span className="ml-2 shrink-0 text-white">
+                <span className={`ml-2 shrink-0 ${valueColor}`}>
                   {item.value.toLocaleString()}
                 </span>
               </div>
