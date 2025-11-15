@@ -3,7 +3,7 @@
  * Shows all URLs for a specific domain with pageview counts
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import type { GetServerSideProps } from 'next'
 import { subDays } from 'date-fns'
 import { DateRange } from 'react-day-picker'
@@ -13,7 +13,7 @@ import { DomainHeader } from '@/components/domain/DomainHeader'
 import { DomainTrendsSection } from '@/components/domain/DomainTrendsSection'
 import { DomainAnalyticsSection } from '@/components/domain/DomainAnalyticsSection'
 import { DomainUrlTable } from '@/components/domain/DomainUrlTable'
-import { TrendData } from '../api/analytics/trends'
+import { useTrendsData } from '@/hooks/useAnalytics'
 
 type UrlStat = {
   id: number
@@ -40,37 +40,24 @@ export default function DomainPage({
     from: subDays(new Date(), 30),
     to: new Date(),
   })
-  const [trendsData, setTrendsData] = useState<TrendData[]>([])
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchTrendsData = async () => {
-      if (!dateRange?.from || !dateRange?.to) return
+  // Calculate days from date range
+  const days = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) return 30
+    return Math.ceil(
+      (dateRange.to.getTime() - dateRange.from.getTime()) /
+        (1000 * 60 * 60 * 24)
+    )
+  }, [dateRange])
 
-      const days = Math.ceil(
-        (dateRange.to.getTime() - dateRange.from.getTime()) /
-          (1000 * 60 * 60 * 24)
-      )
+  // Use React Query hook for trends data
+  const {
+    data: trendsResult,
+    isLoading: loading,
+    isFetching: fetching,
+  } = useTrendsData(days, domain)
 
-      setLoading(true)
-
-      try {
-        const response = await fetch(
-          `/api/analytics/trends?days=${days}&host=${encodeURIComponent(domain)}`
-        )
-        if (response.ok) {
-          const result = await response.json()
-          setTrendsData(result.trends)
-        }
-      } catch (error) {
-        console.error('Error fetching trends data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchTrendsData()
-  }, [dateRange, domain])
+  const trendsData = trendsResult?.trends || []
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -89,6 +76,7 @@ export default function DomainPage({
             onDateRangeChange={setDateRange}
             trendsData={trendsData}
             loading={loading}
+            fetching={fetching}
           />
 
           <DomainAnalyticsSection domain={domain} dateRange={dateRange} />

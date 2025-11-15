@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import { DateRangePicker } from '@/components/DateRangePicker'
 import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart'
+import { ChartTitle } from '@/components/charts/ChartTitle'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendData } from '@/pages/api/analytics/trends'
 
@@ -14,6 +15,7 @@ interface DomainTrendsSectionProps {
   onDateRangeChange: (range: DateRange | undefined) => void
   trendsData: TrendData[]
   loading: boolean
+  fetching?: boolean
 }
 
 export function DomainTrendsSection({
@@ -22,6 +24,7 @@ export function DomainTrendsSection({
   onDateRangeChange,
   trendsData,
   loading,
+  fetching = false,
 }: DomainTrendsSectionProps) {
   const [metricView, setMetricView] = useState<MetricView>('pageviews')
 
@@ -42,15 +45,11 @@ export function DomainTrendsSection({
       </div>
 
       <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-              Traffic Trends
-            </h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Page views and unique visitors for {domain}
-            </p>
-          </div>
+        <ChartTitle
+          title="Traffic Trends"
+          description={`Page views and unique visitors for ${domain}`}
+          loading={fetching}
+        >
           <Tabs
             value={metricView}
             onValueChange={(value) => setMetricView(value as MetricView)}
@@ -64,7 +63,7 @@ export function DomainTrendsSection({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
+        </ChartTitle>
         <DomainTrendsBarChart
           data={trendsData}
           loading={loading}

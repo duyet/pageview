@@ -6,6 +6,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts'
+import { Loader2 } from 'lucide-react'
 import { DeviceData } from '../../pages/api/analytics/devices'
 
 interface DeviceChartProps {
@@ -31,8 +32,9 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          Loading {title.toLowerCase()}...
+        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+          <Loader2 className="size-4 animate-spin" />
+          <span>Loading {title.toLowerCase()}...</span>
         </div>
       </div>
     )
