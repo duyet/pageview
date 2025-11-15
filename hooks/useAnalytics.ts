@@ -2,21 +2,24 @@ import { useQuery } from '@tanstack/react-query'
 import { TrendData } from '@/pages/api/analytics/trends'
 import { DeviceData } from '@/pages/api/analytics/devices'
 import { LocationData } from '@/pages/api/analytics/locations'
+import { BotStatsData } from '@/pages/api/analytics/bots'
 
 export interface AnalyticsFilters {
   host?: string
   urlId?: number
+  excludeBots?: boolean
 }
 
 // Hook for fetching trends data
 export function useTrendsData(days: number, filters?: AnalyticsFilters) {
-  const { host, urlId } = filters || {}
+  const { host, urlId, excludeBots } = filters || {}
   return useQuery({
-    queryKey: ['trends', days, host, urlId],
+    queryKey: ['trends', days, host, urlId, excludeBots],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
+      if (excludeBots) params.append('excludeBots', 'true')
 
       const response = await fetch(`/api/analytics/trends?${params}`)
       if (!response.ok) throw new Error('Failed to fetch trends')
@@ -35,13 +38,14 @@ export function useTrendsData(days: number, filters?: AnalyticsFilters) {
 
 // Hook for fetching devices data
 export function useDevicesData(days: number, filters?: AnalyticsFilters) {
-  const { host, urlId } = filters || {}
+  const { host, urlId, excludeBots } = filters || {}
   return useQuery({
-    queryKey: ['devices', days, host, urlId],
+    queryKey: ['devices', days, host, urlId, excludeBots],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
+      if (excludeBots) params.append('excludeBots', 'true')
 
       const response = await fetch(`/api/analytics/devices?${params}`)
       if (!response.ok) throw new Error('Failed to fetch devices')
@@ -60,13 +64,14 @@ export function useDevicesData(days: number, filters?: AnalyticsFilters) {
 
 // Hook for fetching locations data
 export function useLocationsData(days: number, filters?: AnalyticsFilters) {
-  const { host, urlId } = filters || {}
+  const { host, urlId, excludeBots } = filters || {}
   return useQuery({
-    queryKey: ['locations', days, host, urlId],
+    queryKey: ['locations', days, host, urlId, excludeBots],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
+      if (excludeBots) params.append('excludeBots', 'true')
 
       const response = await fetch(`/api/analytics/locations?${params}`)
       if (!response.ok) throw new Error('Failed to fetch locations')
@@ -76,6 +81,26 @@ export function useLocationsData(days: number, filters?: AnalyticsFilters) {
         countries: data.countries as LocationData[],
         cities: data.cities as LocationData[],
       }
+    },
+    staleTime: 60 * 1000, // 1 minute
+    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+  })
+}
+
+// Hook for fetching bot analytics data
+export function useBotsData(days: number, filters?: AnalyticsFilters) {
+  const { host, urlId } = filters || {}
+  return useQuery({
+    queryKey: ['bots', days, host, urlId],
+    queryFn: async () => {
+      const params = new URLSearchParams({ days: days.toString() })
+      if (host) params.append('host', host)
+      if (urlId) params.append('urlId', urlId.toString())
+
+      const response = await fetch(`/api/analytics/bots?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch bot analytics')
+
+      return (await response.json()) as BotStatsData
     },
     staleTime: 60 * 1000, // 1 minute
     refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes

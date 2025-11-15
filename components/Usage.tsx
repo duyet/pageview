@@ -14,11 +14,15 @@ e.src=t,n.body.appendChild(e)}}
 (window,document,"//${currentHost}/pageview.js");
 `
 
-const getCurlSimple = (currentHost: string) => `curl -X POST https://${currentHost}/api/pageview \\
+const getCurlSimple = (
+  currentHost: string
+) => `curl -X POST https://${currentHost}/api/pageview \\
   -H "Content-Type: application/json" \\
   -d '{"url": "https://example.com/page"}'`
 
-const getCurlFull = (currentHost: string) => `curl -X POST https://${currentHost}/api/pageview \\
+const getCurlFull = (
+  currentHost: string
+) => `curl -X POST https://${currentHost}/api/pageview \\
   -H "Content-Type: application/json" \\
   -d '{
     "url": "https://example.com/page",
@@ -58,7 +62,9 @@ data = {
 response = requests.post(url, json=data)
 print(response.json())  # {'msg': 'Pageview recorded successfully', 'id': 123}`
 
-const getJavaScriptAPI = (currentHost: string) => `// Simple version (auto-detect from browser)
+const getJavaScriptAPI = (
+  currentHost: string
+) => `// Simple version (auto-detect from browser)
 fetch('https://${currentHost}/api/pageview', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },

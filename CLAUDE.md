@@ -87,12 +87,14 @@ Key considerations:
 - This ensures type safety, prevents SQL injection, and maintains consistency
 
 **Rationale**:
+
 - Prisma provides strong TypeScript typing and autocomplete
 - Automatic query validation and prevention of common errors
 - Better testability and maintainability
 - Consistent codebase patterns
 
 **Allowed Prisma patterns**:
+
 ```typescript
 // ✅ Good - Using Prisma methods
 await prisma.pageView.findMany({ where: { ... } })
@@ -106,6 +108,7 @@ await prisma.$executeRaw`UPDATE ...`
 ```
 
 **For complex queries**:
+
 - Use Prisma's `groupBy`, `aggregate`, `findMany` with `distinct`
 - Combine multiple Prisma queries with `Promise.all()` for parallel execution
 - Post-process results in JavaScript if needed
@@ -116,6 +119,7 @@ await prisma.$executeRaw`UPDATE ...`
 The project uses a comprehensive testing setup:
 
 **Unit Testing (Vitest)**:
+
 - Config: `vitest.config.ts`
 - Setup: `tests/setup.ts` (mocks Next.js router, Image component, environment)
 - Environment: jsdom with React Testing Library
@@ -124,6 +128,7 @@ The project uses a comprehensive testing setup:
 - Path aliases: `@/*` maps to project root
 
 **E2E Testing (Playwright)**:
+
 - Config: `playwright.config.ts`
 - Location: `tests/e2e/`
 - Tests run across 5 device profiles: Desktop Chrome/Firefox/Safari, Mobile Chrome/Safari
@@ -131,6 +136,7 @@ The project uses a comprehensive testing setup:
 - Screenshots on failure, traces on retry
 
 **Git Hooks (Husky + lint-staged)**:
+
 - Pre-commit hook runs on staged files:
   - ESLint auto-fix
   - Prettier formatting
@@ -229,6 +235,7 @@ NEXT_PUBLIC_MEASUREMENT_ID='G-XXXXXXXXXX'  # Google Analytics ID
 ```
 
 For E2E testing with Playwright, optionally set:
+
 ```bash
 PLAYWRIGHT_TEST_BASE_URL='http://localhost:3000'  # Default if not set
 ```

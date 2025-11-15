@@ -44,10 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  TrendsChart,
-  MetricToggle,
-} from '../components/charts/TrendsChart'
+import { TrendsChart, MetricToggle } from '../components/charts/TrendsChart'
 import { ChartTitle } from '../components/charts/ChartTitle'
 import { useTrendsData } from '../hooks/useAnalytics'
 

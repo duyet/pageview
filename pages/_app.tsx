@@ -41,26 +41,26 @@ export default function App({ Component, pageProps }: AppProps) {
         <CommandPalette />
         <Toaster position="top-right" richColors />
 
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${GA_MEASUREMENT_ID}');
         `}
-      </Script>
-      <Script id="pageview" strategy="afterInteractive">
-        {`
+        </Script>
+        <Script id="pageview" strategy="afterInteractive">
+          {`
           !function(e,n,t){e.onload=function(){
           let e=n.createElement("script");
           e.src=t,n.body.appendChild(e)}}
           (window,document,"/pageview.js");
         `}
-      </Script>
+        </Script>
       </main>
     </QueryClientProvider>
   )

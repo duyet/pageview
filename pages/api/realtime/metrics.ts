@@ -21,7 +21,10 @@ export default async function handler(
   const now = Date.now()
   if (cachedMetrics && now - cacheTimestamp < CACHE_TTL) {
     // Set cache headers for client-side caching
-    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60')
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=30, stale-while-revalidate=60'
+    )
     return res.status(200).json(cachedMetrics)
   }
 
@@ -199,7 +202,10 @@ export default async function handler(
     cacheTimestamp = Date.now()
 
     // Set cache headers for CDN/client-side caching
-    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60')
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=30, stale-while-revalidate=60'
+    )
     res.status(200).json(metrics)
   } catch (error) {
     console.error('Realtime metrics error:', error)
