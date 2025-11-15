@@ -55,7 +55,7 @@ export default function DomainPage({
     data: trendsResult,
     isLoading: loading,
     isFetching: fetching,
-  } = useTrendsData(days, domain)
+  } = useTrendsData(days, { host: domain })
 
   const trendsData = trendsResult?.trends || []
 

@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   try {
-    const { days = '30', host } = req.query
+    const { days = '30', host, urlId } = req.query
     const numDays = parseInt(days as string, 10)
 
     if (isNaN(numDays) || numDays < 1 || numDays > 365) {
@@ -40,8 +40,12 @@ export default async function handler(
       },
     }
 
+    // Filter by URL ID if specified (takes precedence over host)
+    if (urlId && typeof urlId === 'string') {
+      whereClause.urlId = parseInt(urlId, 10)
+    }
     // Filter by host if specified
-    if (host && typeof host === 'string') {
+    else if (host && typeof host === 'string') {
       whereClause.url = {
         host: {
           host: host,

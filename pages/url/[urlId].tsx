@@ -5,8 +5,11 @@
  * OPTIMIZED: Fixed N+1 query problem
  */
 
+import { useState, useMemo } from 'react'
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
+import { subDays } from 'date-fns'
+import { DateRange } from 'react-day-picker'
 import { ArrowLeft, ExternalLink, Calendar, TrendingUp } from 'lucide-react'
 import { Prisma, Country, Url, Host, UA } from '@prisma/client'
 import prisma from '@/lib/prisma'
@@ -14,6 +17,9 @@ import dayjs from '@/lib/dayjs'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
+import { UrlTrendsSection } from '@/components/url/UrlTrendsSection'
+import { UrlAnalyticsSection } from '@/components/url/UrlAnalyticsSection'
+import { useTrendsData } from '@/hooks/useAnalytics'
 
 type UrlWithHost = Url & {
   host: Host
@@ -76,6 +82,29 @@ export default function URLPage({
   topDevices,
   topEngines,
 }: Props) {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  })
+
+  // Calculate days from date range
+  const days = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to) return 30
+    return Math.ceil(
+      (dateRange.to.getTime() - dateRange.from.getTime()) /
+        (1000 * 60 * 60 * 24)
+    )
+  }, [dateRange])
+
+  // Use React Query hook for trends data
+  const {
+    data: trendsResult,
+    isLoading: loading,
+    isFetching: fetching,
+  } = useTrendsData(days, { urlId: url.id })
+
+  const trendsData = trendsResult?.trends || []
+
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
@@ -170,7 +199,21 @@ export default function URLPage({
             </div>
           </div>
 
-          {/* Analytics Grid */}
+          {/* Traffic Trends Chart */}
+          <UrlTrendsSection
+            urlId={url.id}
+            urlString={url.url}
+            dateRange={dateRange}
+            onDateRangeChange={setDateRange}
+            trendsData={trendsData}
+            loading={loading}
+            fetching={fetching}
+          />
+
+          {/* Analytics Charts */}
+          <UrlAnalyticsSection urlId={url.id} dateRange={dateRange} />
+
+          {/* Legacy Analytics Grid - Keep for backward compatibility */}
           <div className="grid gap-4 md:grid-cols-2">
             {/* Top Countries */}
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">

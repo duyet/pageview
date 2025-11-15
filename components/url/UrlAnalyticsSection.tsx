@@ -6,15 +6,15 @@ import { LocationChart } from '@/components/charts/LocationChart'
 import { ChartTitle } from '@/components/charts/ChartTitle'
 import { useDevicesData, useLocationsData } from '@/hooks/useAnalytics'
 
-interface DomainAnalyticsSectionProps {
-  domain: string
+interface UrlAnalyticsSectionProps {
+  urlId: number
   dateRange: DateRange | undefined
 }
 
-export function DomainAnalyticsSection({
-  domain,
+export function UrlAnalyticsSection({
+  urlId,
   dateRange,
-}: DomainAnalyticsSectionProps) {
+}: UrlAnalyticsSectionProps) {
   // Calculate days from date range
   const days = useMemo(() => {
     if (!dateRange?.from || !dateRange?.to) return 30
@@ -29,13 +29,13 @@ export function DomainAnalyticsSection({
     data: devicesResult,
     isLoading: loadingDevices,
     isFetching: fetchingDevices,
-  } = useDevicesData(days, { host: domain })
+  } = useDevicesData(days, { urlId })
 
   const {
     data: locationsResult,
     isLoading: loadingLocations,
     isFetching: fetchingLocations,
-  } = useLocationsData(days, { host: domain })
+  } = useLocationsData(days, { urlId })
 
   const devicesData = {
     browsers: devicesResult?.browsers || [],
