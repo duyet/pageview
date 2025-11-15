@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import Head from 'next/head'
@@ -48,7 +48,8 @@ import {
   TrendsChart,
   MetricToggle,
 } from '../components/charts/TrendsChart'
-import { TrendData } from './api/analytics/trends'
+import { ChartTitle } from '../components/charts/ChartTitle'
+import { useTrendsData } from '../hooks/useAnalytics'
 
 type DomainStat = {
   hostId: number
@@ -89,12 +90,6 @@ export default function Home({
   totalUrls,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [trendsData, setTrendsData] = useState<TrendData[]>([])
-  const [trendsTotals, setTrendsTotals] = useState<{
-    totalPageviews: number
-    totalUniqueVisitors: number
-  }>({ totalPageviews: 0, totalUniqueVisitors: 0 })
-  const [loadingTrends, setLoadingTrends] = useState(true)
   const [activeMetric, setActiveMetric] = useState<
     'pageviews' | 'uniqueVisitors'
   >('pageviews')
@@ -102,28 +97,18 @@ export default function Home({
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const [isIntegrationOpen, setIsIntegrationOpen] = useState(true)
 
-  // Fetch trends data for last 30 days
-  useEffect(() => {
-    const fetchTrends = async () => {
-      try {
-        const response = await fetch('/api/analytics/trends?days=30')
-        if (response.ok) {
-          const result = await response.json()
-          setTrendsData(result.trends)
-          setTrendsTotals({
-            totalPageviews: result.totalPageviews || 0,
-            totalUniqueVisitors: result.totalUniqueVisitors || 0,
-          })
-        }
-      } catch (error) {
-        console.error('Error fetching trends:', error)
-      } finally {
-        setLoadingTrends(false)
-      }
-    }
+  // Fetch trends data for last 30 days using React Query
+  const {
+    data: trendsResult,
+    isLoading: loadingTrends,
+    isFetching: fetchingTrends,
+  } = useTrendsData(30)
 
-    fetchTrends()
-  }, [])
+  const trendsData = trendsResult?.trends || []
+  const trendsTotals = {
+    totalPageviews: trendsResult?.totalPageviews || 0,
+    totalUniqueVisitors: trendsResult?.totalUniqueVisitors || 0,
+  }
 
   // Mock sparkline data - in production, fetch from API
   const mockSparklineData = [12, 19, 15, 25, 22, 30, 28]
@@ -316,22 +301,18 @@ export default function Home({
         <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
             <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-                    Traffic Trends
-                  </h2>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                    Page views and unique visitors over the last 30 days
-                  </p>
-                </div>
+              <ChartTitle
+                title="Traffic Trends"
+                description="Page views and unique visitors over the last 30 days"
+                loading={fetchingTrends}
+              >
                 <MetricToggle
                   activeMetric={activeMetric}
                   onMetricChange={setActiveMetric}
                   totalPageviews={trendsTotals.totalPageviews}
                   totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
                 />
-              </div>
+              </ChartTitle>
               <TrendsChart
                 data={trendsData}
                 loading={loadingTrends}

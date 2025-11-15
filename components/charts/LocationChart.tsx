@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { Loader2 } from 'lucide-react'
 import { LocationData } from '../../pages/api/analytics/locations'
 
 interface LocationChartProps {
@@ -19,8 +20,9 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          Loading {title.toLowerCase()}...
+        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+          <Loader2 className="size-4 animate-spin" />
+          <span>Loading {title.toLowerCase()}...</span>
         </div>
       </div>
     )

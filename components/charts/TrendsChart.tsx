@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { format, parseISO } from 'date-fns'
+import { Loader2 } from 'lucide-react'
 import { TrendData } from '../../pages/api/analytics/trends'
 
 interface TrendsChartProps {
@@ -43,8 +44,9 @@ export function TrendsChart({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          Loading trends...
+        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+          <Loader2 className="size-4 animate-spin" />
+          <span>Loading trends...</span>
         </div>
       </div>
     )
