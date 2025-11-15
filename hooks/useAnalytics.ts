@@ -3,13 +3,20 @@ import { TrendData } from '@/pages/api/analytics/trends'
 import { DeviceData } from '@/pages/api/analytics/devices'
 import { LocationData } from '@/pages/api/analytics/locations'
 
+export interface AnalyticsFilters {
+  host?: string
+  urlId?: number
+}
+
 // Hook for fetching trends data
-export function useTrendsData(days: number, host?: string) {
+export function useTrendsData(days: number, filters?: AnalyticsFilters) {
+  const { host, urlId } = filters || {}
   return useQuery({
-    queryKey: ['trends', days, host],
+    queryKey: ['trends', days, host, urlId],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
+      if (urlId) params.append('urlId', urlId.toString())
 
       const response = await fetch(`/api/analytics/trends?${params}`)
       if (!response.ok) throw new Error('Failed to fetch trends')
@@ -27,12 +34,14 @@ export function useTrendsData(days: number, host?: string) {
 }
 
 // Hook for fetching devices data
-export function useDevicesData(days: number, host?: string) {
+export function useDevicesData(days: number, filters?: AnalyticsFilters) {
+  const { host, urlId } = filters || {}
   return useQuery({
-    queryKey: ['devices', days, host],
+    queryKey: ['devices', days, host, urlId],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
+      if (urlId) params.append('urlId', urlId.toString())
 
       const response = await fetch(`/api/analytics/devices?${params}`)
       if (!response.ok) throw new Error('Failed to fetch devices')
@@ -50,12 +59,14 @@ export function useDevicesData(days: number, host?: string) {
 }
 
 // Hook for fetching locations data
-export function useLocationsData(days: number, host?: string) {
+export function useLocationsData(days: number, filters?: AnalyticsFilters) {
+  const { host, urlId } = filters || {}
   return useQuery({
-    queryKey: ['locations', days, host],
+    queryKey: ['locations', days, host, urlId],
     queryFn: async () => {
       const params = new URLSearchParams({ days: days.toString() })
       if (host) params.append('host', host)
+      if (urlId) params.append('urlId', urlId.toString())
 
       const response = await fetch(`/api/analytics/locations?${params}`)
       if (!response.ok) throw new Error('Failed to fetch locations')
