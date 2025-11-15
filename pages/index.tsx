@@ -16,6 +16,8 @@ import {
   Zap,
   Shield,
   Clock,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 
 import prisma from '../lib/prisma'
@@ -88,6 +90,7 @@ export default function Home({
   const [loadingTrends, setLoadingTrends] = useState(true)
   const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [isIntegrationOpen, setIsIntegrationOpen] = useState(true)
 
   // Fetch trends data for last 30 days
   useEffect(() => {
@@ -297,18 +300,32 @@ export default function Home({
         {/* Quick Start Section */}
         <section>
           <div className="mx-auto max-w-4xl p-4 sm:px-6">
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
-                  Integration Guide
-                </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  Choose your preferred integration method: embed a tracking
-                  script, use the REST API directly, or push data from your
-                  backend
-                </p>
-              </div>
-              <Usage currentHost={currentHost} />
+            <div className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800/50">
+              <button
+                onClick={() => setIsIntegrationOpen(!isIntegrationOpen)}
+                className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
+              >
+                <div>
+                  <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                    Integration Guide
+                  </h2>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    Choose your preferred integration method: embed a tracking
+                    script, use the REST API directly, or push data from your
+                    backend
+                  </p>
+                </div>
+                {isIntegrationOpen ? (
+                  <ChevronUp className="size-5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
+                ) : (
+                  <ChevronDown className="size-5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
+                )}
+              </button>
+              {isIntegrationOpen && (
+                <div className="border-t border-neutral-200 p-6 pt-4 dark:border-neutral-700">
+                  <Usage currentHost={currentHost} />
+                </div>
+              )}
             </div>
           </div>
         </section>
