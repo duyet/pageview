@@ -45,6 +45,7 @@ export default async function handler(
         FROM "PageView"
         WHERE "createdAt" >= ${last24Hours}
         AND ip IS NOT NULL
+        AND ip != ''
       `,
     ])
 

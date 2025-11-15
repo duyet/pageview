@@ -99,10 +99,34 @@ export default async function handler(
       visitorMap.set(date, Number(item.uniqueVisitors))
     })
 
+    // Calculate total unique visitors across entire period (not sum of daily)
+    let totalUniqueVisitorsQuery: [{ count: bigint }]
+    if (host && typeof host === 'string') {
+      totalUniqueVisitorsQuery = await prisma.$queryRaw`
+        SELECT COUNT(DISTINCT pv.ip) as count
+        FROM "PageView" pv
+        INNER JOIN "Url" u ON pv."urlId" = u.id
+        INNER JOIN "Host" h ON u."hostId" = h.id
+        WHERE pv."createdAt" >= ${startDate}
+          AND pv."createdAt" <= ${endDate}
+          AND h.host = ${host}
+          AND pv.ip IS NOT NULL
+          AND pv.ip != ''
+      `
+    } else {
+      totalUniqueVisitorsQuery = await prisma.$queryRaw`
+        SELECT COUNT(DISTINCT ip) as count
+        FROM "PageView"
+        WHERE "createdAt" >= ${startDate}
+          AND "createdAt" <= ${endDate}
+          AND ip IS NOT NULL
+          AND ip != ''
+      `
+    }
+
     // Generate complete date range with zero-filled missing days
     const trends: TrendData[] = []
     let totalPageviews = 0
-    let totalUniqueVisitors = 0
 
     for (let i = 0; i < numDays; i++) {
       const date = format(subDays(endDate, numDays - 1 - i), 'yyyy-MM-dd')
@@ -116,8 +140,9 @@ export default async function handler(
       })
 
       totalPageviews += pageviews
-      totalUniqueVisitors += uniqueVisitors
     }
+
+    const totalUniqueVisitors = Number(totalUniqueVisitorsQuery[0]?.count || 0)
 
     // Set cache headers for CDN/client-side caching (5 minutes)
     res.setHeader(

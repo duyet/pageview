@@ -2,6 +2,36 @@
 
 This document outlines the performance optimizations implemented to improve data collection and query performance.
 
+## Bug Fixes
+
+### Critical Bug: Incorrect Total Unique Visitors Calculation
+
+**Issue**: The `totalUniqueVisitors` was being calculated as the sum of daily unique visitors, which is incorrect. If the same IP appears on multiple days, they were being counted multiple times.
+
+**Example**:
+- Day 1: IP 1.1.1.1 visits (1 unique visitor)
+- Day 2: IP 1.1.1.1 visits again (1 unique visitor)
+- **Incorrect Total**: 2 unique visitors (sum of daily)
+- **Correct Total**: 1 unique visitor (distinct across period)
+
+**Fix**: Added a separate query to calculate total unique visitors across the entire time range using `COUNT(DISTINCT ip)` instead of summing daily counts.
+
+**Location**: `pages/api/analytics/trends.ts:102-145`
+
+### Bug: Empty IP Strings Counted as Single Visitor
+
+**Issue**: Empty IP strings (`''`) were being counted as a single distinct value in unique visitor calculations, skewing the metrics.
+
+**Fix**:
+- Updated all unique visitor queries to filter out both `NULL` and empty string IPs
+- Improved IP handling in pageview endpoint to properly convert empty strings to `NULL`
+- Added filters: `AND ip IS NOT NULL AND ip != ''`
+
+**Locations**:
+- `pages/api/analytics/trends.ts:113-114, 122-123`
+- `pages/api/realtime/metrics.ts:48`
+- `pages/api/pageview.ts:67-70`
+
 ## Summary of Improvements
 
 ### 1. Database Schema Optimizations
@@ -194,6 +224,24 @@ To track these improvements in production:
    - Monitor cache hit/miss rates
    - Track stale-while-revalidate usage
    - Measure CDN cache effectiveness
+
+## UI Improvements
+
+### Traffic Trends Chart - Tabbed View
+
+**Change**: Updated the Traffic Trends chart to use a toggle/tab interface instead of showing both Page Views and Unique Visitors on the same chart.
+
+**Benefits**:
+- Clearer visualization with less clutter
+- Better Y-axis scaling for each metric
+- Easier to focus on one metric at a time
+- More intuitive user experience
+
+**Location**: `components/charts/TrendsChart.tsx`
+
+The chart now includes a toggle at the top allowing users to switch between:
+- Page Views (blue line)
+- Unique Visitors (green line)
 
 ## Future Optimization Opportunities
 

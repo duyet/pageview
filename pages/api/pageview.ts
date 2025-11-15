@@ -63,7 +63,11 @@ export default async function handler(
 
   // Parse and validate data from middleware
   const uaString = String(req.query.ua || '')
-  const ip = req.query.ip ? String(req.query.ip) : null
+  // Convert empty string to null for proper database handling
+  const ip =
+    req.query.ip && String(req.query.ip).trim() !== ''
+      ? String(req.query.ip)
+      : null
   const countryName = String(req.query.country || '')
   const cityName = String(req.query.city || '')
 
