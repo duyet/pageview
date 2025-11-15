@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Head from 'next/head'
 import { format, subDays } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 import {
@@ -101,7 +102,24 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <>
+      <Head>
+        <title>Analytics Dashboard - Pageview Analytics</title>
+        <meta
+          name="description"
+          content="Advanced analytics dashboard with traffic trends, device breakdowns, and location insights. Track pageviews, unique visitors, and audience demographics with privacy-first analytics."
+        />
+        <meta
+          property="og:title"
+          content="Analytics Dashboard - Pageview Analytics"
+        />
+        <meta
+          property="og:description"
+          content="Advanced analytics dashboard with traffic trends, device breakdowns, and location insights."
+        />
+      </Head>
+
+      <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
           {/* Header */}
@@ -232,5 +250,6 @@ export default function Analytics() {
         </div>
       </div>
     </div>
+    </>
   )
 }

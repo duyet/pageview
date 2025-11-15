@@ -35,10 +35,18 @@ export default function RealtimePage() {
   return (
     <>
       <Head>
-        <title>Real-time Analytics - Pageview</title>
+        <title>Real-time Analytics - Pageview Analytics</title>
         <meta
           name="description"
-          content="Real-time analytics dashboard for pageview tracking"
+          content="Live monitoring dashboard showing real-time pageviews, active visitors, and traffic sources. Track your website activity as it happens with 30-second updates and WebSocket connectivity."
+        />
+        <meta
+          property="og:title"
+          content="Real-time Analytics - Pageview Analytics"
+        />
+        <meta
+          property="og:description"
+          content="Live monitoring dashboard with real-time pageviews, active visitors, and instant updates via WebSocket."
         />
       </Head>
 
