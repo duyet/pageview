@@ -68,7 +68,7 @@ export function DeviceHorizontalChart({
               {/* Text content on top */}
               <div className="relative flex h-full items-center justify-between px-3 text-xs font-medium">
                 <span className="truncate text-white">
-                  {item.name}
+                  {item.name || 'Unknown'}
                 </span>
                 <span className="ml-2 shrink-0 text-white">
                   {item.value.toLocaleString()}
