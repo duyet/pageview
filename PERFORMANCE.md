@@ -9,6 +9,7 @@ This document outlines the performance optimizations implemented to improve data
 **Issue**: The `totalUniqueVisitors` was being calculated as the sum of daily unique visitors, which is incorrect. If the same IP appears on multiple days, they were being counted multiple times.
 
 **Example**:
+
 - Day 1: IP 1.1.1.1 visits (1 unique visitor)
 - Day 2: IP 1.1.1.1 visits again (1 unique visitor)
 - **Incorrect Total**: 2 unique visitors (sum of daily)
@@ -23,11 +24,13 @@ This document outlines the performance optimizations implemented to improve data
 **Issue**: Empty IP strings (`''`) were being counted as a single distinct value in unique visitor calculations, skewing the metrics.
 
 **Fix**:
+
 - Updated all unique visitor queries to filter out both `NULL` and empty string IPs
 - Improved IP handling in pageview endpoint to properly convert empty strings to `NULL`
 - Added filters: `AND ip IS NOT NULL AND ip != ''`
 
 **Locations**:
+
 - `pages/api/analytics/trends.ts:113-114, 122-123`
 - `pages/api/realtime/metrics.ts:48`
 - `pages/api/pageview.ts:67-70`
@@ -37,6 +40,7 @@ This document outlines the performance optimizations implemented to improve data
 ### 1. Database Schema Optimizations
 
 **Composite Indexes Added:**
+
 - `(urlId, createdAt)` - For URL-specific time-series queries
 - `(countryId, createdAt)` - For location analytics over time
 - `(cityId, createdAt)` - For city analytics over time
@@ -50,12 +54,14 @@ This document outlines the performance optimizations implemented to improve data
 ### 2. Data Collection Endpoint (`/api/pageview.ts`)
 
 **Before:**
+
 - Nested `connectOrCreate` operations causing sequential database round-trips (5-6 sequential queries)
 - No validation of empty strings
 - Console logging on every request in production
 - No proper error handling for invalid URLs
 
 **After:**
+
 - Transaction-based parallel upserts using `Promise.all` (reduces to 2-3 round-trips)
 - Proper validation and error handling
 - Development-only logging
@@ -63,6 +69,7 @@ This document outlines the performance optimizations implemented to improve data
 - **Performance Gain:** ~60-70% reduction in database round-trips
 
 **Query Reduction:**
+
 ```
 Before: Host lookup → Host create → Slug lookup → Slug create → URL lookup → URL create → UA lookup → UA create → Country lookup → Country create → City lookup → City create → PageView create (up to 13 queries)
 
@@ -72,6 +79,7 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 ### 3. Real-time Metrics Endpoint (`/api/realtime/metrics.ts`)
 
 **Optimizations:**
+
 - **30-second in-memory cache** with proper TTL (as documented)
 - **HTTP cache headers**: `Cache-Control: public, s-maxage=30, stale-while-revalidate=60`
 - **Database-level date truncation** using `DATE_TRUNC()` instead of JavaScript
@@ -79,6 +87,7 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 - **Reduced query count**: Combined multiple queries where possible
 
 **Performance Gain:**
+
 - 95%+ request reduction from cache hits
 - 40-50% faster query execution from raw SQL optimization
 - CDN caching support for edge distribution
@@ -88,11 +97,13 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 #### Trends Endpoint (`/api/analytics/trends.ts`)
 
 **Before:**
+
 - Two separate `groupBy` queries (pageviews and unique visitors)
 - Incorrect calculation: summing daily unique visitors instead of distinct count
 - No caching
 
 **After:**
+
 - Parallel Prisma queries with `Promise.all()` for pageviews and unique visitors
 - Separate query for total unique visitors using `findMany` with `distinct: ['ip']`
 - Proper filtering of empty IPs: `ip: { not: null, notIn: [''] }`
@@ -102,12 +113,14 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 #### Devices Endpoint (`/api/analytics/devices.ts`)
 
 **Before:**
+
 - Three separate `groupBy` queries (browsers, OS, devices)
 - Additional lookup queries for UA details
 - Separate total count query
 - No filtering of empty browser/OS/device values
 
 **After:**
+
 - Parallel Prisma queries with `Promise.all()` for all stats
 - Single UA lookup for all needed IDs
 - Filtering of empty values in JavaScript layer
@@ -117,11 +130,13 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 #### Locations Endpoint (`/api/analytics/locations.ts`)
 
 **Before:**
+
 - Two separate `groupBy` queries (countries and cities)
 - Additional lookup queries for location details
 - Separate total count query
 
 **After:**
+
 - Parallel Prisma queries with `Promise.all()` for all stats
 - Separate lookups for country and city details
 - 5-minute HTTP cache headers
@@ -131,12 +146,12 @@ After: [Host, Slug, UA, Country, City] parallel upserts → URL upsert → PageV
 
 ### API Response Caching
 
-| Endpoint | Cache TTL | Stale-While-Revalidate | Type |
-|----------|-----------|------------------------|------|
-| `/api/realtime/metrics` | 30s | 60s | Server + HTTP |
-| `/api/analytics/trends` | 5m | 10m | HTTP |
-| `/api/analytics/devices` | 5m | 10m | HTTP |
-| `/api/analytics/locations` | 5m | 10m | HTTP |
+| Endpoint                   | Cache TTL | Stale-While-Revalidate | Type          |
+| -------------------------- | --------- | ---------------------- | ------------- |
+| `/api/realtime/metrics`    | 30s       | 60s                    | Server + HTTP |
+| `/api/analytics/trends`    | 5m        | 10m                    | HTTP          |
+| `/api/analytics/devices`   | 5m        | 10m                    | HTTP          |
+| `/api/analytics/locations` | 5m        | 10m                    | HTTP          |
 
 **Server-side cache:** In-memory cache for real-time metrics
 **HTTP cache:** CDN and browser caching via Cache-Control headers
@@ -159,6 +174,7 @@ await prisma.$queryRaw`SELECT DISTINCT ip ...`
 ```
 
 ### 2. Parallel Query Execution with Prisma
+
 ```typescript
 // Before
 const result1 = await query1()
@@ -169,25 +185,27 @@ const result3 = await query3()
 const [result1, result2, result3] = await Promise.all([
   query1(),
   query2(),
-  query3()
+  query3(),
 ])
 ```
 
 ### 3. Prisma Distinct for Unique Counts
+
 ```typescript
 // Get unique IPs using Prisma
 const uniqueIps = await prisma.pageView.findMany({
   where: {
     createdAt: { gte: startDate },
-    ip: { not: null, notIn: [''] }
+    ip: { not: null, notIn: [''] },
   },
   select: { ip: true },
-  distinct: ['ip']
+  distinct: ['ip'],
 })
 const uniqueCount = uniqueIps.length
 ```
 
 ### 4. Transaction Batching with Prisma
+
 ```typescript
 // Before
 await prisma.host.connectOrCreate(...)
@@ -205,16 +223,16 @@ await prisma.$transaction(async (tx) => {
 
 Based on these optimizations, expected improvements:
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Data collection latency | ~200-300ms | ~80-120ms | 60-70% faster (transaction batching) |
-| Real-time metrics (cached) | ~150-200ms | ~2-5ms | 95%+ faster (in-memory cache) |
-| Real-time metrics (uncached) | ~150-200ms | ~100-120ms | 30-40% faster (parallel queries) |
-| Analytics trends | ~300-400ms | ~150-200ms | 40-50% faster (parallel + correct logic) |
-| Analytics devices | ~400-500ms | ~180-220ms | 50-60% faster (parallel queries) |
-| Analytics locations | ~300-400ms | ~150-180ms | 50-55% faster (parallel queries) |
-| Database queries per pageview | 7-13 | 3 | 70-77% reduction (transaction batching) |
-| Unique visitor accuracy | Incorrect (sum) | Correct (distinct) | Bug fixed |
+| Metric                        | Before          | After              | Improvement                              |
+| ----------------------------- | --------------- | ------------------ | ---------------------------------------- |
+| Data collection latency       | ~200-300ms      | ~80-120ms          | 60-70% faster (transaction batching)     |
+| Real-time metrics (cached)    | ~150-200ms      | ~2-5ms             | 95%+ faster (in-memory cache)            |
+| Real-time metrics (uncached)  | ~150-200ms      | ~100-120ms         | 30-40% faster (parallel queries)         |
+| Analytics trends              | ~300-400ms      | ~150-200ms         | 40-50% faster (parallel + correct logic) |
+| Analytics devices             | ~400-500ms      | ~180-220ms         | 50-60% faster (parallel queries)         |
+| Analytics locations           | ~300-400ms      | ~150-180ms         | 50-55% faster (parallel queries)         |
+| Database queries per pageview | 7-13            | 3                  | 70-77% reduction (transaction batching)  |
+| Unique visitor accuracy       | Incorrect (sum) | Correct (distinct) | Bug fixed                                |
 
 ## Monitoring Recommendations
 
@@ -242,6 +260,7 @@ To track these improvements in production:
 **Change**: Updated the Traffic Trends chart to use a toggle/tab interface instead of showing both Page Views and Unique Visitors on the same chart.
 
 **Benefits**:
+
 - Clearer visualization with less clutter
 - Better Y-axis scaling for each metric
 - Easier to focus on one metric at a time
@@ -250,6 +269,7 @@ To track these improvements in production:
 **Location**: `components/charts/TrendsChart.tsx`
 
 The chart now includes a toggle at the top allowing users to switch between:
+
 - Page Views (blue line)
 - Unique Visitors (green line)
 
@@ -268,6 +288,7 @@ The chart now includes a toggle at the top allowing users to switch between:
 To apply these optimizations to production:
 
 1. **Database Migration:**
+
    ```bash
    # Update Prisma schema
    yarn prisma:generate

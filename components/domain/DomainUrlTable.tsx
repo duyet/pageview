@@ -60,9 +60,7 @@ export function DomainUrlTable({
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead className="h-10 text-sm">URL</TableHead>
-            <TableHead className="h-10 text-right text-sm">
-              Pageviews
-            </TableHead>
+            <TableHead className="h-10 text-right text-sm">Pageviews</TableHead>
             <TableHead className="h-10 text-right text-sm">Share</TableHead>
             <TableHead className="h-10 w-[80px]"></TableHead>
           </TableRow>
@@ -71,9 +69,7 @@ export function DomainUrlTable({
           {urlStats.map((urlStat) => {
             const percentage =
               totalPageviews > 0
-                ? ((urlStat._count.pageViews / totalPageviews) * 100).toFixed(
-                    1
-                  )
+                ? ((urlStat._count.pageViews / totalPageviews) * 100).toFixed(1)
                 : 0
 
             return (

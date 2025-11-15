@@ -7,6 +7,7 @@
 Modern analytics without the tracking baggage. Track pageviews without tracking users. Minimal cookies (10-min deduplication only), no user profiling, maximum transparency.
 
 ✨ **Features**
+
 - 🚀 Fast & lightweight tracking script
 - 🔒 Privacy-first (no user profiling or persistent cookies)
 - ⚡ Real-time monitoring with WebSocket updates
