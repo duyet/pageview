@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DateRange } from 'react-day-picker'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DeviceChart } from '@/components/charts/DeviceChart'
+import { DeviceHorizontalChart } from '@/components/charts/DeviceHorizontalChart'
 import { LocationChart } from '@/components/charts/LocationChart'
 import { DeviceData } from '@/pages/api/analytics/devices'
 import { LocationData } from '@/pages/api/analytics/locations'
@@ -100,7 +100,7 @@ export function DomainAnalyticsSection({
                 Most popular
               </p>
             </div>
-            <DeviceChart
+            <DeviceHorizontalChart
               data={devicesData.browsers}
               title="Browsers"
               loading={loading.devices}
@@ -116,7 +116,7 @@ export function DomainAnalyticsSection({
                 Device OS
               </p>
             </div>
-            <DeviceChart
+            <DeviceHorizontalChart
               data={devicesData.os}
               title="Operating Systems"
               loading={loading.devices}
@@ -132,7 +132,7 @@ export function DomainAnalyticsSection({
                 Desktop, mobile, tablet
               </p>
             </div>
-            <DeviceChart
+            <DeviceHorizontalChart
               data={devicesData.devices}
               title="Device Types"
               loading={loading.devices}

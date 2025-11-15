@@ -6,7 +6,7 @@ import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendData } from '@/pages/api/analytics/trends'
 
-export type MetricView = 'both' | 'pageviews' | 'visitors'
+export type MetricView = 'pageviews' | 'visitors'
 
 interface DomainTrendsSectionProps {
   domain: string
@@ -23,7 +23,7 @@ export function DomainTrendsSection({
   trendsData,
   loading,
 }: DomainTrendsSectionProps) {
-  const [metricView, setMetricView] = useState<MetricView>('both')
+  const [metricView, setMetricView] = useState<MetricView>('pageviews')
 
   const formatDateRange = () => {
     if (!dateRange?.from || !dateRange?.to) return ''
@@ -56,14 +56,11 @@ export function DomainTrendsSection({
             onValueChange={(value) => setMetricView(value as MetricView)}
           >
             <TabsList className="h-9">
-              <TabsTrigger value="both" className="text-xs">
-                Both
-              </TabsTrigger>
               <TabsTrigger value="pageviews" className="text-xs">
                 Page Views
               </TabsTrigger>
               <TabsTrigger value="visitors" className="text-xs">
-                Visitors
+                Unique Visitors
               </TabsTrigger>
             </TabsList>
           </Tabs>
