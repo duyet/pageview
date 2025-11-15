@@ -11,7 +11,7 @@ import prisma from '@/lib/prisma'
 import { analyzeDomain } from '@/lib/domainGrouping'
 import { DomainHeader } from '@/components/domain/DomainHeader'
 import { DomainTrendsSection } from '@/components/domain/DomainTrendsSection'
-import { DomainStats } from '@/components/domain/DomainStats'
+import { DomainAnalyticsSection } from '@/components/domain/DomainAnalyticsSection'
 import { DomainUrlTable } from '@/components/domain/DomainUrlTable'
 import { TrendData } from '../api/analytics/trends'
 
@@ -72,9 +72,6 @@ export default function DomainPage({
     fetchTrendsData()
   }, [dateRange, domain])
 
-  const averagePerUrl =
-    urlStats.length > 0 ? Math.round(totalPageviews / urlStats.length) : 0
-
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
@@ -82,6 +79,7 @@ export default function DomainPage({
           <DomainHeader
             domain={domain}
             totalPageviews={totalPageviews}
+            totalUrls={urlStats.length}
             previewCount={previewCount}
           />
 
@@ -93,11 +91,7 @@ export default function DomainPage({
             loading={loading}
           />
 
-          <DomainStats
-            totalUrls={urlStats.length}
-            totalPageviews={totalPageviews}
-            averagePerUrl={averagePerUrl}
-          />
+          <DomainAnalyticsSection domain={domain} dateRange={dateRange} />
 
           <DomainUrlTable urlStats={urlStats} totalPageviews={totalPageviews} />
         </div>

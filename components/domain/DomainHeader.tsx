@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 interface DomainHeaderProps {
   domain: string
   totalPageviews: number
+  totalUrls: number
   previewCount: number
 }
 
 export function DomainHeader({
   domain,
   totalPageviews,
+  totalUrls,
   previewCount,
 }: DomainHeaderProps) {
   return (
@@ -39,12 +41,22 @@ export function DomainHeader({
             )}
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
-            {totalPageviews.toLocaleString()}
+        <div className="flex gap-6 text-right">
+          <div>
+            <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+              {totalUrls}
+            </div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-400">
+              Total URLs
+            </div>
           </div>
-          <div className="text-sm text-neutral-600 dark:text-neutral-400">
-            Total Views
+          <div>
+            <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+              {totalPageviews.toLocaleString()}
+            </div>
+            <div className="text-sm text-neutral-600 dark:text-neutral-400">
+              Total Views
+            </div>
           </div>
         </div>
       </div>
