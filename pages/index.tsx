@@ -172,10 +172,28 @@ export default function Home({
   return (
     <>
       <Head>
-        <title>Pageview Analytics - Simple & Privacy-Focused</title>
+        <title>Pageview Analytics - Open, Simple & Privacy-Focused</title>
         <meta
           name="description"
-          content="Lightweight pageview tracking for modern websites"
+          content="Modern analytics without the tracking baggage. Privacy-first pageview tracking via script, REST API, or backend. Minimal cookies, no user profiling. Open source and transparent."
+        />
+        <meta
+          property="og:title"
+          content="Pageview Analytics - Open, Simple & Privacy-Focused"
+        />
+        <meta
+          property="og:description"
+          content="Privacy-focused pageview tracking with multiple integration options. Embed a script, use the REST API, or push data directly from your backend."
+        />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Pageview Analytics - Open, Simple & Privacy-Focused"
+        />
+        <meta
+          name="twitter:description"
+          content="Modern analytics without the tracking baggage. Privacy-first pageview tracking via script, REST API, or backend."
         />
       </Head>
 
