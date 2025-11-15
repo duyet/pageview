@@ -50,6 +50,16 @@ yarn vercel-build
 # Code quality
 yarn lint
 yarn fmt  # Prettier formatting
+yarn type-check  # TypeScript type checking (no emit)
+yarn validate  # Run type-check + lint + test
+
+# Testing
+yarn test  # Run unit tests with Vitest
+yarn test:watch  # Watch mode for unit tests
+yarn test:ui  # Vitest UI interface
+yarn test:coverage  # Generate coverage report (70% threshold)
+yarn test:e2e  # Run E2E tests with Playwright
+yarn test:e2e:ui  # Playwright UI mode
 ```
 
 ## Database Management
@@ -67,6 +77,33 @@ Key considerations:
 - Comprehensive indexing strategy for optimal query performance
 - `connectOrCreate` pattern used extensively to handle normalization
 - Migration files in `prisma/migrations/`
+
+## Testing
+
+The project uses a comprehensive testing setup:
+
+**Unit Testing (Vitest)**:
+- Config: `vitest.config.ts`
+- Setup: `tests/setup.ts` (mocks Next.js router, Image component, environment)
+- Environment: jsdom with React Testing Library
+- Location: `tests/unit/**/*.test.ts(x)`
+- Coverage thresholds: 70% for lines, functions, branches, statements
+- Path aliases: `@/*` maps to project root
+
+**E2E Testing (Playwright)**:
+- Config: `playwright.config.ts`
+- Location: `tests/e2e/`
+- Tests run across 5 device profiles: Desktop Chrome/Firefox/Safari, Mobile Chrome/Safari
+- Auto-starts dev server at http://localhost:3000
+- Screenshots on failure, traces on retry
+
+**Git Hooks (Husky + lint-staged)**:
+- Pre-commit hook runs on staged files:
+  - ESLint auto-fix
+  - Prettier formatting
+  - Vitest on related tests
+- Configured in `package.json` lint-staged section
+- Hook files in `.husky/`
 
 ## API Architecture
 
@@ -91,7 +128,14 @@ The tracking script (`pageview.ts`) implements:
 - **Charts**: Recharts 3.0.2 for data visualization
 - **Database**: Prisma 6.11.0 + PostgreSQL (Neon database)
 - **Real-time**: Socket.io 4.8.1 (server + client)
-- **Utilities**: date-fns 4.1.0, dayjs 1.11.13, normalize-url 8.0.2
+- **Data Fetching**: @tanstack/react-query 5.90.8
+- **Validation**: Zod 4.1.12
+- **Authentication**: next-auth 4.24.13 with @auth/prisma-adapter
+- **Rate Limiting**: @upstash/ratelimit + @upstash/redis
+- **Notifications**: sonner 2.0.7 (toast notifications)
+- **API Docs**: next-swagger-doc + swagger-ui-react
+- **Utilities**: date-fns 4.1.0, dayjs 1.11.13, normalize-url 8.0.2, framer-motion 12.23.22
+- **Testing**: Vitest 4.0.8 + @testing-library/react, Playwright 1.56.1
 - **Deployment**: Vercel with turbo 1.13.4 build optimization
 - **Package Manager**: Yarn
 
@@ -139,6 +183,23 @@ prisma/
 └── migrations/           # Database migrations
 ```
 
+## Environment Variables
+
+Required environment variables for local development and deployment:
+
+```bash
+# Database (Required)
+DATABASE_URL='postgresql://user:password@host:port/database'
+
+# Analytics (Optional)
+NEXT_PUBLIC_MEASUREMENT_ID='G-XXXXXXXXXX'  # Google Analytics ID
+```
+
+For E2E testing with Playwright, optionally set:
+```bash
+PLAYWRIGHT_TEST_BASE_URL='http://localhost:3000'  # Default if not set
+```
+
 ## Development Notes
 
 - Uses `turbo.json` for Vercel build optimization
@@ -146,6 +207,8 @@ prisma/
 - shadcn/ui components configuration in `components.json`
 - Custom hooks for real-time data and WebSocket management
 - Middleware runs on Vercel Edge for geo/UA enrichment
+- Path aliases: `@/*` maps to project root (configured in tsconfig.json and vitest.config.ts)
+- Git workflow: Push to `dev` branch, create PR to `main` for production deployment
 - Production deployment requires:
   - PostgreSQL database (Neon recommended)
   - `DATABASE_URL` environment variable
