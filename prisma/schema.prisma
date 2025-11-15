@@ -28,12 +28,18 @@ model PageView {
   // Metadata
   createdAt DateTime @default(now())
 
-  // Add indexes for better performance
+  // Single-column indexes for basic lookups
   @@index([urlId])
-  @@index([countryId])
-  @@index([cityId])
-  @@index([uAId])
   @@index([createdAt])
+
+  // Composite indexes for common query patterns
+  @@index([urlId, createdAt]) // For URL-specific time-series queries
+  @@index([countryId, createdAt]) // For location analytics over time
+  @@index([cityId, createdAt]) // For city analytics over time
+  @@index([uAId, createdAt]) // For device/browser analytics over time
+  @@index([createdAt, urlId]) // For time-range queries with URL filtering
+  @@index([createdAt, countryId]) // For time-range queries with country filtering
+  @@index([ip, createdAt]) // For unique visitor calculations
 }
 
 model Url {

@@ -51,42 +51,52 @@ export default async function handler(
       }
     }
 
-    // Get daily pageview counts
-    const dailyPageviews = await prisma.pageView.groupBy({
-      by: ['createdAt'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
+    // Optimize: Use raw SQL with date truncation and CTE to combine queries
+    let dailyStats: Array<{
+      date: Date
+      pageviews: bigint
+      uniqueVisitors: bigint
+    }>
 
-    // Get unique daily visitors (by IP)
-    const dailyUniqueVisitors = await prisma.pageView.groupBy({
-      by: ['createdAt'],
-      where: whereClause,
-      _count: {
-        ip: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
+    if (host && typeof host === 'string') {
+      // With host filter
+      dailyStats = await prisma.$queryRaw`
+        SELECT
+          DATE_TRUNC('day', pv."createdAt") as date,
+          COUNT(*) as pageviews,
+          COUNT(DISTINCT pv.ip) as "uniqueVisitors"
+        FROM "PageView" pv
+        INNER JOIN "Url" u ON pv."urlId" = u.id
+        INNER JOIN "Host" h ON u."hostId" = h.id
+        WHERE pv."createdAt" >= ${startDate}
+          AND pv."createdAt" <= ${endDate}
+          AND h.host = ${host}
+        GROUP BY DATE_TRUNC('day', pv."createdAt")
+        ORDER BY date ASC
+      `
+    } else {
+      // Without host filter
+      dailyStats = await prisma.$queryRaw`
+        SELECT
+          DATE_TRUNC('day', "createdAt") as date,
+          COUNT(*) as pageviews,
+          COUNT(DISTINCT ip) as "uniqueVisitors"
+        FROM "PageView"
+        WHERE "createdAt" >= ${startDate}
+          AND "createdAt" <= ${endDate}
+        GROUP BY DATE_TRUNC('day', "createdAt")
+        ORDER BY date ASC
+      `
+    }
 
-    // Create a map for quick lookup
+    // Create maps for quick lookup
     const pageviewMap = new Map<string, number>()
     const visitorMap = new Map<string, number>()
 
-    dailyPageviews.forEach((item) => {
-      const date = format(item.createdAt, 'yyyy-MM-dd')
-      pageviewMap.set(date, (pageviewMap.get(date) || 0) + item._count.id)
-    })
-
-    dailyUniqueVisitors.forEach((item) => {
-      const date = format(item.createdAt, 'yyyy-MM-dd')
-      visitorMap.set(date, (visitorMap.get(date) || 0) + item._count.ip)
+    dailyStats.forEach((item) => {
+      const date = format(new Date(item.date), 'yyyy-MM-dd')
+      pageviewMap.set(date, Number(item.pageviews))
+      visitorMap.set(date, Number(item.uniqueVisitors))
     })
 
     // Generate complete date range with zero-filled missing days
@@ -109,6 +119,11 @@ export default async function handler(
       totalUniqueVisitors += uniqueVisitors
     }
 
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       trends,
       totalPageviews,

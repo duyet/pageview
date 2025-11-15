@@ -50,119 +50,134 @@ export default async function handler(
       }
     }
 
-    // Get browser statistics
-    const browserStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        _count: {
-          id: 'desc',
-        },
-      },
-      take: 10, // Top 10 browsers
-    })
+    // Optimize: Use raw SQL with JOINs to get all stats in fewer queries
+    let browserStatsRaw: Array<{ browser: string; count: bigint }>
+    let osStatsRaw: Array<{ os: string; count: bigint }>
+    let deviceStatsRaw: Array<{ deviceType: string; count: bigint }>
+    let total: number
 
-    // Get OS statistics
-    const osStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        _count: {
-          id: 'desc',
-        },
-      },
-      take: 10, // Top 10 OS
-    })
+    if (host && typeof host === 'string') {
+      // With host filter - run queries in parallel
+      const [browserResults, osResults, deviceResults, totalResult] =
+        await Promise.all([
+          prisma.$queryRaw<Array<{ browser: string; count: bigint }>>`
+            SELECT ua.browser, COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            INNER JOIN "Url" u ON pv."urlId" = u.id
+            INNER JOIN "Host" h ON u."hostId" = h.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND h.host = ${host}
+              AND ua.browser IS NOT NULL
+              AND ua.browser != ''
+            GROUP BY ua.browser
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<Array<{ os: string; count: bigint }>>`
+            SELECT ua.os, COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            INNER JOIN "Url" u ON pv."urlId" = u.id
+            INNER JOIN "Host" h ON u."hostId" = h.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND h.host = ${host}
+              AND ua.os IS NOT NULL
+              AND ua.os != ''
+            GROUP BY ua.os
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<Array<{ deviceType: string; count: bigint }>>`
+            SELECT ua."deviceType", COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            INNER JOIN "Url" u ON pv."urlId" = u.id
+            INNER JOIN "Host" h ON u."hostId" = h.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND h.host = ${host}
+              AND ua."deviceType" IS NOT NULL
+              AND ua."deviceType" != ''
+            GROUP BY ua."deviceType"
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<[{ count: bigint }]>`
+            SELECT COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "Url" u ON pv."urlId" = u.id
+            INNER JOIN "Host" h ON u."hostId" = h.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND h.host = ${host}
+          `,
+        ])
+      browserStatsRaw = browserResults
+      osStatsRaw = osResults
+      deviceStatsRaw = deviceResults
+      total = Number(totalResult[0]?.count || 0)
+    } else {
+      // Without host filter - run queries in parallel
+      const [browserResults, osResults, deviceResults, totalResult] =
+        await Promise.all([
+          prisma.$queryRaw<Array<{ browser: string; count: bigint }>>`
+            SELECT ua.browser, COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND ua.browser IS NOT NULL
+              AND ua.browser != ''
+            GROUP BY ua.browser
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<Array<{ os: string; count: bigint }>>`
+            SELECT ua.os, COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND ua.os IS NOT NULL
+              AND ua.os != ''
+            GROUP BY ua.os
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<Array<{ deviceType: string; count: bigint }>>`
+            SELECT ua."deviceType", COUNT(*) as count
+            FROM "PageView" pv
+            INNER JOIN "UA" ua ON pv."uAId" = ua.id
+            WHERE pv."createdAt" >= ${startDate}
+              AND ua."deviceType" IS NOT NULL
+              AND ua."deviceType" != ''
+            GROUP BY ua."deviceType"
+            ORDER BY count DESC
+            LIMIT 10
+          `,
+          prisma.$queryRaw<[{ count: bigint }]>`
+            SELECT COUNT(*) as count
+            FROM "PageView"
+            WHERE "createdAt" >= ${startDate}
+          `,
+        ])
+      browserStatsRaw = browserResults
+      osStatsRaw = osResults
+      deviceStatsRaw = deviceResults
+      total = Number(totalResult[0]?.count || 0)
+    }
 
-    // Get device type statistics
-    const deviceStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        _count: {
-          id: 'desc',
-        },
-      },
-      take: 10, // Top 10 devices
-    })
-
-    // Get UA details for browsers
-    const allUaIds = [
-      ...browserStats.map((s) => s.uAId),
-      ...osStats.map((s) => s.uAId),
-      ...deviceStats.map((s) => s.uAId),
-    ].filter(Boolean) as number[]
-
-    const uaIds = Array.from(new Set(allUaIds))
-
-    const uaDetails = await prisma.uA.findMany({
-      where: {
-        id: {
-          in: uaIds,
-        },
-      },
-      select: {
-        id: true,
-        browser: true,
-        os: true,
-        device: true,
-        deviceType: true,
-      },
-    })
-
-    const uaMap = new Map(uaDetails.map((ua) => [ua.id, ua]))
-
-    // Calculate total for percentages
-    const total = await prisma.pageView.count({
-      where: whereClause,
-    })
-
-    // Process browser data
+    // Convert results directly to maps
     const browserMap = new Map<string, number>()
-    browserStats.forEach((stat) => {
-      if (stat.uAId) {
-        const ua = uaMap.get(stat.uAId)
-        if (ua?.browser) {
-          const browser = ua.browser
-          browserMap.set(
-            browser,
-            (browserMap.get(browser) || 0) + stat._count.id
-          )
-        }
-      }
+    browserStatsRaw.forEach((stat) => {
+      browserMap.set(stat.browser, Number(stat.count))
     })
 
-    // Process OS data
     const osMap = new Map<string, number>()
-    osStats.forEach((stat) => {
-      if (stat.uAId) {
-        const ua = uaMap.get(stat.uAId)
-        if (ua?.os) {
-          const os = ua.os
-          osMap.set(os, (osMap.get(os) || 0) + stat._count.id)
-        }
-      }
+    osStatsRaw.forEach((stat) => {
+      osMap.set(stat.os, Number(stat.count))
     })
 
-    // Process device data
     const deviceMap = new Map<string, number>()
-    deviceStats.forEach((stat) => {
-      if (stat.uAId) {
-        const ua = uaMap.get(stat.uAId)
-        if (ua?.deviceType) {
-          const device = ua.deviceType
-          deviceMap.set(device, (deviceMap.get(device) || 0) + stat._count.id)
-        }
-      }
+    deviceStatsRaw.forEach((stat) => {
+      deviceMap.set(stat.deviceType, Number(stat.count))
     })
 
     // Convert to arrays with percentages
@@ -193,6 +208,11 @@ export default async function handler(
         percentage: total > 0 ? Math.round((value / total) * 100) : 0,
       }))
 
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       browsers,
       os,

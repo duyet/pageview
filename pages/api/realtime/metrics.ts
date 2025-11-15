@@ -4,6 +4,11 @@ import { format, subHours, startOfHour } from 'date-fns'
 import prisma from '../../../lib/prisma'
 import { RealtimeMetrics } from '../../../types/socket'
 
+// Simple in-memory cache with 30s TTL as documented
+let cachedMetrics: RealtimeMetrics | null = null
+let cacheTimestamp: number = 0
+const CACHE_TTL = 30 * 1000 // 30 seconds
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RealtimeMetrics | { error: string }>
@@ -12,32 +17,39 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // Check cache first
+  const now = Date.now()
+  if (cachedMetrics && now - cacheTimestamp < CACHE_TTL) {
+    // Set cache headers for client-side caching
+    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60')
+    return res.status(200).json(cachedMetrics)
+  }
+
   try {
-    const now = new Date()
-    const last24Hours = subHours(now, 24)
-    const last1Hour = subHours(now, 1)
+    const currentTime = new Date()
+    const last24Hours = subHours(currentTime, 24)
+    const last1Hour = subHours(currentTime, 1)
 
-    // Get total views in last 24 hours
-    const totalViews = await prisma.pageView.count({
-      where: {
-        createdAt: {
-          gte: last24Hours,
+    // Optimize: Get total views and unique visitors in a single query using raw SQL
+    const [totalViewsResult, uniqueVisitorsResult] = await Promise.all([
+      prisma.pageView.count({
+        where: {
+          createdAt: {
+            gte: last24Hours,
+          },
         },
-      },
-    })
+      }),
+      // Use raw SQL for distinct count (more efficient)
+      prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(DISTINCT ip) as count
+        FROM "PageView"
+        WHERE "createdAt" >= ${last24Hours}
+        AND ip IS NOT NULL
+      `,
+    ])
 
-    // Get unique visitors in last 24 hours (by IP)
-    const uniqueVisitors = await prisma.pageView.groupBy({
-      by: ['ip'],
-      where: {
-        createdAt: {
-          gte: last24Hours,
-        },
-      },
-      _count: {
-        ip: true,
-      },
-    })
+    const totalViews = totalViewsResult
+    const uniqueVisitors = Number(uniqueVisitorsResult[0]?.count || 0)
 
     // Get most active pages in last hour
     const activePages = await prisma.pageView.groupBy({
@@ -130,34 +142,30 @@ export default async function handler(
         count: c._count.id,
       }))
 
-    // Get hourly views for last 24 hours
-    const hourlyViews = await prisma.pageView.groupBy({
-      by: ['createdAt'],
-      where: {
-        createdAt: {
-          gte: last24Hours,
-        },
-      },
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
+    // Optimize: Use database-level date truncation for hourly aggregation
+    const hourlyViewsRaw = await prisma.$queryRaw<
+      Array<{ hour: Date; count: bigint }>
+    >`
+      SELECT
+        DATE_TRUNC('hour', "createdAt") as hour,
+        COUNT(*) as count
+      FROM "PageView"
+      WHERE "createdAt" >= ${last24Hours}
+      GROUP BY DATE_TRUNC('hour', "createdAt")
+      ORDER BY hour ASC
+    `
 
-    // Process hourly data
+    // Convert to map for efficient lookup
     const hourlyMap = new Map<string, number>()
-
-    hourlyViews.forEach((item) => {
-      const hour = format(startOfHour(item.createdAt), 'yyyy-MM-dd HH:00')
-      hourlyMap.set(hour, (hourlyMap.get(hour) || 0) + item._count.id)
+    hourlyViewsRaw.forEach((item) => {
+      const hourKey = format(new Date(item.hour), 'yyyy-MM-dd HH:00')
+      hourlyMap.set(hourKey, Number(item.count))
     })
 
-    // Generate complete 24-hour range
+    // Generate complete 24-hour range with zero-filled missing hours
     const hourlyData = []
     for (let i = 23; i >= 0; i--) {
-      const hour = startOfHour(subHours(now, i))
+      const hour = startOfHour(subHours(currentTime, i))
       const hourKey = format(hour, 'yyyy-MM-dd HH:00')
       const hourLabel = format(hour, 'HH:00')
 
@@ -169,12 +177,18 @@ export default async function handler(
 
     const metrics: RealtimeMetrics = {
       totalViews,
-      uniqueVisitors: uniqueVisitors.length,
+      uniqueVisitors,
       activePages: activePagesData,
       recentCountries: recentCountriesData,
       hourlyViews: hourlyData,
     }
 
+    // Update cache
+    cachedMetrics = metrics
+    cacheTimestamp = Date.now()
+
+    // Set cache headers for CDN/client-side caching
+    res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=60')
     res.status(200).json(metrics)
   } catch (error) {
     console.error('Realtime metrics error:', error)

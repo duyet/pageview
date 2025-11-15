@@ -49,94 +49,107 @@ export default async function handler(
       }
     }
 
-    // Get country statistics
-    const countryStats = await prisma.pageView.groupBy({
-      by: ['countryId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        _count: {
-          id: 'desc',
-        },
-      },
-      take: 15, // Top 15 countries
+    // Optimize: Use raw SQL with JOINs to get all location stats efficiently
+    let countryStatsRaw: Array<{ country: string; count: bigint }>
+    let cityStatsRaw: Array<{ city: string; count: bigint }>
+    let total: number
+
+    if (host && typeof host === 'string') {
+      // With host filter - run queries in parallel
+      const [countryResults, cityResults, totalResult] = await Promise.all([
+        prisma.$queryRaw<Array<{ country: string; count: bigint }>>`
+          SELECT c.country, COUNT(*) as count
+          FROM "PageView" pv
+          INNER JOIN "Country" c ON pv."countryId" = c.id
+          INNER JOIN "Url" u ON pv."urlId" = u.id
+          INNER JOIN "Host" h ON u."hostId" = h.id
+          WHERE pv."createdAt" >= ${startDate}
+            AND h.host = ${host}
+          GROUP BY c.country
+          ORDER BY count DESC
+          LIMIT 15
+        `,
+        prisma.$queryRaw<Array<{ city: string; count: bigint }>>`
+          SELECT ci.city, COUNT(*) as count
+          FROM "PageView" pv
+          INNER JOIN "City" ci ON pv."cityId" = ci.id
+          INNER JOIN "Url" u ON pv."urlId" = u.id
+          INNER JOIN "Host" h ON u."hostId" = h.id
+          WHERE pv."createdAt" >= ${startDate}
+            AND h.host = ${host}
+          GROUP BY ci.city
+          ORDER BY count DESC
+          LIMIT 15
+        `,
+        prisma.$queryRaw<[{ count: bigint }]>`
+          SELECT COUNT(*) as count
+          FROM "PageView" pv
+          INNER JOIN "Url" u ON pv."urlId" = u.id
+          INNER JOIN "Host" h ON u."hostId" = h.id
+          WHERE pv."createdAt" >= ${startDate}
+            AND h.host = ${host}
+        `,
+      ])
+      countryStatsRaw = countryResults
+      cityStatsRaw = cityResults
+      total = Number(totalResult[0]?.count || 0)
+    } else {
+      // Without host filter - run queries in parallel
+      const [countryResults, cityResults, totalResult] = await Promise.all([
+        prisma.$queryRaw<Array<{ country: string; count: bigint }>>`
+          SELECT c.country, COUNT(*) as count
+          FROM "PageView" pv
+          INNER JOIN "Country" c ON pv."countryId" = c.id
+          WHERE pv."createdAt" >= ${startDate}
+          GROUP BY c.country
+          ORDER BY count DESC
+          LIMIT 15
+        `,
+        prisma.$queryRaw<Array<{ city: string; count: bigint }>>`
+          SELECT ci.city, COUNT(*) as count
+          FROM "PageView" pv
+          INNER JOIN "City" ci ON pv."cityId" = ci.id
+          WHERE pv."createdAt" >= ${startDate}
+          GROUP BY ci.city
+          ORDER BY count DESC
+          LIMIT 15
+        `,
+        prisma.$queryRaw<[{ count: bigint }]>`
+          SELECT COUNT(*) as count
+          FROM "PageView"
+          WHERE "createdAt" >= ${startDate}
+        `,
+      ])
+      countryStatsRaw = countryResults
+      cityStatsRaw = cityResults
+      total = Number(totalResult[0]?.count || 0)
+    }
+
+    // Process country data directly
+    const countryData: LocationData[] = countryStatsRaw.map((stat) => {
+      const value = Number(stat.count)
+      return {
+        name: stat.country || 'Unknown',
+        value,
+        percentage: total > 0 ? Math.round((value / total) * 100) : 0,
+      }
     })
 
-    // Get city statistics
-    const cityStats = await prisma.pageView.groupBy({
-      by: ['cityId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        _count: {
-          id: 'desc',
-        },
-      },
-      take: 15, // Top 15 cities
+    // Process city data directly
+    const cityData: LocationData[] = cityStatsRaw.map((stat) => {
+      const value = Number(stat.count)
+      return {
+        name: stat.city || 'Unknown',
+        value,
+        percentage: total > 0 ? Math.round((value / total) * 100) : 0,
+      }
     })
 
-    // Get country details
-    const countryIds = countryStats
-      .map((s) => s.countryId)
-      .filter(Boolean) as number[]
-
-    const countries = await prisma.country.findMany({
-      where: {
-        id: {
-          in: countryIds,
-        },
-      },
-      select: {
-        id: true,
-        country: true,
-      },
-    })
-
-    // Get city details
-    const cityIds = cityStats.map((s) => s.cityId).filter(Boolean) as number[]
-
-    const cities = await prisma.city.findMany({
-      where: {
-        id: {
-          in: cityIds,
-        },
-      },
-      select: {
-        id: true,
-        city: true,
-      },
-    })
-
-    const countryMap = new Map(countries.map((c) => [c.id, c.country]))
-    const cityMap = new Map(cities.map((c) => [c.id, c.city]))
-
-    // Calculate total for percentages
-    const total = await prisma.pageView.count({
-      where: whereClause,
-    })
-
-    // Process country data
-    const countryData: LocationData[] = countryStats
-      .filter((stat) => stat.countryId && countryMap.has(stat.countryId))
-      .map((stat) => ({
-        name: countryMap.get(stat.countryId!) || 'Unknown',
-        value: stat._count.id,
-        percentage: total > 0 ? Math.round((stat._count.id / total) * 100) : 0,
-      }))
-
-    // Process city data
-    const cityData: LocationData[] = cityStats
-      .filter((stat) => stat.cityId && cityMap.has(stat.cityId))
-      .map((stat) => ({
-        name: cityMap.get(stat.cityId!) || 'Unknown',
-        value: stat._count.id,
-        percentage: total > 0 ? Math.round((stat._count.id / total) * 100) : 0,
-      }))
-
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       countries: countryData,
       cities: cityData,
