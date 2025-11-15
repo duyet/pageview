@@ -46,11 +46,34 @@ export default async function handler(
       whereClause.urlId = parseInt(urlId, 10)
     }
     // Filter by host if specified
+    // Note: Prisma groupBy may not support nested relation filters in where clause,
+    // so we need to first find matching URL IDs and then filter by those
     else if (host && typeof host === 'string') {
-      whereClause.url = {
-        host: {
-          host: host,
+      const matchingUrls = await prisma.url.findMany({
+        where: {
+          host: {
+            host: host,
+          },
         },
+        select: {
+          id: true,
+        },
+      })
+
+      const urlIds = matchingUrls.map((u) => u.id)
+
+      if (urlIds.length === 0) {
+        // No matching URLs found, return empty results
+        return res.status(200).json({
+          browsers: [],
+          os: [],
+          devices: [],
+          total: 0,
+        })
+      }
+
+      whereClause.urlId = {
+        in: urlIds,
       }
     }
 
