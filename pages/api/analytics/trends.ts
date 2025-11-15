@@ -51,53 +51,80 @@ export default async function handler(
       }
     }
 
-    // Get daily pageview counts
-    const dailyPageviews = await prisma.pageView.groupBy({
-      by: ['createdAt'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
+    // Get daily pageviews and unique visitors using Prisma
+    const [dailyPageviews, uniqueIpsByDay] = await Promise.all([
+      // Get daily pageview counts
+      prisma.pageView.groupBy({
+        by: ['createdAt'],
+        where: whereClause,
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+      // Get unique IPs by day for daily unique visitor count
+      prisma.pageView.groupBy({
+        by: ['createdAt', 'ip'],
+        where: {
+          ...whereClause,
+          ip: {
+            not: null,
+            notIn: [''],
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      }),
+    ])
 
-    // Get unique daily visitors (by IP)
-    const dailyUniqueVisitors = await prisma.pageView.groupBy({
-      by: ['createdAt'],
-      where: whereClause,
-      _count: {
-        ip: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
-
-    // Create a map for quick lookup
+    // Create maps for quick lookup
     const pageviewMap = new Map<string, number>()
-    const visitorMap = new Map<string, number>()
+    const visitorMap = new Map<string, Set<string>>()
 
+    // Process pageviews
     dailyPageviews.forEach((item) => {
-      const date = format(item.createdAt, 'yyyy-MM-dd')
+      const date = format(startOfDay(item.createdAt), 'yyyy-MM-dd')
       pageviewMap.set(date, (pageviewMap.get(date) || 0) + item._count.id)
     })
 
-    dailyUniqueVisitors.forEach((item) => {
-      const date = format(item.createdAt, 'yyyy-MM-dd')
-      visitorMap.set(date, (visitorMap.get(date) || 0) + item._count.ip)
+    // Process unique visitors by day
+    uniqueIpsByDay.forEach((item) => {
+      const date = format(startOfDay(item.createdAt), 'yyyy-MM-dd')
+      if (!visitorMap.has(date)) {
+        visitorMap.set(date, new Set())
+      }
+      if (item.ip) {
+        visitorMap.get(date)!.add(item.ip)
+      }
+    })
+
+    // Calculate total unique visitors across entire period (not sum of daily)
+    // This requires getting all unique IPs across the date range
+    const allUniqueIps = await prisma.pageView.findMany({
+      where: {
+        ...whereClause,
+        ip: {
+          not: null,
+          notIn: [''],
+        },
+      },
+      select: {
+        ip: true,
+      },
+      distinct: ['ip'],
     })
 
     // Generate complete date range with zero-filled missing days
     const trends: TrendData[] = []
     let totalPageviews = 0
-    let totalUniqueVisitors = 0
 
     for (let i = 0; i < numDays; i++) {
       const date = format(subDays(endDate, numDays - 1 - i), 'yyyy-MM-dd')
       const pageviews = pageviewMap.get(date) || 0
-      const uniqueVisitors = visitorMap.get(date) || 0
+      const uniqueVisitors = visitorMap.get(date)?.size || 0
 
       trends.push({
         date,
@@ -106,9 +133,16 @@ export default async function handler(
       })
 
       totalPageviews += pageviews
-      totalUniqueVisitors += uniqueVisitors
     }
 
+    // Total unique visitors is count of distinct IPs across entire period
+    const totalUniqueVisitors = allUniqueIps.length
+
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       trends,
       totalPageviews,

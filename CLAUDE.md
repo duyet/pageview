@@ -78,6 +78,39 @@ Key considerations:
 - `connectOrCreate` pattern used extensively to handle normalization
 - Migration files in `prisma/migrations/`
 
+## Database Query Guidelines
+
+**IMPORTANT: Use Prisma Exclusively**
+
+- **DO NOT use raw SQL queries** (`prisma.$queryRaw`, `prisma.$executeRaw`)
+- **ALWAYS use Prisma ORM methods** for all database operations
+- This ensures type safety, prevents SQL injection, and maintains consistency
+
+**Rationale**:
+- Prisma provides strong TypeScript typing and autocomplete
+- Automatic query validation and prevention of common errors
+- Better testability and maintainability
+- Consistent codebase patterns
+
+**Allowed Prisma patterns**:
+```typescript
+// ✅ Good - Using Prisma methods
+await prisma.pageView.findMany({ where: { ... } })
+await prisma.pageView.groupBy({ by: ['createdAt'], ... })
+await prisma.pageView.count({ where: { ... } })
+await prisma.pageView.findMany({ distinct: ['ip'], ... })
+
+// ❌ Bad - Using raw SQL
+await prisma.$queryRaw`SELECT ...`
+await prisma.$executeRaw`UPDATE ...`
+```
+
+**For complex queries**:
+- Use Prisma's `groupBy`, `aggregate`, `findMany` with `distinct`
+- Combine multiple Prisma queries with `Promise.all()` for parallel execution
+- Post-process results in JavaScript if needed
+- Use transactions (`prisma.$transaction`) for atomic operations
+
 ## Testing
 
 The project uses a comprehensive testing setup:

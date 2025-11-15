@@ -50,52 +50,57 @@ export default async function handler(
       }
     }
 
-    // Get browser statistics
-    const browserStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
+    // Get browser, OS, and device statistics using Prisma
+    const [browserStats, osStats, deviceStats, total] = await Promise.all([
+      // Browser statistics
+      prisma.pageView.groupBy({
+        by: ['uAId'],
+        where: whereClause,
         _count: {
-          id: 'desc',
+          id: true,
         },
-      },
-      take: 10, // Top 10 browsers
-    })
-
-    // Get OS statistics
-    const osStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 10,
+      }),
+      // OS statistics
+      prisma.pageView.groupBy({
+        by: ['uAId'],
+        where: whereClause,
         _count: {
-          id: 'desc',
+          id: true,
         },
-      },
-      take: 10, // Top 10 OS
-    })
-
-    // Get device type statistics
-    const deviceStats = await prisma.pageView.groupBy({
-      by: ['uAId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 10,
+      }),
+      // Device type statistics
+      prisma.pageView.groupBy({
+        by: ['uAId'],
+        where: whereClause,
         _count: {
-          id: 'desc',
+          id: true,
         },
-      },
-      take: 10, // Top 10 devices
-    })
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 10,
+      }),
+      // Total count
+      prisma.pageView.count({
+        where: whereClause,
+      }),
+    ])
 
-    // Get UA details for browsers
+    // Get UA details for all unique UA IDs
     const allUaIds = [
       ...browserStats.map((s) => s.uAId),
       ...osStats.map((s) => s.uAId),
@@ -121,17 +126,12 @@ export default async function handler(
 
     const uaMap = new Map(uaDetails.map((ua) => [ua.id, ua]))
 
-    // Calculate total for percentages
-    const total = await prisma.pageView.count({
-      where: whereClause,
-    })
-
     // Process browser data
     const browserMap = new Map<string, number>()
     browserStats.forEach((stat) => {
       if (stat.uAId) {
         const ua = uaMap.get(stat.uAId)
-        if (ua?.browser) {
+        if (ua?.browser && ua.browser !== '') {
           const browser = ua.browser
           browserMap.set(
             browser,
@@ -146,7 +146,7 @@ export default async function handler(
     osStats.forEach((stat) => {
       if (stat.uAId) {
         const ua = uaMap.get(stat.uAId)
-        if (ua?.os) {
+        if (ua?.os && ua.os !== '') {
           const os = ua.os
           osMap.set(os, (osMap.get(os) || 0) + stat._count.id)
         }
@@ -158,7 +158,7 @@ export default async function handler(
     deviceStats.forEach((stat) => {
       if (stat.uAId) {
         const ua = uaMap.get(stat.uAId)
-        if (ua?.deviceType) {
+        if (ua?.deviceType && ua.deviceType !== '') {
           const device = ua.deviceType
           deviceMap.set(device, (deviceMap.get(device) || 0) + stat._count.id)
         }
@@ -193,6 +193,11 @@ export default async function handler(
         percentage: total > 0 ? Math.round((value / total) * 100) : 0,
       }))
 
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       browsers,
       os,

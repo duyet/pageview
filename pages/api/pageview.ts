@@ -44,78 +44,115 @@ export default async function handler(
     return res.status(400).json({ msg: 'URL is required' })
   }
 
-  const normalizedUrl = normalizeUrl(url as string, {
-    removeQueryParameters: [/^utm_\w+/i, 'fbclid', 'ref', 'ref_src'],
-  })
-  console.log(`Normalized URL: ${normalizedUrl}`)
-  const parsedUrl = new URL(normalizedUrl)
-  console.log('Parsed URL', parsedUrl)
+  let normalizedUrl: string
+  let parsedUrl: URL
+
+  try {
+    normalizedUrl = normalizeUrl(url as string, {
+      removeQueryParameters: [/^utm_\w+/i, 'fbclid', 'ref', 'ref_src'],
+    })
+    parsedUrl = new URL(normalizedUrl)
+  } catch (err) {
+    return res.status(400).json({ msg: 'Invalid URL' })
+  }
+
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Normalized URL: ${normalizedUrl}`, parsedUrl)
+  }
+
+  // Parse and validate data from middleware
+  const uaString = String(req.query.ua || '')
+  // Convert empty string to null for proper database handling
+  const ip =
+    req.query.ip && String(req.query.ip).trim() !== ''
+      ? String(req.query.ip)
+      : null
+  const countryName = String(req.query.country || '')
+  const cityName = String(req.query.city || '')
+
+  // Skip empty or invalid entries
+  if (!uaString || !countryName || !cityName) {
+    return res.status(400).json({ msg: 'Missing required fields' })
+  }
 
   const parsedUAFromMiddleware = {
-    ua: '' + req.query.ua,
-    browser: '' + req.query.browser,
-    browserVersion: '' + req.query.browserVersion,
-    os: '' + req.query.os,
-    osVersion: '' + req.query.osVersion,
-    engine: '' + req.query.engine,
-    engineVersion: '' + req.query.engineVersion,
-    device: '' + req.query.device,
-    deviceModel: '' + req.query.deviceModel,
-    deviceType: '' + req.query.deviceType,
+    ua: uaString,
+    browser: String(req.query.browser || ''),
+    browserVersion: String(req.query.browserVersion || ''),
+    os: String(req.query.os || ''),
+    osVersion: String(req.query.osVersion || ''),
+    engine: String(req.query.engine || ''),
+    engineVersion: String(req.query.engineVersion || ''),
+    device: String(req.query.device || ''),
+    deviceModel: String(req.query.deviceModel || ''),
+    deviceType: String(req.query.deviceType || ''),
     isBot: req.query.isBot === 'true',
   }
 
   try {
-    const pageview = await prisma.pageView.create({
-      data: {
-        url: {
-          connectOrCreate: {
-            where: { url: normalizedUrl },
-            create: {
-              url: normalizedUrl,
-              host: {
-                connectOrCreate: {
-                  where: { host: parsedUrl.hostname },
-                  create: { host: parsedUrl.hostname },
-                },
-              },
-              slug: {
-                connectOrCreate: {
-                  where: { slug: parsedUrl.pathname },
-                  create: { slug: parsedUrl.pathname },
-                },
-              },
-            },
-          },
+    // Use a transaction to batch the lookups/creates for better performance
+    const pageview = await prisma.$transaction(async (tx) => {
+      // First, ensure all referenced entities exist
+      // This reduces the number of round trips by doing lookups in parallel
+      const [host, slug, ua, country, city] = await Promise.all([
+        tx.host.upsert({
+          where: { host: parsedUrl.hostname },
+          update: {},
+          create: { host: parsedUrl.hostname },
+        }),
+        tx.slug.upsert({
+          where: { slug: parsedUrl.pathname },
+          update: {},
+          create: { slug: parsedUrl.pathname },
+        }),
+        tx.uA.upsert({
+          where: { ua: uaString },
+          update: {},
+          create: parsedUAFromMiddleware,
+        }),
+        tx.country.upsert({
+          where: { country: countryName },
+          update: {},
+          create: { country: countryName },
+        }),
+        tx.city.upsert({
+          where: { city: cityName },
+          update: {},
+          create: { city: cityName },
+        }),
+      ])
+
+      // Then upsert the URL
+      const urlRecord = await tx.url.upsert({
+        where: { url: normalizedUrl },
+        update: {},
+        create: {
+          url: normalizedUrl,
+          hostId: host.id,
+          slugId: slug.id,
         },
-        ua: {
-          connectOrCreate: {
-            where: { ua: parsedUAFromMiddleware.ua },
-            create: {
-              ...parsedUAFromMiddleware,
-            },
-          },
+      })
+
+      // Finally create the pageview with all IDs
+      return tx.pageView.create({
+        data: {
+          urlId: urlRecord.id,
+          uAId: ua.id,
+          ip,
+          countryId: country.id,
+          cityId: city.id,
         },
-        ip: req.query.ip ? '' + req.query.ip : null,
-        country: {
-          connectOrCreate: {
-            where: { country: '' + req.query.country },
-            create: { country: '' + req.query.country },
-          },
-        },
-        city: {
-          connectOrCreate: {
-            where: { city: '' + req.query.city },
-            create: { city: '' + req.query.city },
-          },
-        },
-      },
+      })
     })
 
-    console.log('Record created', pageview)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Record created', pageview)
+    }
+
     return res.json({ msg: 'URL created' })
   } catch (err) {
-    console.error(err)
+    console.error('Error creating pageview:', err)
     return res.status(500).json({ msg: 'Something went wrong' })
   }
 }

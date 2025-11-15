@@ -49,35 +49,41 @@ export default async function handler(
       }
     }
 
-    // Get country statistics
-    const countryStats = await prisma.pageView.groupBy({
-      by: ['countryId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
+    // Get country and city statistics using Prisma
+    const [countryStats, cityStats, total] = await Promise.all([
+      // Country statistics
+      prisma.pageView.groupBy({
+        by: ['countryId'],
+        where: whereClause,
         _count: {
-          id: 'desc',
+          id: true,
         },
-      },
-      take: 15, // Top 15 countries
-    })
-
-    // Get city statistics
-    const cityStats = await prisma.pageView.groupBy({
-      by: ['cityId'],
-      where: whereClause,
-      _count: {
-        id: true,
-      },
-      orderBy: {
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 15,
+      }),
+      // City statistics
+      prisma.pageView.groupBy({
+        by: ['cityId'],
+        where: whereClause,
         _count: {
-          id: 'desc',
+          id: true,
         },
-      },
-      take: 15, // Top 15 cities
-    })
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 15,
+      }),
+      // Total count
+      prisma.pageView.count({
+        where: whereClause,
+      }),
+    ])
 
     // Get country details
     const countryIds = countryStats
@@ -114,11 +120,6 @@ export default async function handler(
     const countryMap = new Map(countries.map((c) => [c.id, c.country]))
     const cityMap = new Map(cities.map((c) => [c.id, c.city]))
 
-    // Calculate total for percentages
-    const total = await prisma.pageView.count({
-      where: whereClause,
-    })
-
     // Process country data
     const countryData: LocationData[] = countryStats
       .filter((stat) => stat.countryId && countryMap.has(stat.countryId))
@@ -137,6 +138,11 @@ export default async function handler(
         percentage: total > 0 ? Math.round((stat._count.id / total) * 100) : 0,
       }))
 
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
     res.status(200).json({
       countries: countryData,
       cities: cityData,
