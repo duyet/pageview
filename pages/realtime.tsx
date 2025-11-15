@@ -4,7 +4,6 @@ import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { useRealtimeMetrics } from '../hooks/useRealtimeMetrics'
-import { useSocket } from '../hooks/useSocket'
 import { RealtimeChart } from '../components/charts/RealtimeChart'
 import {
   PageViewsCard,
@@ -19,8 +18,8 @@ import {
 
 export default function RealtimePage() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
-  const { metrics, loading, error, refetch } = useRealtimeMetrics(30000) // 30 seconds
-  const { isConnected } = useSocket()
+  const { metrics, loading, error, isConnected, refetch } =
+    useRealtimeMetrics(30000) // 30 seconds
 
   useEffect(() => {
     if (metrics) {
