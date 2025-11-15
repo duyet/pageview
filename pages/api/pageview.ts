@@ -5,6 +5,26 @@ import prisma from '../../lib/prisma'
 
 type Data = {
   msg: string
+  id?: number
+}
+
+// Custom pageview data format for direct API calls
+type CustomPageviewData = {
+  url: string
+  ua?: string
+  browser?: string
+  browserVersion?: string
+  os?: string
+  osVersion?: string
+  engine?: string
+  engineVersion?: string
+  device?: string
+  deviceModel?: string
+  deviceType?: string
+  isBot?: boolean
+  country?: string
+  city?: string
+  ip?: string
 }
 
 export const getUrl = (req: NextApiRequest): string | null => {
@@ -61,34 +81,67 @@ export default async function handler(
     console.log(`Normalized URL: ${normalizedUrl}`, parsedUrl)
   }
 
-  // Parse and validate data from middleware
-  const uaString = String(req.query.ua || '')
+  // Check if custom data is provided in request body
+  const customData: CustomPageviewData | undefined = req.body
+  const hasCustomData =
+    customData &&
+    (customData.ua ||
+      customData.country ||
+      customData.city ||
+      customData.browser)
+
+  // Use custom data if provided, otherwise fall back to middleware-enriched data
+  const uaString = hasCustomData
+    ? customData.ua || req.headers['user-agent'] || ''
+    : String(req.query.ua || '')
+
   // Convert empty string to null for proper database handling
-  const ip =
-    req.query.ip && String(req.query.ip).trim() !== ''
+  const ip = hasCustomData
+    ? customData.ip || null
+    : req.query.ip && String(req.query.ip).trim() !== ''
       ? String(req.query.ip)
       : null
-  const countryName = String(req.query.country || '')
-  const cityName = String(req.query.city || '')
 
-  // Skip empty or invalid entries
-  if (!uaString || !countryName || !cityName) {
+  const countryName = hasCustomData
+    ? customData.country || 'Unknown'
+    : String(req.query.country || '')
+
+  const cityName = hasCustomData
+    ? customData.city || 'Unknown'
+    : String(req.query.city || '')
+
+  // Skip empty or invalid entries (only for non-custom data)
+  if (!hasCustomData && (!uaString || !countryName || !cityName)) {
     return res.status(400).json({ msg: 'Missing required fields' })
   }
 
-  const parsedUAFromMiddleware = {
-    ua: uaString,
-    browser: String(req.query.browser || ''),
-    browserVersion: String(req.query.browserVersion || ''),
-    os: String(req.query.os || ''),
-    osVersion: String(req.query.osVersion || ''),
-    engine: String(req.query.engine || ''),
-    engineVersion: String(req.query.engineVersion || ''),
-    device: String(req.query.device || ''),
-    deviceModel: String(req.query.deviceModel || ''),
-    deviceType: String(req.query.deviceType || ''),
-    isBot: req.query.isBot === 'true',
-  }
+  const parsedUAFromMiddleware = hasCustomData
+    ? {
+        ua: uaString,
+        browser: customData.browser || '',
+        browserVersion: customData.browserVersion || '',
+        os: customData.os || '',
+        osVersion: customData.osVersion || '',
+        engine: customData.engine || '',
+        engineVersion: customData.engineVersion || '',
+        device: customData.device || '',
+        deviceModel: customData.deviceModel || '',
+        deviceType: customData.deviceType || '',
+        isBot: customData.isBot || false,
+      }
+    : {
+        ua: uaString,
+        browser: String(req.query.browser || ''),
+        browserVersion: String(req.query.browserVersion || ''),
+        os: String(req.query.os || ''),
+        osVersion: String(req.query.osVersion || ''),
+        engine: String(req.query.engine || ''),
+        engineVersion: String(req.query.engineVersion || ''),
+        device: String(req.query.device || ''),
+        deviceModel: String(req.query.deviceModel || ''),
+        deviceType: String(req.query.deviceType || ''),
+        isBot: req.query.isBot === 'true',
+      }
 
   try {
     // Use a transaction to batch the lookups/creates for better performance
@@ -150,7 +203,7 @@ export default async function handler(
       console.log('Record created', pageview)
     }
 
-    return res.json({ msg: 'URL created' })
+    return res.json({ msg: 'Pageview recorded successfully', id: pageview.id })
   } catch (err) {
     console.error('Error creating pageview:', err)
     return res.status(500).json({ msg: 'Something went wrong' })
