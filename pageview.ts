@@ -35,8 +35,14 @@ export const genScript = (endpoint: string) => `
   window.addEventListener('locationchange', pageview)
   window.addEventListener('popstate', pageview)
 
-  // First load
-  window.addEventListener('DOMContentLoaded', pageview)
+  // First load - handle both cases: DOM not loaded yet, and already loaded
+  if (document.readyState === 'loading') {
+    // DOM is still loading, wait for DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', pageview)
+  } else {
+    // DOM is already loaded (interactive or complete), trigger immediately
+    pageview()
+  }
 
   // helper function to generate a unique identifier
   function generatePageviewId() {
