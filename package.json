@@ -46,7 +46,7 @@
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.552.0",
     "nanoid": "^5.1.6",
-    "next": "14.2.33",
+    "next": "15.5.10",
     "next-auth": "^4.24.13",
     "next-swagger-doc": "^0.4.1",
     "normalize-url": "^8.0.2",
