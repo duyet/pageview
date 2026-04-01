@@ -79,7 +79,7 @@
     "@vitest/ui": "^4.0.8",
     "autoprefixer": "^10.4.21",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.35",
+    "eslint-config-next": "16.2.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-tailwindcss": "^3.18.0",
     "husky": "^9.1.7",
