@@ -31,8 +31,7 @@ export function useTrendsData(days: number, filters?: AnalyticsFilters) {
         totalUniqueVisitors: data.totalUniqueVisitors as number,
       }
     },
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Auto-refresh every minute
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
   })
 }
 
@@ -57,8 +56,7 @@ export function useDevicesData(days: number, filters?: AnalyticsFilters) {
         devices: data.devices as DeviceData[],
       }
     },
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
   })
 }
 
@@ -82,8 +80,7 @@ export function useLocationsData(days: number, filters?: AnalyticsFilters) {
         cities: data.cities as LocationData[],
       }
     },
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
   })
 }
 
@@ -102,7 +99,6 @@ export function useBotsData(days: number, filters?: AnalyticsFilters) {
 
       return (await response.json()) as BotStatsData
     },
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 2 * 60 * 1000, // Auto-refresh every 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
   })
 }

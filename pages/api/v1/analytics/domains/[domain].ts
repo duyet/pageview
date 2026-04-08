@@ -108,6 +108,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     })
     .then((result) => result.length)
 
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=300, stale-while-revalidate=600'
+  )
+
   return successResponse(res, {
     domain,
     summary: {

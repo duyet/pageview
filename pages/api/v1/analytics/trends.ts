@@ -98,6 +98,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     totalUniqueVisitors += uniqueVisitors
   }
 
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=300, stale-while-revalidate=600'
+  )
+
   return successResponse(res, {
     trends,
     summary: {

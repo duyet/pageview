@@ -89,6 +89,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
           total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
       }))
 
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
+
     return successResponse(res, {
       countries: locations,
       total,
@@ -155,6 +160,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
         percentage:
           total > 0 ? Math.round((stat._count.id / total) * 1000) / 10 : 0,
       }))
+
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
 
     return successResponse(res, {
       cities: locations,

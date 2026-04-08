@@ -149,6 +149,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     total,
   }
 
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=300, stale-while-revalidate=600'
+  )
+
   if (type === 'browser') {
     return successResponse(res, { browsers, total })
   } else if (type === 'os') {
