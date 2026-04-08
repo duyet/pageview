@@ -42,8 +42,9 @@ export default async function handler(
           },
         },
       }),
-      // Get unique IPs using Prisma distinct
-      prisma.pageView.findMany({
+      // Count unique IPs using Prisma groupBy (avoids loading full records into memory)
+      prisma.pageView.groupBy({
+        by: ['ip'],
         where: {
           createdAt: {
             gte: last24Hours,
@@ -53,10 +54,7 @@ export default async function handler(
             notIn: [''],
           },
         },
-        select: {
-          ip: true,
-        },
-        distinct: ['ip'],
+        _count: { _all: true },
       }),
     ])
 
