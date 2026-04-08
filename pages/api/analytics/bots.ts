@@ -5,6 +5,7 @@ import { getBotTypeDescription } from '../../../lib/botDetection'
 
 const cache = new Map<string, { data: BotStatsData; timestamp: number }>()
 const CACHE_TTL = 5 * 60 * 1000
+const CACHE_MAX = 50
 
 export type BotData = {
   botType: string
@@ -195,6 +196,19 @@ export default async function handler(
       humanPercentage,
       botsByType,
       topBots,
+    }
+    // Evict expired entries if at capacity
+    if (cache.size >= CACHE_MAX) {
+      const now = Date.now()
+      const expired: string[] = []
+      cache.forEach((v, k) => {
+        if (now - v.timestamp >= CACHE_TTL) expired.push(k)
+      })
+      expired.forEach((k) => cache.delete(k))
+      if (cache.size >= CACHE_MAX) {
+        const oldest = cache.keys().next().value
+        if (oldest) cache.delete(oldest)
+      }
     }
     cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
 

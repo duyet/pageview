@@ -4,6 +4,7 @@ import prisma from '../../../lib/prisma'
 
 const cache = new Map<string, { data: ResponseData; timestamp: number }>()
 const CACHE_TTL = 5 * 60 * 1000
+const CACHE_MAX = 50
 
 export type LocationData = {
   name: string
@@ -188,6 +189,14 @@ export default async function handler(
       countries: countryData,
       cities: cityData,
       total,
+    }
+    // Evict expired entries if at capacity
+    if (cache.size >= CACHE_MAX) {
+      const now = Date.now()
+      for (const [k, v] of cache) {
+        if (now - v.timestamp >= CACHE_TTL) cache.delete(k)
+      }
+      if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value)
     }
     cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
 

@@ -3,9 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 import prisma from '../../../lib/prisma'
 
-// In-memory cache with 5-min TTL (matches Cache-Control s-maxage=300)
+// In-memory cache with 5-min TTL and max 50 entries
 const cache = new Map<string, { data: ResponseData; timestamp: number }>()
 const CACHE_TTL = 5 * 60 * 1000
+const CACHE_MAX = 50
 
 export type TrendData = {
   date: string
@@ -187,7 +188,14 @@ export default async function handler(
       totalUniqueVisitors,
     }
 
-    // Update cache
+    // Update cache (evict expired entries if at capacity)
+    if (cache.size >= CACHE_MAX) {
+      const now = Date.now()
+      for (const [k, v] of cache) {
+        if (now - v.timestamp >= CACHE_TTL) cache.delete(k)
+      }
+      if (cache.size >= CACHE_MAX) cache.delete(cache.keys().next().value)
+    }
     cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
 
     // Set cache headers for CDN/client-side caching (5 minutes)
