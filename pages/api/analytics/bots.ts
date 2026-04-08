@@ -89,15 +89,14 @@ export default async function handler(
     const humanPageviews = totalPageviews - botPageviews
 
     // Get bot traffic grouped by bot type
+    // Note: groupBy doesn't support compound relation filters properly (P2022),
+    // so we filter by isBot only and filter null botType in JS after fetching UA details
     const botsByTypeRaw = await prisma.pageView.groupBy({
       by: ['uAId'],
       where: {
         ...whereClause,
         ua: {
           isBot: true,
-          botType: {
-            not: null,
-          },
         },
       },
       _count: {
