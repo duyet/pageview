@@ -2,6 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../lib/prisma'
 
+const cache = new Map<string, { data: ResponseData; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000
+
 export type LocationData = {
   name: string
   value: number
@@ -28,6 +31,16 @@ export default async function handler(
 
     if (isNaN(numDays) || numDays < 1 || numDays > 365) {
       return res.status(400).json({ error: 'Invalid days parameter (1-365)' })
+    }
+
+    const cacheKey = `locations:${numDays}:${host || ''}:${urlId || ''}:${excludeBots || ''}`
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      res.setHeader(
+        'Cache-Control',
+        'public, s-maxage=300, stale-while-revalidate=600'
+      )
+      return res.status(200).json(cached.data)
     }
 
     const startDate = new Date()
@@ -171,16 +184,19 @@ export default async function handler(
         percentage: total > 0 ? Math.round((stat._count.id / total) * 100) : 0,
       }))
 
+    const responseData: ResponseData = {
+      countries: countryData,
+      cities: cityData,
+      total,
+    }
+    cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
+
     // Set cache headers for CDN/client-side caching (5 minutes)
     res.setHeader(
       'Cache-Control',
       'public, s-maxage=300, stale-while-revalidate=600'
     )
-    res.status(200).json({
-      countries: countryData,
-      cities: cityData,
-      total,
-    })
+    res.status(200).json(responseData)
   } catch (error) {
     console.error('Analytics locations error:', error)
     res.status(500).json({ error: 'Internal server error' })

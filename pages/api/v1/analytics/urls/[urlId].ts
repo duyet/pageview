@@ -168,6 +168,11 @@ async function getHandler(req: NextApiRequest, res: NextApiResponse) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([date, count]) => ({ date, pageviews: count }))
 
+  res.setHeader(
+    'Cache-Control',
+    'public, s-maxage=300, stale-while-revalidate=600'
+  )
+
   return successResponse(res, {
     url: {
       id: url.id,

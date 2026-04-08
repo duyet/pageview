@@ -3,6 +3,9 @@ import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 import prisma from '../../../lib/prisma'
 import { getBotTypeDescription } from '../../../lib/botDetection'
 
+const cache = new Map<string, { data: BotStatsData; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000
+
 export type BotData = {
   botType: string
   botName: string | null
@@ -38,6 +41,16 @@ export default async function handler(
       return res.status(400).json({ error: 'Invalid days parameter (1-365)' })
     }
 
+    const cacheKey = `bots:${numDays}:${host || ''}`
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      res.setHeader(
+        'Cache-Control',
+        'public, s-maxage=300, stale-while-revalidate=600'
+      )
+      return res.status(200).json(cached.data)
+    }
+
     const endDate = endOfDay(new Date())
     const startDate = startOfDay(subDays(endDate, numDays - 1))
 
@@ -58,8 +71,8 @@ export default async function handler(
       }
     }
 
-    // Get total pageviews and bot/human breakdown
-    const [totalPageviews, botPageviews, humanPageviews] = await Promise.all([
+    // Get total pageviews and bot count (human = total - bot)
+    const [totalPageviews, botPageviews] = await Promise.all([
       prisma.pageView.count({
         where: whereClause,
       }),
@@ -71,15 +84,8 @@ export default async function handler(
           },
         },
       }),
-      prisma.pageView.count({
-        where: {
-          ...whereClause,
-          ua: {
-            isBot: false,
-          },
-        },
-      }),
     ])
+    const humanPageviews = totalPageviews - botPageviews
 
     // Get bot traffic grouped by bot type
     const botsByTypeRaw = await prisma.pageView.groupBy({
@@ -181,13 +187,7 @@ export default async function handler(
     const humanPercentage =
       totalPageviews > 0 ? (humanPageviews / totalPageviews) * 100 : 0
 
-    // Set cache headers for CDN/client-side caching (5 minutes)
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=300, stale-while-revalidate=600'
-    )
-
-    res.status(200).json({
+    const responseData: BotStatsData = {
       totalBots: botPageviews,
       totalHumans: humanPageviews,
       totalPageviews,
@@ -195,7 +195,16 @@ export default async function handler(
       humanPercentage,
       botsByType,
       topBots,
-    })
+    }
+    cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
+
+    // Set cache headers for CDN/client-side caching (5 minutes)
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    )
+
+    res.status(200).json(responseData)
   } catch (error) {
     console.error('Bot analytics error:', error)
     res.status(500).json({ error: 'Internal server error' })

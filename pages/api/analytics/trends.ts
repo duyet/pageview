@@ -3,6 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { format, subDays, startOfDay, endOfDay } from 'date-fns'
 import prisma from '../../../lib/prisma'
 
+// In-memory cache with 5-min TTL (matches Cache-Control s-maxage=300)
+const cache = new Map<string, { data: ResponseData; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000
+
 export type TrendData = {
   date: string
   pageviews: number
@@ -29,6 +33,17 @@ export default async function handler(
 
     if (isNaN(numDays) || numDays < 1 || numDays > 365) {
       return res.status(400).json({ error: 'Invalid days parameter (1-365)' })
+    }
+
+    // Check cache
+    const cacheKey = `trends:${numDays}:${host || ''}:${urlId || ''}:${excludeBots || ''}`
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      res.setHeader(
+        'Cache-Control',
+        'public, s-maxage=300, stale-while-revalidate=600'
+      )
+      return res.status(200).json(cached.data)
     }
 
     const endDate = endOfDay(new Date())
@@ -111,8 +126,9 @@ export default async function handler(
           createdAt: 'asc',
         },
       }),
-      // Get all unique IPs across the date range for total unique visitors
-      prisma.pageView.findMany({
+      // Count unique IPs across the date range for total unique visitors
+      prisma.pageView.groupBy({
+        by: ['ip'],
         where: {
           ...whereClause,
           ip: {
@@ -120,10 +136,6 @@ export default async function handler(
             notIn: [''],
           },
         },
-        select: {
-          ip: true,
-        },
-        distinct: ['ip'],
       }),
     ])
 
@@ -169,16 +181,21 @@ export default async function handler(
     // Total unique visitors is count of distinct IPs across entire period
     const totalUniqueVisitors = allUniqueIps.length
 
+    const responseData: ResponseData = {
+      trends,
+      totalPageviews,
+      totalUniqueVisitors,
+    }
+
+    // Update cache
+    cache.set(cacheKey, { data: responseData, timestamp: Date.now() })
+
     // Set cache headers for CDN/client-side caching (5 minutes)
     res.setHeader(
       'Cache-Control',
       'public, s-maxage=300, stale-while-revalidate=600'
     )
-    res.status(200).json({
-      trends,
-      totalPageviews,
-      totalUniqueVisitors,
-    })
+    res.status(200).json(responseData)
   } catch (error) {
     console.error('Analytics trends error:', error)
     res.status(500).json({ error: 'Internal server error' })
