@@ -22,6 +22,9 @@ export async function middleware(req: NextRequest) {
   url.searchParams.set('ip', ip || '')
   url.searchParams.set('country', geo?.country || '')
   url.searchParams.set('city', geo?.city || '')
+  url.searchParams.set('region', geo?.region || '')
+  url.searchParams.set('latitude', geo?.latitude || '')
+  url.searchParams.set('longitude', geo?.longitude || '')
 
   // UA
   const parsedUA = userAgent(req)

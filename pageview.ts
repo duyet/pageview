@@ -37,8 +37,19 @@ export const genScript = (endpoint: string) => `
     const newPageviewId = generatePageviewId()
     setCookie(cookieName, newPageviewId)
 
+    // Construct enriched telemetry parameters
+    const params = [
+      'url=' + encodeURIComponent(currentUrl),
+      'title=' + encodeURIComponent(document.title || ''),
+      'ref=' + encodeURIComponent(document.referrer || ''),
+      'sw=' + (window.screen ? window.screen.width : 0),
+      'sh=' + (window.screen ? window.screen.height : 0),
+      'lang=' + encodeURIComponent(navigator.language || ''),
+      'sid=' + encodeURIComponent(getSessionId())
+    ].join('&')
+
     // Send beacon with fallback
-    sendBeaconWithFallback(ENDPOINT + '?url=' + encodeURIComponent(currentUrl))
+    sendBeaconWithFallback(ENDPOINT + '?' + params)
   }
 
   // Debounced tracking to prevent rapid-fire events
@@ -126,6 +137,20 @@ export const genScript = (endpoint: string) => `
   // Helper: Generate unique pageview ID
   function generatePageviewId() {
     return Math.random().toString(36).substring(2, 11)
+  }
+
+  // Helper: Get or create session ID
+  function getSessionId() {
+    try {
+      var sessId = window.sessionStorage.getItem('pv-sess')
+      if (!sessId) {
+        sessId = 'sess-' + Math.random().toString(36).substring(2, 11)
+        window.sessionStorage.setItem('pv-sess', sessId)
+      }
+      return sessId
+    } catch (e) {
+      return ''
+    }
   }
 
   // Helper: Set cookie with expiration

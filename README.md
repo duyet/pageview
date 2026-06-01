@@ -34,7 +34,7 @@ flowchart TD
     subgraph Client ["Client Browser"]
         A[Load Page / Route Change] --> B{10-Min Cookie Dedup?}
         B -- Yes --> C[Skip Pageview]
-        B -- No --> D[Send Beacon Ping]
+        B -- No --> D[Send Beacon Ping + Rich Telemetry]
     end
 
     subgraph Edge ["Vercel Edge Middleware"]
@@ -42,21 +42,136 @@ flowchart TD
         E --> F[Run Enhanced Bot Detection]
     end
 
-    subgraph Backend ["Next.js Backend & Database"]
+    subgraph Backend ["Next.js Backend API"]
         F --> G[Normalize URL & Strip UTMs]
-        G --> H[Prisma Atomic Transaction]
-        H --> I[(PostgreSQL Database)]
+        G --> H[Adapter Hub - Parallel Broadcast]
+    end
+
+    subgraph Adapters ["Active Storage Backends"]
+        H --> I[Postgres via Prisma]
+        H --> J[ClickHouse HTTP URL]
+        H --> K[MotherDuck / DuckDB]
+        H --> L[Secure HTTP Webhook]
     end
 
     class A,B,C,D client;
     class E,F edge;
     class G,H api;
-    class I db;
+    class I,J,K,L db;
 ```
 
-1. **Lightweight Client-side Tracking (`pageview.js`):** Client websites load a dynamically generated tracking script. To keep it privacy-first, the script uses a temporary (10-minute) cookie to deduplicate pageviews and transmits data using the non-blocking `navigator.sendBeacon` API. It also hooks into modern SPA routing (`history.pushState` / `popstate`).
-2. **Edge-level Enrichment (`middleware.ts`):** Requests are intercepted at the Vercel Edge. The middleware enriches request metrics with client geolocation data (country, city) and parses browser/device capabilities, plus applies robust bot detection before passing the data to the API.
-3. **Normalized Database Storage (`/api/pageview`):** The API normalizes incoming URLs (stripping promotional UTM tags). It runs an atomic `prisma.$transaction` using the `connectOrCreate` pattern to deduplicate metadata fields (hosts, slugs, browsers, cities) and records the pageview cleanly into PostgreSQL.
+1. **Lightweight Client-side Tracking (`pageview.js`):** Client websites load a dynamically generated tracking script. To keep it privacy-first, the script uses a temporary (10-minute) cookie to deduplicate pageviews, and transmits data using the non-blocking `navigator.sendBeacon` API. It collects rich telemetry, including page titles, referrer URLs, viewport dimensions, user locale, and a session ID (`sessionStorage` backed). It also hooks into modern SPA routing (`history.pushState` / `popstate`).
+2. **Edge-level Enrichment (`middleware.ts`):** Requests are intercepted at the Vercel Edge. The middleware enriches request metrics with client geolocation data (country, city, region, latitude, longitude) and parses browser/device capabilities, plus applies robust bot detection before passing the data to the API.
+3. **Plug-and-Play Multi-Database Broadcasting (`/api/pageview`):** The API normalizes incoming URLs (stripping promotional UTM tags). It converts the payload into a unified `PageViewEvent` and broadcasts it concurrently to all active database and streaming adapters in parallel using `Promise.allSettled` to make sure slow/offline downstream pipelines never block or fail the primary request.
+
+## Multi-Database Broadcast System
+
+Easily configure pageview events to broadcast to multiple databases or endpoints. Each adapter is completely self-configuring and "plug-and-play" — simply define the corresponding environment variable to activate it.
+
+### Configuration Variables
+
+Define these variables in your `.env` file to enable adapters:
+
+| Environment Variable | Description                                                                                                                                      | Example Value                                                 |
+| :------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------ |
+| `ENABLE_POSTGRES`    | Toggles PostgreSQL storage via Prisma. Enabled by default (`true`).                                                                              | `false` (to disable)                                          |
+| `CLICKHOUSE_URL`     | Activates ClickHouse HTTP URL broadcasting. Supports authentication, custom databases, and table queries.                                        | `http://user:password@localhost:8123/default?table=pageviews` |
+| `MOTHERDUCK_TOKEN`   | Enables MotherDuck serverless DuckDB cloud integration. Falls back to a local JSONL development buffer if DuckDB C++ bindings are not installed. | `md_token_xyz`                                                |
+| `WEBHOOK_URL`        | Triggers POST requests forwarding the JSON event to external endpoints.                                                                          | `https://api.myproject.com/v1/webhooks/pageviews`             |
+| `WEBHOOK_SECRET`     | Generates a SHA-256 HMAC payload signature sent in the `X-Webhook-Signature` header for secure verification.                                     | `my-webhook-secret-signing-key`                               |
+
+---
+
+### Database Tables DDL Setup
+
+#### 1. ClickHouse
+
+Run this SQL to create the tracking table in ClickHouse:
+
+```sql
+CREATE TABLE IF NOT EXISTS default.pageviews (
+    id String,
+    sessionId Nullable(String),
+    url String,
+    host String,
+    path String,
+    title Nullable(String),
+    referrer Nullable(String),
+    timestamp DateTime64(3),
+    ua Nullable(String),
+    browser Nullable(String),
+    browserVersion Nullable(String),
+    os Nullable(String),
+    osVersion Nullable(String),
+    engine Nullable(String),
+    engineVersion Nullable(String),
+    device Nullable(String),
+    deviceModel Nullable(String),
+    deviceType Nullable(String),
+    isBot UInt8,
+    botType Nullable(String),
+    botName Nullable(String),
+    ip Nullable(String),
+    country Nullable(String),
+    city Nullable(String),
+    region Nullable(String),
+    latitude Nullable(Float64),
+    longitude Nullable(Float64),
+    screenWidth Nullable(Int32),
+    screenHeight Nullable(Int32),
+    language Nullable(String),
+    utmSource Nullable(String),
+    utmMedium Nullable(String),
+    utmCampaign Nullable(String),
+    utmTerm Nullable(String),
+    utmContent Nullable(String)
+) ENGINE = MergeTree()
+ORDER BY (host, timestamp, id);
+```
+
+#### 2. MotherDuck / DuckDB
+
+Run this SQL inside DuckDB:
+
+```sql
+CREATE TABLE IF NOT EXISTS pageviews (
+    id VARCHAR,
+    sessionId VARCHAR,
+    url VARCHAR,
+    host VARCHAR,
+    path VARCHAR,
+    title VARCHAR,
+    referrer VARCHAR,
+    timestamp TIMESTAMP,
+    ua VARCHAR,
+    browser VARCHAR,
+    browserVersion VARCHAR,
+    os VARCHAR,
+    osVersion VARCHAR,
+    engine VARCHAR,
+    engineVersion VARCHAR,
+    device VARCHAR,
+    deviceModel VARCHAR,
+    deviceType VARCHAR,
+    isBot BOOLEAN,
+    botType VARCHAR,
+    botName VARCHAR,
+    ip VARCHAR,
+    country VARCHAR,
+    city VARCHAR,
+    region VARCHAR,
+    latitude DOUBLE,
+    longitude DOUBLE,
+    screenWidth INTEGER,
+    screenHeight INTEGER,
+    language VARCHAR,
+    utmSource VARCHAR,
+    utmMedium VARCHAR,
+    utmCampaign VARCHAR,
+    utmTerm VARCHAR,
+    utmContent VARCHAR
+);
+```
 
 ## Quick Start
 

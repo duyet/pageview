@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import normalizeUrl from 'normalize-url'
+import crypto from 'crypto'
 
-import prisma from '../../lib/prisma'
+import { broadcastPageView } from '../../lib/adapters'
+import { PageViewEvent } from '../../lib/adapters/types'
 
 type Data = {
   msg: string
-  id?: number
+  id?: string
 }
 
 // Custom pageview data format for direct API calls
@@ -27,11 +29,22 @@ type CustomPageviewData = {
   country?: string
   city?: string
   ip?: string
+
+  // Custom enrichment fields for API
+  title?: string
+  referrer?: string
+  region?: string
+  latitude?: number
+  longitude?: number
+  screenWidth?: number
+  screenHeight?: number
+  language?: string
+  sessionId?: string
 }
 
 export const getUrl = (req: NextApiRequest): string | null => {
   // Get the URL from the request body, if it exists.
-  if (req.body.url) {
+  if (req.body && req.body.url) {
     console.log('Detected url in body', req.body.url)
     return req.body.url
   }
@@ -155,69 +168,138 @@ export default async function handler(
             : null,
       }
 
+  // Parse marketing UTM attributes from the raw target URL
+  let utmSource: string | null = null
+  let utmMedium: string | null = null
+  let utmCampaign: string | null = null
+  let utmTerm: string | null = null
+  let utmContent: string | null = null
+
   try {
-    // Use a transaction to batch the lookups/creates for better performance
-    const pageview = await prisma.$transaction(async (tx: any) => {
-      // First, ensure all referenced entities exist
-      // This reduces the number of round trips by doing lookups in parallel
-      const [host, slug, ua, country, city] = await Promise.all([
-        tx.host.upsert({
-          where: { host: parsedUrl.hostname },
-          update: {},
-          create: { host: parsedUrl.hostname },
-        }),
-        tx.slug.upsert({
-          where: { slug: parsedUrl.pathname },
-          update: {},
-          create: { slug: parsedUrl.pathname },
-        }),
-        tx.uA.upsert({
-          where: { ua: uaString },
-          update: {},
-          create: parsedUAFromMiddleware,
-        }),
-        tx.country.upsert({
-          where: { country: countryName },
-          update: {},
-          create: { country: countryName },
-        }),
-        tx.city.upsert({
-          where: { city: cityName },
-          update: {},
-          create: { city: cityName },
-        }),
-      ])
+    const origUrl = new URL(url as string)
+    utmSource = origUrl.searchParams.get('utm_source')
+    utmMedium = origUrl.searchParams.get('utm_medium')
+    utmCampaign = origUrl.searchParams.get('utm_campaign')
+    utmTerm = origUrl.searchParams.get('utm_term')
+    utmContent = origUrl.searchParams.get('utm_content')
+  } catch (err) {
+    // Ignore invalid original URLs
+  }
 
-      // Then upsert the URL
-      const urlRecord = await tx.url.upsert({
-        where: { url: normalizedUrl },
-        update: {},
-        create: {
-          url: normalizedUrl,
-          hostId: host.id,
-          slugId: slug.id,
-        },
-      })
+  // Extract enrichment parameters from query or body
+  const title = (
+    hasCustomData
+      ? customData.title
+      : req.body?.title || req.query.title || null
+  ) as string | null
+  const referrer = (
+    hasCustomData
+      ? customData.referrer
+      : req.body?.ref ||
+        req.query.ref ||
+        req.body?.referrer ||
+        req.query.referrer ||
+        req.headers.referer ||
+        null
+  ) as string | null
 
-      // Finally create the pageview with all IDs
-      return tx.pageView.create({
-        data: {
-          urlId: urlRecord.id,
-          uAId: ua.id,
-          ip,
-          countryId: country.id,
-          cityId: city.id,
-        },
-      })
-    })
+  const screenWidthVal = hasCustomData
+    ? customData.screenWidth
+    : req.body?.sw || req.query.sw
+  const screenWidth = screenWidthVal
+    ? parseInt(String(screenWidthVal), 10)
+    : null
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Record created', pageview)
+  const screenHeightVal = hasCustomData
+    ? customData.screenHeight
+    : req.body?.sh || req.query.sh
+  const screenHeight = screenHeightVal
+    ? parseInt(String(screenHeightVal), 10)
+    : null
+
+  const language = (
+    hasCustomData
+      ? customData.language
+      : req.body?.lang || req.query.lang || null
+  ) as string | null
+  const sessionId = (
+    hasCustomData
+      ? customData.sessionId
+      : req.body?.sid || req.query.sid || null
+  ) as string | null
+  const region = (
+    hasCustomData
+      ? customData.region
+      : req.body?.region || req.query.region || null
+  ) as string | null
+
+  const latitudeVal = hasCustomData
+    ? customData.latitude
+    : req.body?.latitude || req.query.latitude
+  const latitude = latitudeVal ? parseFloat(String(latitudeVal)) : null
+
+  const longitudeVal = hasCustomData
+    ? customData.longitude
+    : req.body?.longitude || req.query.longitude
+  const longitude = longitudeVal ? parseFloat(String(longitudeVal)) : null
+
+  try {
+    const eventId = crypto.randomUUID()
+    const pageviewEvent: PageViewEvent = {
+      id: eventId,
+      sessionId,
+      url: normalizedUrl,
+      host: parsedUrl.hostname,
+      path: parsedUrl.pathname,
+      title,
+      referrer,
+      timestamp: new Date(),
+
+      ua: uaString,
+      browser: parsedUAFromMiddleware.browser || null,
+      browserVersion: parsedUAFromMiddleware.browserVersion || null,
+      os: parsedUAFromMiddleware.os || null,
+      osVersion: parsedUAFromMiddleware.osVersion || null,
+      engine: parsedUAFromMiddleware.engine || null,
+      engineVersion: parsedUAFromMiddleware.engineVersion || null,
+      device: parsedUAFromMiddleware.device || null,
+      deviceModel: parsedUAFromMiddleware.deviceModel || null,
+      deviceType: parsedUAFromMiddleware.deviceType || null,
+      isBot: parsedUAFromMiddleware.isBot || false,
+      botType: parsedUAFromMiddleware.botType || null,
+      botName: parsedUAFromMiddleware.botName || null,
+
+      ip,
+      country: countryName,
+      city: cityName,
+      region,
+      latitude,
+      longitude,
+
+      screenWidth,
+      screenHeight,
+      language,
+
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmTerm,
+      utmContent,
     }
 
-    return res.json({ msg: 'Pageview recorded successfully', id: pageview.id })
+    // Broadcast pageview event concurrently to all active storage and HTTP streaming backends
+    await broadcastPageView(pageviewEvent)
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        'Record processed and broadcasted successfully',
+        pageviewEvent
+      )
+    }
+
+    return res.json({ msg: 'Pageview recorded successfully', id: eventId })
   } catch (err) {
-    console.error('Error creating pageview:', err)
+    console.error('Error processing/broadcasting pageview:', err)
     return res.status(500).json({ msg: 'Something went wrong' })
   }
 }

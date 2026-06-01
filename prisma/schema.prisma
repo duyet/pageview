@@ -25,6 +25,22 @@ model PageView {
   uAId      Int?
   ua        UA?      @relation(fields: [uAId], references: [id], onDelete: SetNull)
 
+  // Enrichment fields
+  title          String?
+  referrer       String?
+  region         String?
+  latitude       Float?
+  longitude      Float?
+  screenWidth    Int?
+  screenHeight   Int?
+  language       String?
+  sessionId      String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmTerm        String?
+  utmContent     String?
+
   // Metadata
   createdAt DateTime @default(now())
 
