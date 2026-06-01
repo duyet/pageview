@@ -55,46 +55,112 @@ export class ClickHouseAdapter implements PageViewAdapter {
     console.log(
       `ClickHouse HTTP Adapter configured for database: "${this.database}", table: "${this.table}"`
     )
-    console.log(`Suggested ClickHouse Table DDL:
-      CREATE TABLE IF NOT EXISTS ${this.database}.${this.table} (
-          id String,
-          sessionId Nullable(String),
-          url String,
-          host String,
-          path String,
-          title Nullable(String),
-          referrer Nullable(String),
-          timestamp DateTime64(3),
-          ua Nullable(String),
-          browser Nullable(String),
-          browserVersion Nullable(String),
-          os Nullable(String),
-          osVersion Nullable(String),
-          engine Nullable(String),
-          engineVersion Nullable(String),
-          device Nullable(String),
-          deviceModel Nullable(String),
-          deviceType Nullable(String),
-          isBot UInt8,
-          botType Nullable(String),
-          botName Nullable(String),
-          ip Nullable(String),
-          country Nullable(String),
-          city Nullable(String),
-          region Nullable(String),
-          latitude Nullable(Float64),
-          longitude Nullable(Float64),
-          screenWidth Nullable(Int32),
-          screenHeight Nullable(Int32),
-          language Nullable(String),
-          utmSource Nullable(String),
-          utmMedium Nullable(String),
-          utmCampaign Nullable(String),
-          utmTerm Nullable(String),
-          utmContent Nullable(String)
-      ) ENGINE = MergeTree()
-      ORDER BY (host, timestamp, id)
-    `)
+
+    try {
+      const parsed = new URL(this.connectionUrl)
+      const targetUrl = new URL(parsed.origin)
+      targetUrl.pathname = '/'
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'text/plain',
+      }
+
+      if (this.authHeader) {
+        headers['Authorization'] = this.authHeader
+      }
+
+      // 1. Auto-create database if not using 'default'
+      if (this.database && this.database !== 'default') {
+        console.log(
+          `[ClickHouse] Attempting to auto-create database "${this.database}" if not exists...`
+        )
+        const createDbQuery = `CREATE DATABASE IF NOT EXISTS ${this.database}`
+        const dbRes = await fetch(targetUrl.toString(), {
+          method: 'POST',
+          headers,
+          body: createDbQuery,
+        })
+        if (!dbRes.ok) {
+          const dbErr = await dbRes.text()
+          console.warn(
+            `[ClickHouse] Database auto-creation warning (could be permission related):`,
+            dbErr
+          )
+        } else {
+          console.log(
+            `[ClickHouse] Database "${this.database}" verified/created.`
+          )
+        }
+      }
+
+      // 2. Auto-create table
+      console.log(
+        `[ClickHouse] Attempting to auto-create table "${this.database}.${this.table}" if not exists...`
+      )
+      const ddl = `
+        CREATE TABLE IF NOT EXISTS ${this.database}.${this.table} (
+            id String,
+            sessionId Nullable(String),
+            url String,
+            host String,
+            path String,
+            title Nullable(String),
+            referrer Nullable(String),
+            timestamp DateTime64(3),
+            ua Nullable(String),
+            browser Nullable(String),
+            browserVersion Nullable(String),
+            os Nullable(String),
+            osVersion Nullable(String),
+            engine Nullable(String),
+            engineVersion Nullable(String),
+            device Nullable(String),
+            deviceModel Nullable(String),
+            deviceType Nullable(String),
+            isBot UInt8,
+            botType Nullable(String),
+            botName Nullable(String),
+            ip Nullable(String),
+            country Nullable(String),
+            city Nullable(String),
+            region Nullable(String),
+            latitude Nullable(Float64),
+            longitude Nullable(Float64),
+            screenWidth Nullable(Int32),
+            screenHeight Nullable(Int32),
+            language Nullable(String),
+            utmSource Nullable(String),
+            utmMedium Nullable(String),
+            utmCampaign Nullable(String),
+            utmTerm Nullable(String),
+            utmContent Nullable(String)
+        ) ENGINE = MergeTree()
+        ORDER BY (host, timestamp, id)
+      `
+
+      const tableRes = await fetch(targetUrl.toString(), {
+        method: 'POST',
+        headers,
+        body: ddl,
+      })
+
+      if (!tableRes.ok) {
+        const tableErr = await tableRes.text()
+        console.warn(
+          `[ClickHouse] Table auto-creation warning (could be permission related):`,
+          tableErr
+        )
+      } else {
+        console.log(
+          `[ClickHouse] Table "${this.database}.${this.table}" verified/created successfully.`
+        )
+      }
+    } catch (err: any) {
+      console.warn(
+        '[ClickHouse] Automatic schema initialization failed or was skipped:',
+        err.message
+      )
+    }
   }
 
   async broadcast(event: PageViewEvent): Promise<void> {
