@@ -1,49 +1,7 @@
-import fs from 'fs'
-import path from 'path'
+import { loadEnvConfig } from '@next/env'
 
-// Load environment variables manually
-const envPath = path.join(process.cwd(), '.env.local')
-if (fs.existsSync(envPath)) {
-  const content = fs.readFileSync(envPath, 'utf8')
-  content.split('\n').forEach((line) => {
-    const trimmed = line.trim()
-    if (!trimmed || trimmed.startsWith('#')) return
-    const index = trimmed.indexOf('=')
-    if (index === -1) return
-    const key = trimmed.substring(0, index).trim()
-    let value = trimmed.substring(index + 1).trim()
-    if (
-      (value.startsWith("'") && value.endsWith("'")) ||
-      (value.startsWith('"') && value.endsWith('"'))
-    ) {
-      value = value.substring(1, value.length - 1)
-    }
-    process.env[key] = value
-  })
-}
-
-// Fallback to .env if needed
-const envFallback = path.join(process.cwd(), '.env')
-if (fs.existsSync(envFallback)) {
-  const content = fs.readFileSync(envFallback, 'utf8')
-  content.split('\n').forEach((line) => {
-    const trimmed = line.trim()
-    if (!trimmed || trimmed.startsWith('#')) return
-    const index = trimmed.indexOf('=')
-    if (index === -1) return
-    const key = trimmed.substring(0, index).trim()
-    let value = trimmed.substring(index + 1).trim()
-    if (
-      (value.startsWith("'") && value.endsWith("'")) ||
-      (value.startsWith('"') && value.endsWith('"'))
-    ) {
-      value = value.substring(1, value.length - 1)
-    }
-    if (!process.env[key]) {
-      process.env[key] = value
-    }
-  })
-}
+// Load environment variables automatically using Next.js native loader
+loadEnvConfig(process.cwd())
 
 // Resolve targeted ClickHouse URL: Command parameter > CLICKHOUSE_ADMIN_URL > CLICKHOUSE_URL
 const targetUrlString =
