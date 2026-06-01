@@ -370,7 +370,7 @@ export function HomepageClient({
                     <TableHead className="h-10 text-right text-sm">
                       <button
                         onClick={() => handleSort('urls')}
-                        className="ml-auto inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        className="ml-auto inline-flex items-center font-medium hover:text-foreground"
                       >
                         URLs
                         <SortIcon column="urls" />
@@ -379,7 +379,7 @@ export function HomepageClient({
                     <TableHead className="h-10 text-right text-sm">
                       <button
                         onClick={() => handleSort('pageviews')}
-                        className="ml-auto inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        className="ml-auto inline-flex items-center font-medium hover:text-foreground"
                       >
                         Pageviews
                         <SortIcon column="pageviews" />
