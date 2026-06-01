@@ -176,7 +176,10 @@ export class ClickHouseAdapter implements PageViewAdapter {
         path: event.path,
         title: event.title || null,
         referrer: event.referrer || null,
-        timestamp: event.timestamp.toISOString(),
+        timestamp: event.timestamp
+          .toISOString()
+          .replace('T', ' ')
+          .replace('Z', ''),
         ua: event.ua || null,
         browser: event.browser || null,
         browserVersion: event.browserVersion || null,
