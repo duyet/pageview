@@ -8,15 +8,15 @@ const SOURCES = [
     id: 'postgres' as DataSource,
     name: 'PostgreSQL',
     icon: Database,
-    color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/30',
-    hoverColor: 'hover:bg-blue-50/50 dark:hover:bg-blue-950/20',
+    color: 'text-teal-600 bg-teal-50 dark:bg-teal-950/30',
+    hoverColor: 'hover:bg-teal-50/50 dark:hover:bg-teal-950/20',
     description: 'Neon PostgreSQL database',
   },
   {
     id: 'clickhouse' as DataSource,
     name: 'ClickHouse',
     icon: Zap,
-    color: 'text-amber-500 bg-amber-50 dark:bg-amber-950/30',
+    color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/30',
     hoverColor: 'hover:bg-amber-50/50 dark:hover:bg-amber-950/20',
     description: 'High-speed column store',
   },
@@ -24,8 +24,8 @@ const SOURCES = [
     id: 'duckdb' as DataSource,
     name: 'DuckDB',
     icon: Bird,
-    color: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950/30',
-    hoverColor: 'hover:bg-yellow-50/50 dark:hover:bg-yellow-950/20',
+    color: 'text-orange-600 bg-orange-50 dark:bg-orange-950/30',
+    hoverColor: 'hover:bg-orange-50/50 dark:hover:bg-orange-950/20',
     description: 'Embedded DuckDB / MotherDuck',
   },
 ];
@@ -61,28 +61,28 @@ export const DataSourceSelector = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'flex items-center gap-2.5 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all shadow-sm duration-200',
+          'flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-200',
           isOpen
-            ? 'border-neutral-300 bg-neutral-50 shadow-inner dark:border-neutral-700 dark:bg-neutral-800'
-            : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700 dark:hover:bg-neutral-800/80',
+            ? 'border-border bg-accent shadow-inner'
+            : 'border-border bg-card hover:bg-accent',
         )}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
         <span
           className={cn(
-            'flex size-5.5 items-center justify-center rounded-lg p-0.5 shadow-sm transition-transform duration-300 group-hover:scale-105',
+            'flex size-5 items-center justify-center rounded-md p-0.5 transition-transform duration-300 group-hover:scale-105',
             activeSource.color,
           )}
         >
-          <activeSource.icon className="size-4" />
+          <activeSource.icon className="size-3.5" />
         </span>
-        <span className="hidden font-medium text-neutral-700 dark:text-neutral-200 md:inline">
+        <span className="hidden font-medium text-foreground md:inline">
           {activeSource.name}
         </span>
         <ChevronDown
           className={cn(
-            'size-4 text-neutral-400 transition-transform duration-200',
+            'size-3.5 text-muted-foreground transition-transform duration-200',
             isOpen && 'rotate-180',
           )}
         />
@@ -90,14 +90,14 @@ export const DataSourceSelector = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-2xl border border-neutral-100 bg-white p-2 shadow-xl ring-1 ring-black/5 duration-150 animate-in fade-in slide-in-from-top-2 focus:outline-none dark:border-neutral-800 dark:bg-neutral-950">
-          <div className="px-3.5 py-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-              Active Analytical Source
+        <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-border bg-card p-2 anthropic-shadow-md animate-in fade-in slide-in-from-top-2 focus:outline-none">
+          <div className="px-3 py-2">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Data Source
             </span>
           </div>
 
-          <div className="space-y-1" role="listbox">
+          <div className="space-y-0.5" role="listbox">
             {SOURCES.map((source) => {
               const isSelected = source.id === dataSource;
               return (
@@ -110,20 +110,19 @@ export const DataSourceSelector = () => {
                   role="option"
                   aria-selected={isSelected}
                   className={cn(
-                    'group flex w-full items-center gap-3.5 rounded-xl px-3 py-2.5 text-left transition-all duration-150',
+                    'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all duration-150',
                     isSelected
-                      ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
-                      : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200',
-                    source.hoverColor,
+                      ? 'bg-accent text-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground',
                   )}
                 >
                   <span
                     className={cn(
-                      'flex size-8 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-300 group-hover:scale-105',
+                      'flex size-7 shrink-0 items-center justify-center rounded-md transition-all duration-300 group-hover:scale-105',
                       source.color,
                     )}
                   >
-                    <source.icon className="size-[18px]" />
+                    <source.icon className="size-4" />
                   </span>
 
                   <div className="min-w-0 flex-1">
@@ -132,10 +131,10 @@ export const DataSourceSelector = () => {
                         {source.name}
                       </span>
                       {isSelected && (
-                        <span className="flex size-1.5 animate-pulse rounded-full bg-emerald-500" />
+                        <span className="flex size-1.5 animate-pulse rounded-full bg-teal-500" />
                       )}
                     </div>
-                    <span className="mt-0.5 block truncate text-xs text-neutral-400 dark:text-neutral-500">
+                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">
                       {source.description}
                     </span>
                   </div>

@@ -61,7 +61,7 @@ export function UrlAnalyticsSection({
 
       <TabsContent value="devices" className="space-y-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
             <ChartTitle
               title="Browsers"
               description="Most popular"
@@ -74,7 +74,7 @@ export function UrlAnalyticsSection({
             />
           </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
             <ChartTitle
               title="Operating Systems"
               description="Device OS"
@@ -87,7 +87,7 @@ export function UrlAnalyticsSection({
             />
           </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
             <ChartTitle
               title="Device Types"
               description="Desktop, mobile, tablet"
@@ -104,7 +104,7 @@ export function UrlAnalyticsSection({
 
       <TabsContent value="locations" className="space-y-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
             <ChartTitle
               title="Top Countries"
               description="Visitors by country"
@@ -117,7 +117,7 @@ export function UrlAnalyticsSection({
             />
           </div>
 
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
             <ChartTitle
               title="Top Cities"
               description="Visitors by city"

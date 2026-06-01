@@ -97,16 +97,16 @@ export function AnalyticsClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
           {/* Header */}
           <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
-              <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+              <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
                 Analytics
               </h1>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 {dateRange?.from && dateRange?.to && formatDateRange()}
               </p>
             </div>
@@ -116,7 +116,7 @@ export function AnalyticsClient() {
                 className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
                   excludeBots
                     ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300'
-                    : 'border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700'
+                    : 'border-border bg-card text-foreground hover:bg-accent'
                 }`}
               >
                 <Bot className="size-4" />
@@ -127,7 +127,7 @@ export function AnalyticsClient() {
           </div>
 
           {/* Trends Chart */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-border bg-card p-6">
             <ChartTitle
               title="Traffic Trends"
               description="Page views and unique visitors over time"
@@ -168,7 +168,7 @@ export function AnalyticsClient() {
 
             <TabsContent value="devices" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Browsers"
                     description="Most popular"
@@ -181,7 +181,7 @@ export function AnalyticsClient() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Operating Systems"
                     description="Device OS"
@@ -194,7 +194,7 @@ export function AnalyticsClient() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Device Types"
                     description="Desktop, mobile, tablet"
@@ -211,7 +211,7 @@ export function AnalyticsClient() {
 
             <TabsContent value="locations" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Top Countries"
                     description="Visitors by country"
@@ -224,7 +224,7 @@ export function AnalyticsClient() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Top Cities"
                     description="Visitors by city"
@@ -241,7 +241,7 @@ export function AnalyticsClient() {
 
             <TabsContent value="audience" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="UTM Campaigns"
                     description="Traffic by UTM campaign"
@@ -254,7 +254,7 @@ export function AnalyticsClient() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Languages"
                     description="Browser locale preferences"
@@ -267,7 +267,7 @@ export function AnalyticsClient() {
                   />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Screen Resolutions"
                     description="Viewport width & height"
@@ -283,7 +283,7 @@ export function AnalyticsClient() {
             </TabsContent>
 
             <TabsContent value="bots" className="space-y-4">
-              <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <div className="rounded-lg border border-border bg-card p-6">
                 <ChartTitle
                   title="Bot vs Human Traffic"
                   description="Traffic breakdown by source type"
@@ -293,7 +293,7 @@ export function AnalyticsClient() {
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Bot Types"
                     description="Distribution by bot category"
@@ -302,7 +302,7 @@ export function AnalyticsClient() {
                   <BotTypeChart data={botsResult} loading={loadingBots} />
                 </div>
 
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                <div className="rounded-lg border border-border bg-card p-4">
                   <ChartTitle
                     title="Top Bots"
                     description="Most active bot agents"

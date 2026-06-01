@@ -35,12 +35,16 @@ interface BotChartProps {
 }
 
 const COLORS = [
-  '#ef4444', // red - AI scrapers
-  '#3b82f6', // blue - search crawlers
-  '#10b981', // green - SEO tools
-  '#8b5cf6', // violet - social media
-  '#f59e0b', // amber - monitoring
-  '#6b7280', // gray - other
+  '#D97706', // amber (primary)
+  '#0F766E', // teal
+  '#E09145', // warm orange
+  '#7C6FA0', // muted purple
+  '#2B6CB0', // steel blue
+  '#65A30D', // lime green
+  '#C2410C', // deep orange
+  '#0891B2', // cyan
+  '#BE185D', // rose
+  '#4F46E5', // indigo
 ];
 
 export function BotOverviewChart({ data, loading }: BotChartProps) {
@@ -71,14 +75,14 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
       value: data.totalHumans,
       percentage: data.humanPercentage,
       icon: User,
-      color: '#10b981',
+      color: '#0F766E',
     },
     {
       name: 'Bot Traffic',
       value: data.totalBots,
       percentage: data.botPercentage,
       icon: Bot,
-      color: '#ef4444',
+      color: '#C2410C',
     },
   ];
 
@@ -87,7 +91,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
           <div className="flex items-center gap-2">
-            <User className="size-5 text-emerald-500" />
+            <User className="size-5 text-teal-600" />
             <span className="text-sm text-neutral-600 dark:text-neutral-400">
               Human Traffic
             </span>
@@ -102,7 +106,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
 
         <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
           <div className="flex items-center gap-2">
-            <Bot className="size-5 text-red-500" />
+            <Bot className="size-5 text-orange-700" />
             <span className="text-sm text-neutral-600 dark:text-neutral-400">
               Bot Traffic
             </span>
@@ -128,7 +132,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
                 `${props.name} (${props.percentage.toFixed(1)}%)`
               }
               outerRadius={80}
-              fill="#8884d8"
+              fill="#D97706"
               dataKey="value"
             >
               {chartData.map((entry, index) => (
@@ -196,7 +200,7 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
               `${props.botType} (${props.percentage.toFixed(1)}%)`
             }
             outerRadius={80}
-            fill="#8884d8"
+            fill="#D97706"
             dataKey="count"
           >
             {data.botsByType.map((_entry, index) => (
@@ -297,7 +301,7 @@ export function TopBotsChart({ data, loading }: BotChartProps) {
               return null;
             }}
           />
-          <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="count" fill="#D97706" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

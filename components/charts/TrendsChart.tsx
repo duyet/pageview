@@ -44,7 +44,7 @@ export function TrendsChart({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading trends...</span>
         </div>
@@ -55,7 +55,7 @@ export function TrendsChart({
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground dark:text-muted-foreground">
           No data available
         </div>
       </div>
@@ -70,12 +70,12 @@ export function TrendsChart({
   const metricConfig = {
     pageviews: {
       label: 'Page Views',
-      color: '#6366f1',
+      color: '#D97706',
       dataKey: 'pageviews',
     },
     uniqueVisitors: {
       label: 'Unique Visitors',
-      color: '#10b981',
+      color: '#0F766E',
       dataKey: 'uniqueVisitors',
     },
   };
@@ -94,13 +94,13 @@ export function TrendsChart({
           <XAxis
             dataKey="formattedDate"
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground dark:text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground dark:text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
@@ -108,17 +108,17 @@ export function TrendsChart({
             content={({ active, payload, label }) => {
               if (active && payload?.length) {
                 return (
-                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
-                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg border border-border bg-card p-3 shadow-lg dark:border-border bg-card">
+                    <p className="mb-1 text-sm font-medium text-foreground dark:text-foreground">
                       {label}
                     </p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       <span
                         className="mr-1.5 inline-block size-3 rounded-sm"
                         style={{ backgroundColor: currentConfig.color }}
                       ></span>
                       {currentConfig.label}:{' '}
-                      <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                      <span className="font-medium text-foreground dark:text-foreground">
                         {payload[0]?.value?.toLocaleString()}
                       </span>
                     </p>
@@ -155,13 +155,13 @@ export function MetricToggle({
   totalUniqueVisitors,
 }: MetricToggleProps) {
   return (
-    <div className="inline-flex items-center gap-1 rounded-md border border-neutral-200 bg-neutral-50 p-0.5 dark:border-neutral-700 dark:bg-neutral-800/50">
+    <div className="inline-flex items-center gap-1 rounded-md border border-border bg-muted p-0.5 dark:border-border ">
       <button
         onClick={() => onMetricChange('pageviews')}
         className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
           activeMetric === 'pageviews'
-            ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100'
-            : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
+            ? 'bg-card text-foreground shadow-sm dark:bg-neutral-700 dark:text-foreground'
+            : 'text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
         }`}
       >
         Page Views
@@ -175,8 +175,8 @@ export function MetricToggle({
         onClick={() => onMetricChange('uniqueVisitors')}
         className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
           activeMetric === 'uniqueVisitors'
-            ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100'
-            : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100'
+            ? 'bg-card text-foreground shadow-sm dark:bg-neutral-700 dark:text-foreground'
+            : 'text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
         }`}
       >
         Unique Visitors

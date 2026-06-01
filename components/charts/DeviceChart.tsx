@@ -9,16 +9,16 @@ interface DeviceChartProps {
 }
 
 const COLORS = [
-  '#6366f1', // indigo
-  '#10b981', // emerald
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#8b5cf6', // violet
-  '#06b6d4', // cyan
-  '#84cc16', // lime
-  '#f97316', // orange
-  '#ec4899', // pink
-  '#14b8a6', // teal
+  '#D97706', // amber (primary)
+  '#0F766E', // teal
+  '#E09145', // warm orange
+  '#7C6FA0', // muted purple
+  '#2B6CB0', // steel blue
+  '#65A30D', // lime green
+  '#C2410C', // deep orange
+  '#0891B2', // cyan
+  '#BE185D', // rose
+  '#4F46E5', // indigo
 ];
 
 export function DeviceChart({ data, title, loading }: DeviceChartProps) {
@@ -74,7 +74,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
             labelLine={false}
             label={(entry: any) => `${entry.name} (${entry.percentage}%)`}
             outerRadius={80}
-            fill="#8884d8"
+            fill="#D97706"
             dataKey="value"
           >
             {chartData.map((_entry, index) => (

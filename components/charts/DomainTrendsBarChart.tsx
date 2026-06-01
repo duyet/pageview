@@ -97,7 +97,7 @@ export function DomainTrendsBarChart({
           />
           <Bar
             dataKey={isPageViewsMode ? 'pageviews' : 'uniqueVisitors'}
-            fill={isPageViewsMode ? '#6366f1' : '#10b981'}
+            fill={isPageViewsMode ? '#D97706' : '#0F766E'}
             radius={[4, 4, 0, 0]}
             name={isPageViewsMode ? 'Page Views' : 'Unique Visitors'}
             isAnimationActive={false}

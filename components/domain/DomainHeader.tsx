@@ -26,15 +26,15 @@ export function DomainHeader({
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+          <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
             {domain}
           </h1>
           <div className="mt-1 flex flex-col gap-1">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <p className="text-sm text-muted-foreground">
               Domain analytics and URL breakdown
             </p>
             {previewCount > 0 && (
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 Including {previewCount} preview deployment
                 {previewCount > 1 ? 's' : ''}
               </p>
@@ -43,20 +43,16 @@ export function DomainHeader({
         </div>
         <div className="flex gap-6 text-right">
           <div>
-            <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+            <div className="text-xl font-medium text-foreground sm:text-2xl">
               {totalUrls}
             </div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-400">
-              Total URLs
-            </div>
+            <div className="text-sm text-muted-foreground">Total URLs</div>
           </div>
           <div>
-            <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+            <div className="text-xl font-medium text-foreground sm:text-2xl">
               {totalPageviews.toLocaleString()}
             </div>
-            <div className="text-sm text-neutral-600 dark:text-neutral-400">
-              Total Views
-            </div>
+            <div className="text-sm text-muted-foreground">Total Views</div>
           </div>
         </div>
       </div>

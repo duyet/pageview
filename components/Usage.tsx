@@ -150,7 +150,7 @@ export const Usage = ({ currentHost }: Props) => {
                 </pre>
               </div>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-muted p-4 dark:border-border ">
               <h4 className="mb-2 text-sm font-medium">API Response</h4>
               <div className="font-mono text-xs">
                 {`{"msg": "Pageview recorded successfully", "id": 123}`}

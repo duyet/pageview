@@ -18,7 +18,7 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground dark:text-muted-foreground">
           Loading real-time data...
         </div>
       </div>
@@ -28,7 +28,7 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground dark:text-muted-foreground">
           No real-time data available
         </div>
       </div>
@@ -47,14 +47,14 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
           <XAxis
             dataKey="hour"
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground dark:text-muted-foreground"
             tickLine={false}
             axisLine={false}
             interval="preserveStartEnd"
           />
           <YAxis
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground dark:text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
@@ -62,17 +62,17 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
             content={({ active, payload, label }) => {
               if (active && payload?.length) {
                 return (
-                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
-                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg border border-border bg-card p-3 shadow-lg dark:border-border bg-card">
+                    <p className="mb-1 text-sm font-medium text-foreground dark:text-foreground">
                       {label}
                     </p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
                       <span
                         className="mr-1.5 inline-block size-3 rounded-full"
                         style={{ backgroundColor: payload[0].color }}
                       ></span>
                       Views:{' '}
-                      <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                      <span className="font-medium text-foreground dark:text-foreground">
                         {payload[0].value?.toLocaleString()}
                       </span>
                     </p>
@@ -85,10 +85,10 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
           <Line
             type="monotone"
             dataKey="views"
-            stroke="#f59e0b"
+            stroke="#D97706"
             strokeWidth={2.5}
             dot={false}
-            activeDot={{ r: 4, fill: '#f59e0b', strokeWidth: 0 }}
+            activeDot={{ r: 4, fill: '#D97706', strokeWidth: 0 }}
           />
         </LineChart>
       </ResponsiveContainer>

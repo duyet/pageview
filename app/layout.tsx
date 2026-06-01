@@ -19,10 +19,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <main className="min-h-screen bg-neutral-50">
-          <Providers>{children}</Providers>
-        </main>
+      <body className="min-h-screen bg-background font-[system-ui,_-apple-system,_BlinkMacSystemFont,_'Segoe_UI',_Roboto,_'Helvetica_Neue',_Arial,_sans-serif]">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

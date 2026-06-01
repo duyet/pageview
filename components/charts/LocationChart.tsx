@@ -93,7 +93,7 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
               return null;
             }}
           />
-          <Bar dataKey="value" fill="#6366f1" radius={[0, 6, 6, 0]} />
+          <Bar dataKey="value" fill="#D97706" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

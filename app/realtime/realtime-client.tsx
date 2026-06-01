@@ -34,16 +34,16 @@ export function RealtimeClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+              <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
                 Real-time
               </h1>
-              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Last 24 hours live monitoring
               </p>
             </div>

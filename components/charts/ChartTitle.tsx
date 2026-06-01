@@ -17,17 +17,15 @@ export function ChartTitle({
     <div className="mb-4 flex items-start justify-between gap-4">
       <div>
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+          <h2 className="text-sm font-medium text-foreground sm:text-base">
             {title}
           </h2>
           {loading && (
-            <Loader2 className="size-4 animate-spin text-neutral-400 dark:text-neutral-500" />
+            <Loader2 className="size-4 animate-spin text-muted-foreground" />
           )}
         </div>
         {description && (
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {children}

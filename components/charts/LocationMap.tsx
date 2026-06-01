@@ -85,7 +85,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading location data...</span>
         </div>
@@ -96,7 +96,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground dark:text-muted-foreground">
           No location data
         </div>
       </div>
@@ -106,13 +106,13 @@ export function LocationMap({ data, loading }: LocationMapProps) {
   // Get color based on intensity (0-1)
   const getColor = (intensity: number) => {
     const colors = [
-      'bg-indigo-100 dark:bg-indigo-950',
-      'bg-indigo-200 dark:bg-indigo-900',
-      'bg-indigo-300 dark:bg-indigo-800',
-      'bg-indigo-400 dark:bg-indigo-700',
-      'bg-indigo-500 dark:bg-indigo-600',
-      'bg-indigo-600 dark:bg-indigo-500',
-      'bg-indigo-700 dark:bg-indigo-400',
+      'bg-amber-100 dark:bg-amber-950',
+      'bg-amber-200 dark:bg-amber-900',
+      'bg-amber-300 dark:bg-amber-800',
+      'bg-amber-400 dark:bg-amber-700',
+      'bg-amber-500 dark:bg-amber-600',
+      'bg-amber-600 dark:bg-amber-500',
+      'bg-amber-700 dark:bg-amber-400',
     ];
 
     const index = Math.min(
@@ -129,26 +129,26 @@ export function LocationMap({ data, loading }: LocationMapProps) {
         {colorScale.map((item, index) => (
           <div
             key={index}
-            className={`group relative cursor-default rounded-lg border border-neutral-200 p-3 transition-all hover:scale-105 hover:shadow-md dark:border-neutral-700 ${getColor(item.intensity)}`}
+            className={`group relative cursor-default rounded-lg border border-border p-3 transition-all hover:scale-105 hover:shadow-md dark:border-border ${getColor(item.intensity)}`}
           >
             <div className="flex flex-col items-center gap-1">
-              <div className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
+              <div className="text-lg font-bold text-foreground dark:text-foreground">
                 {item.country}
               </div>
               <div className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
                 {item.count.toLocaleString()}
               </div>
-              <div className="text-xs text-neutral-700 dark:text-neutral-300">
+              <div className="text-xs text-foreground dark:text-muted-foreground">
                 views
               </div>
             </div>
 
             {/* Tooltip on hover */}
-            <div className="pointer-events-none absolute -top-12 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm shadow-lg group-hover:block dark:border-neutral-700 dark:bg-neutral-800">
-              <div className="font-medium text-neutral-900 dark:text-neutral-100">
+            <div className="pointer-events-none absolute -top-12 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-lg group-hover:block dark:border-border bg-card">
+              <div className="font-medium text-foreground dark:text-foreground">
                 {item.name}
               </div>
-              <div className="text-xs text-neutral-600 dark:text-neutral-400">
+              <div className="text-xs text-muted-foreground dark:text-muted-foreground">
                 {item.count.toLocaleString()} visits
               </div>
             </div>
@@ -157,7 +157,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground dark:text-muted-foreground">
         <span>Less traffic</span>
         <div className="flex gap-1">
           {[0, 1, 2, 3, 4, 5, 6].map((i) => (

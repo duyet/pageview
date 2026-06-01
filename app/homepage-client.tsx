@@ -150,33 +150,33 @@ export function HomepageClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section>
         <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-2.5 py-0.5 dark:bg-neutral-800">
-            <TrendingUp className="size-3 text-neutral-500 dark:text-neutral-400" />
-            <span className="text-xs text-neutral-600 dark:text-neutral-400">
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-0.5">
+            <TrendingUp className="size-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
               <AnimatedNumber
                 value={totalPageViews}
-                className="font-medium text-neutral-900 dark:text-neutral-100"
+                className="font-medium text-foreground"
               />{' '}
               pageviews
             </span>
           </div>
 
-          <h1 className="mb-3 text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+          <h1 className="mb-3 text-xl font-normal tracking-tight text-foreground sm:text-2xl">
             Simple analytics, powerful insights
           </h1>
 
-          <p className="mb-6 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-base">
+          <p className="mb-6 text-sm leading-relaxed text-muted-foreground sm:text-base">
             Privacy-focused pageview tracking with multiple integration options.
             Embed a script, use the REST API, or push data directly from your
             backend.
           </p>
 
           {/* Features */}
-          <div className="flex flex-wrap gap-6 text-sm text-neutral-600 dark:text-neutral-400">
+          <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <Zap className="size-4" />
               <span>Fast</span>
@@ -207,42 +207,42 @@ export function HomepageClient({
             className="grid grid-cols-1 gap-4 sm:grid-cols-3"
           >
             <motion.div variants={item}>
-              <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
+              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
                 <div className="mb-2 flex items-center gap-2">
-                  <BarChart3 className="size-4 text-neutral-500 dark:text-neutral-400" />
-                  <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <BarChart3 className="size-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
                     Total Views
                   </span>
                 </div>
-                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                <div className="text-xl font-medium text-foreground sm:text-2xl">
                   <AnimatedNumber value={totalPageViews} separator="," />
                 </div>
               </div>
             </motion.div>
 
             <motion.div variants={item}>
-              <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
+              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
                 <div className="mb-2 flex items-center gap-2">
-                  <Globe className="size-4 text-neutral-500 dark:text-neutral-400" />
-                  <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <Globe className="size-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
                     Domains
                   </span>
                 </div>
-                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                <div className="text-xl font-medium text-foreground sm:text-2xl">
                   <AnimatedNumber value={domainStats.length} />
                 </div>
               </div>
             </motion.div>
 
             <motion.div variants={item}>
-              <div className="rounded-lg border border-neutral-200 bg-white p-4 transition-colors hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/50 dark:hover:border-neutral-600">
+              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
                 <div className="mb-2 flex items-center gap-2">
-                  <LinkIcon className="size-4 text-neutral-500 dark:text-neutral-400" />
-                  <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                  <LinkIcon className="size-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
                     URLs
                   </span>
                 </div>
-                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                <div className="text-xl font-medium text-foreground sm:text-2xl">
                   <AnimatedNumber value={totalUrls} separator="," />
                 </div>
               </div>
@@ -254,7 +254,7 @@ export function HomepageClient({
       {/* Traffic Trends Chart */}
       <section>
         <div className="mx-auto max-w-4xl p-4 sm:px-6">
-          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-border bg-card p-6">
             <ChartTitle
               title="Traffic Trends"
               description="Page views and unique visitors over the last 30 days"
@@ -281,29 +281,29 @@ export function HomepageClient({
       {/* Quick Start Section */}
       <section>
         <div className="mx-auto max-w-4xl p-4 sm:px-6">
-          <div className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-border bg-card">
             <button
               onClick={() => setIsIntegrationOpen(!isIntegrationOpen)}
-              className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800"
+              className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-accent"
             >
               <div>
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Integration Guide
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-muted-foreground">
                   Choose your preferred integration method: embed a tracking
                   script, use the REST API directly, or push data from your
                   backend
                 </p>
               </div>
               {isIntegrationOpen ? (
-                <ChevronUp className="size-5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+                <ChevronUp className="size-5 shrink-0 text-muted-foreground" />
               ) : (
-                <ChevronDown className="size-5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+                <ChevronDown className="size-5 shrink-0 text-muted-foreground" />
               )}
             </button>
             {isIntegrationOpen && (
-              <div className="border-t border-neutral-200 p-6 pt-4 dark:border-neutral-700">
+              <div className="border-t border-border p-6 pt-4">
                 <Usage currentHost={currentHost} />
               </div>
             )}
@@ -316,21 +316,21 @@ export function HomepageClient({
         <div className="mx-auto max-w-4xl p-4 sm:px-6">
           <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-base font-medium text-neutral-900 dark:text-neutral-100">
+              <h2 className="text-base font-medium text-foreground">
                 Tracked Domains
               </h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 {filteredDomains.length} domain
                 {filteredDomains.length !== 1 && 's'}
               </p>
             </div>
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search domains..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-9 rounded-lg border-neutral-200 pl-9 text-sm dark:border-neutral-700"
+                className="h-9 rounded-lg border-border pl-9 text-sm"
               />
             </div>
           </div>
@@ -354,14 +354,14 @@ export function HomepageClient({
               }
             />
           ) : (
-            <div className="rounded-lg border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-card">
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="h-10 text-sm">
                       <button
                         onClick={() => handleSort('domain')}
-                        className="inline-flex items-center font-medium hover:text-neutral-900 dark:hover:text-neutral-100"
+                        className="inline-flex items-center font-medium hover:text-foreground"
                       >
                         Domain
                         <SortIcon column="domain" />
@@ -406,11 +406,11 @@ export function HomepageClient({
                               className="size-5 rounded"
                             />
                             <div className="flex flex-col">
-                              <span className="text-sm font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-500">
+                              <span className="text-sm font-medium text-foreground hover:text-primary">
                                 {hostName}
                               </span>
                               {row.previewCount && (
-                                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                <span className="text-xs text-muted-foreground">
                                   +{row.previewCount} preview deployment
                                   {row.previewCount > 1 ? 's' : ''}
                                 </span>
@@ -418,15 +418,15 @@ export function HomepageClient({
                             </div>
                           </Link>
                         </TableCell>
-                        <TableCell className="py-3 text-right text-sm text-neutral-600 dark:text-neutral-400">
+                        <TableCell className="py-3 text-right text-sm text-muted-foreground">
                           {row._count}
                         </TableCell>
-                        <TableCell className="py-3 text-right text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        <TableCell className="py-3 text-right text-sm font-medium text-foreground">
                           {row.pageViews?.toLocaleString() || 0}
                         </TableCell>
                         <TableCell className="py-3 text-right">
                           <Link href={`/domain/${hostName}`}>
-                            <ArrowRight className="size-4 text-neutral-500 transition-transform group-hover:translate-x-0.5 dark:text-neutral-400" />
+                            <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                           </Link>
                         </TableCell>
                       </TableRow>

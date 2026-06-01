@@ -30,16 +30,16 @@ export function DomainUrlTable({
 }: DomainUrlTableProps) {
   if (urlStats.length === 0) {
     return (
-      <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+      <div className="rounded-lg border bg-border bg-card p-6 dark:bg-border ">
         <div className="mb-4">
-          <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+          <h2 className="text-sm font-medium text-foreground dark:text-foreground sm:text-base">
             URLs
           </h2>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
             All tracked URLs for this domain sorted by pageviews
           </p>
         </div>
-        <div className="py-12 text-center text-sm text-neutral-600 dark:text-neutral-400">
+        <div className="py-12 text-center text-sm text-muted-foreground dark:text-muted-foreground">
           <p>No URLs tracked yet</p>
         </div>
       </div>
@@ -47,12 +47,12 @@ export function DomainUrlTable({
   }
 
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+    <div className="rounded-lg border bg-border bg-card p-6 dark:bg-border ">
       <div className="mb-4">
-        <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+        <h2 className="text-sm font-medium text-foreground dark:text-foreground sm:text-base">
           URLs
         </h2>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="text-sm text-muted-foreground dark:text-muted-foreground">
           All tracked URLs for this domain sorted by pageviews
         </p>
       </div>
@@ -79,7 +79,7 @@ export function DomainUrlTable({
                     href={urlStat.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-neutral-900 hover:text-blue-600 hover:underline dark:text-neutral-100/80"
+                    className="flex items-center gap-1.5 text-foreground hover:text-primary hover:underline dark:text-foreground/80"
                   >
                     <span className="truncate">{urlStat.url}</span>
                     <ExternalLink className="size-3 shrink-0 opacity-40" />

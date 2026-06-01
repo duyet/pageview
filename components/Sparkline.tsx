@@ -8,7 +8,7 @@ interface SparklineProps {
 
 export function Sparkline({
   data,
-  color = '#3b82f6',
+  color = '#D97706',
   className,
 }: SparklineProps) {
   const chartData = data.map((value, index) => ({ value, index }));

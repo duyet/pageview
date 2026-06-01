@@ -37,9 +37,9 @@ export function RealtimeMetricCard({
 
   const trendColor =
     trend === 'up'
-      ? 'text-green-600'
+      ? 'text-teal-700'
       : trend === 'down'
-        ? 'text-red-600'
+        ? 'text-orange-700'
         : 'text-muted-foreground';
 
   return (
