@@ -161,10 +161,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
         <span>Less traffic</span>
         <div className="flex gap-1">
           {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className={`h-4 w-6 rounded ${getColor(i / 6)}`}
-            ></div>
+            <div key={i} className={`h-4 w-6 rounded ${getColor(i / 6)}`}></div>
           ))}
         </div>
         <span>More traffic</span>

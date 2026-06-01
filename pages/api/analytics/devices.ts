@@ -129,7 +129,13 @@ export default async function handler(
     const uaIds = uaStats.map((s) => s.uAId).filter(Boolean) as number[]
     const uaDetails = await prisma.uA.findMany({
       where: { id: { in: uaIds } },
-      select: { id: true, browser: true, os: true, device: true, deviceType: true },
+      select: {
+        id: true,
+        browser: true,
+        os: true,
+        device: true,
+        deviceType: true,
+      },
     })
     const uaMap = new Map(uaDetails.map((ua) => [ua.id, ua]))
 
