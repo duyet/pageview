@@ -1,27 +1,27 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export type UsageType = 'js' | 'nextjs' | 'api' | 'curl' | 'python' | 'badge'
+export type UsageType = 'js' | 'nextjs' | 'api' | 'curl' | 'python' | 'badge';
 
 type Props = {
-  currentHost: string
-}
+  currentHost: string;
+};
 
 const getJsSnippet = (currentHost: string) => `
 !function(e,n,t){e.onload=function(){
 let e=n.createElement("script");
 e.src=t,n.body.appendChild(e)}}
 (window,document,"//${currentHost}/pageview.js");
-`
+`;
 
 const getCurlSimple = (
-  currentHost: string
+  currentHost: string,
 ) => `curl -X POST https://${currentHost}/api/pageview \\
   -H "Content-Type: application/json" \\
-  -d '{"url": "https://example.com/page"}'`
+  -d '{"url": "https://example.com/page"}'`;
 
 const getCurlFull = (
-  currentHost: string
+  currentHost: string,
 ) => `curl -X POST https://${currentHost}/api/pageview \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -34,7 +34,7 @@ const getCurlFull = (
     "country": "US",
     "city": "San Francisco",
     "ip": "1.2.3.4"
-  }'`
+  }'`;
 
 const getPythonSimple = (currentHost: string) => `import requests
 
@@ -42,7 +42,7 @@ url = "https://${currentHost}/api/pageview"
 data = {"url": "https://example.com/page"}
 
 response = requests.post(url, json=data)
-print(response.json())`
+print(response.json())`;
 
 const getPythonFull = (currentHost: string) => `import requests
 
@@ -60,10 +60,10 @@ data = {
 }
 
 response = requests.post(url, json=data)
-print(response.json())  # {'msg': 'Pageview recorded successfully', 'id': 123}`
+print(response.json())  # {'msg': 'Pageview recorded successfully', 'id': 123}`;
 
 const getJavaScriptAPI = (
-  currentHost: string
+  currentHost: string,
 ) => `// Simple version (auto-detect from browser)
 fetch('https://${currentHost}/api/pageview', {
   method: 'POST',
@@ -87,7 +87,7 @@ fetch('https://${currentHost}/api/pageview', {
     country: 'US',
     city: 'San Francisco'
   })
-})`
+})`;
 
 export const Usage = ({ currentHost }: Props) => {
   return (
@@ -251,5 +251,5 @@ export const Usage = ({ currentHost }: Props) => {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};

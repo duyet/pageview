@@ -1,37 +1,37 @@
+import { Bot, Loader2, User } from 'lucide-react';
 import {
-  PieChart,
-  Pie,
+  Bar,
+  BarChart,
+  CartesianGrid,
   Cell,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
-} from 'recharts'
-import { Loader2, Bot, User } from 'lucide-react'
+} from 'recharts';
 // TODO: Move to shared types file or app/api/analytics/bots/route.ts when created
 export interface BotData {
-  botType: string
-  botName: string
-  count: number
-  percentage: number
+  botType: string;
+  botName: string;
+  count: number;
+  percentage: number;
 }
 
 export interface BotStatsData {
-  totalPageviews: number
-  totalHumans: number
-  totalBots: number
-  humanPercentage: number
-  botPercentage: number
-  botsByType: BotData[]
-  topBots: BotData[]
+  totalPageviews: number;
+  totalHumans: number;
+  totalBots: number;
+  humanPercentage: number;
+  botPercentage: number;
+  botsByType: BotData[];
+  topBots: BotData[];
 }
 
 interface BotChartProps {
-  data: BotStatsData | undefined
-  loading?: boolean
+  data: BotStatsData | undefined;
+  loading?: boolean;
 }
 
 const COLORS = [
@@ -41,7 +41,7 @@ const COLORS = [
   '#8b5cf6', // violet - social media
   '#f59e0b', // amber - monitoring
   '#6b7280', // gray - other
-]
+];
 
 export function BotOverviewChart({ data, loading }: BotChartProps) {
   if (loading) {
@@ -52,7 +52,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
           <span>Loading bot analytics...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.totalPageviews === 0) {
@@ -62,7 +62,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
           No bot data available
         </div>
       </div>
-    )
+    );
   }
 
   const chartData = [
@@ -80,7 +80,7 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
       icon: Bot,
       color: '#ef4444',
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4">
@@ -137,8 +137,8 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
             </Pie>
             <Tooltip
               content={({ active, payload }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload
+                if (active && payload?.length) {
+                  const data = payload[0].payload;
                   return (
                     <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                       <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -149,16 +149,16 @@ export function BotOverviewChart({ data, loading }: BotChartProps) {
                         {data.percentage.toFixed(1)}%)
                       </p>
                     </div>
-                  )
+                  );
                 }
-                return null
+                return null;
               }}
             />
           </PieChart>
         </ResponsiveContainer>
       </div>
     </div>
-  )
+  );
 }
 
 export function BotTypeChart({ data, loading }: BotChartProps) {
@@ -170,7 +170,7 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
           <span>Loading bot types...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.botsByType.length === 0) {
@@ -180,7 +180,7 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
           No bot type data
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -199,7 +199,7 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
             fill="#8884d8"
             dataKey="count"
           >
-            {data.botsByType.map((entry, index) => (
+            {data.botsByType.map((_entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
@@ -208,8 +208,8 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
           </Pie>
           <Tooltip
             content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const data = payload[0].payload as BotData
+              if (active && payload?.length) {
+                const data = payload[0].payload as BotData;
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -220,15 +220,15 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
                       {data.percentage.toFixed(1)}%)
                     </p>
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
           />
         </PieChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
 
 export function TopBotsChart({ data, loading }: BotChartProps) {
@@ -240,7 +240,7 @@ export function TopBotsChart({ data, loading }: BotChartProps) {
           <span>Loading top bots...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.topBots.length === 0) {
@@ -250,7 +250,7 @@ export function TopBotsChart({ data, loading }: BotChartProps) {
           No bot data available
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -277,8 +277,8 @@ export function TopBotsChart({ data, loading }: BotChartProps) {
           />
           <Tooltip
             content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const data = payload[0].payload as BotData
+              if (active && payload?.length) {
+                const data = payload[0].payload as BotData;
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -292,14 +292,14 @@ export function TopBotsChart({ data, loading }: BotChartProps) {
                       {data.percentage.toFixed(1)}%)
                     </p>
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
           />
           <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

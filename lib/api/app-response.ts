@@ -4,8 +4,8 @@
  * Produces the same JSON envelope as the Pages Router response helpers.
  */
 
-import { nanoid } from 'nanoid'
-import type { ApiMeta } from '@/types/api'
+import { nanoid } from 'nanoid';
+import type { ApiMeta } from '@/types/api';
 
 function createMeta(extra?: Partial<ApiMeta>): ApiMeta {
   return {
@@ -13,14 +13,14 @@ function createMeta(extra?: Partial<ApiMeta>): ApiMeta {
     requestId: nanoid(),
     version: 'v1',
     ...extra,
-  }
+  };
 }
 
 interface SuccessOptions {
   /** Extra metadata merged into the default meta envelope. */
-  meta?: Partial<ApiMeta>
+  meta?: Partial<ApiMeta>;
   /** Additional headers on the Response. */
-  headers?: Record<string, string>
+  headers?: Record<string, string>;
 }
 
 /**
@@ -29,12 +29,12 @@ interface SuccessOptions {
 export function successResponse<T>(
   data: T,
   status: number = 200,
-  options?: SuccessOptions
+  options?: SuccessOptions,
 ): Response {
   return Response.json(
     { success: true, data, meta: createMeta(options?.meta) },
-    { status, headers: options?.headers }
-  )
+    { status, headers: options?.headers },
+  );
 }
 
 /**
@@ -43,12 +43,12 @@ export function successResponse<T>(
 function errorResponse(
   error: { code: string; message: string; details?: Record<string, unknown> },
   status: number,
-  headers?: Record<string, string>
+  headers?: Record<string, string>,
 ): Response {
   return Response.json(
     { success: false, error, meta: createMeta() },
-    { status, headers }
-  )
+    { status, headers },
+  );
 }
 
 /**
@@ -56,31 +56,26 @@ function errorResponse(
  */
 export function badRequestResponse(
   message: string = 'Bad request',
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): Response {
-  return errorResponse({ code: 'BAD_REQUEST', message, details }, 400)
+  return errorResponse({ code: 'BAD_REQUEST', message, details }, 400);
 }
 
 /**
  * 404 Not Found
  */
-export function notFoundResponse(
-  resource: string = 'Resource'
-): Response {
+export function notFoundResponse(resource: string = 'Resource'): Response {
   return errorResponse(
     { code: 'NOT_FOUND', message: `${resource} not found` },
-    404
-  )
+    404,
+  );
 }
 
 /**
  * 503 Service Unavailable
  */
 export function serviceUnavailableResponse(
-  message: string = 'Service temporarily unavailable'
+  message: string = 'Service temporarily unavailable',
 ): Response {
-  return errorResponse(
-    { code: 'SERVICE_UNAVAILABLE', message },
-    503
-  )
+  return errorResponse({ code: 'SERVICE_UNAVAILABLE', message }, 503);
 }

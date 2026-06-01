@@ -3,43 +3,40 @@
  * Get analytics for a specific domain
  */
 
-import { subDays } from 'date-fns'
+import { subDays } from 'date-fns';
+import { notFoundResponse, successResponse } from '@/lib/api/app-response';
+import prisma from '@/lib/prisma';
 import {
-  successResponse,
-  notFoundResponse,
-} from '@/lib/api/app-response'
-import {
-  analyticsDomainQuerySchema,
   analyticsDomainParamsSchema,
-} from '@/lib/validation/schemas'
-import prisma from '@/lib/prisma'
+  analyticsDomainQuerySchema,
+} from '@/lib/validation/schemas';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ domain: string }> }
+  { params }: { params: Promise<{ domain: string }> },
 ) {
-  const { domain } = await params
+  const { domain } = await params;
 
   // Validate parameters
-  analyticsDomainParamsSchema.parse({ domain })
+  analyticsDomainParamsSchema.parse({ domain });
 
-  const { searchParams } = new URL(request.url)
-  const query = Object.fromEntries(searchParams.entries())
+  const { searchParams } = new URL(request.url);
+  const query = Object.fromEntries(searchParams.entries());
 
-  const validated = analyticsDomainQuerySchema.parse(query)
-  const { days = 30, page = 1, pageSize = 50 } = validated
+  const validated = analyticsDomainQuerySchema.parse(query);
+  const { days = 30, page = 1, pageSize = 50 } = validated;
 
   // Check if domain exists
   const host = await prisma.host.findUnique({
     where: { host: domain },
     select: { id: true },
-  })
+  });
 
   if (!host) {
-    return notFoundResponse('Domain')
+    return notFoundResponse('Domain');
   }
 
-  const startDate = days ? subDays(new Date(), days) : undefined
+  const startDate = days ? subDays(new Date(), days) : undefined;
 
   // Build where clause
   const whereClause: any = {
@@ -48,12 +45,12 @@ export async function GET(
         id: host.id,
       },
     },
-  }
+  };
 
   if (startDate) {
     whereClause.createdAt = {
       gte: startDate,
-    }
+    };
   }
 
   // Get URL statistics for this domain
@@ -86,7 +83,7 @@ export async function GET(
     },
     skip: (page - 1) * pageSize,
     take: pageSize,
-  })
+  });
 
   // Calculate statistics for each URL
   const urlStats = urls.map((url) => ({
@@ -96,23 +93,23 @@ export async function GET(
     totalPageviews: url.pageViews.length,
     uniqueVisitors: new Set(url.pageViews.map((pv) => pv.ip)).size,
     lastPageview: url.pageViews[0]?.createdAt.toISOString(),
-  }))
+  }));
 
   // Sort by pageviews
-  urlStats.sort((a, b) => b.totalPageviews - a.totalPageviews)
+  urlStats.sort((a, b) => b.totalPageviews - a.totalPageviews);
 
   // Get domain totals
   const [totalPageviews, totalUrls] = await Promise.all([
     prisma.pageView.count({ where: whereClause }),
     prisma.url.count({ where: { hostId: host.id } }),
-  ])
+  ]);
 
   const uniqueVisitors = await prisma.pageView
     .groupBy({
       by: ['ip'],
       where: whereClause,
     })
-    .then((result) => result.length)
+    .then((result) => result.length);
 
   return successResponse(
     {
@@ -133,6 +130,6 @@ export async function GET(
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
-    }
-  )
+    },
+  );
 }

@@ -1,14 +1,14 @@
-import { PrismaClient } from '@prisma/client'
-import dotenv from 'dotenv'
-import path from 'path'
+import path from 'node:path';
+import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
 
 // Load env variables
-dotenv.config({ path: path.join(__dirname, '../.env.local') })
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function run() {
-  console.log('Querying Postgres for pageviews to https://duni.vn...')
+  console.log('Querying Postgres for pageviews to https://duni.vn...');
   try {
     const pvs = await prisma.pageView.findMany({
       where: {
@@ -27,19 +27,19 @@ async function run() {
       orderBy: {
         createdAt: 'desc',
       },
-    })
+    });
 
-    console.log(`Found ${pvs.length} records.`)
+    console.log(`Found ${pvs.length} records.`);
     for (const pv of pvs) {
       console.log(
-        `id: ${pv.id}, url: ${pv.url.url}, createdAt: ${pv.createdAt.toISOString()}, country: ${pv.country?.country}, city: ${pv.city?.city}, ua: ${pv.ua?.ua}`
-      )
+        `id: ${pv.id}, url: ${pv.url.url}, createdAt: ${pv.createdAt.toISOString()}, country: ${pv.country?.country}, city: ${pv.city?.city}, ua: ${pv.ua?.ua}`,
+      );
     }
   } catch (err: any) {
-    console.error('Error querying Postgres:', err.message)
+    console.error('Error querying Postgres:', err.message);
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }
 
-run()
+run();

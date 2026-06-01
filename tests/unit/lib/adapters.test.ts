@@ -1,13 +1,11 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import fs from 'fs'
-import path from 'path'
-import crypto from 'crypto'
-
-import { ClickHouseAdapter } from '@/lib/adapters/clickhouse'
-import { WebhookAdapter } from '@/lib/adapters/webhook'
-import { MotherDuckAdapter } from '@/lib/adapters/motherduck'
-import { broadcastPageView, registeredAdapters } from '@/lib/adapters'
-import { PageViewEvent } from '@/lib/adapters/types'
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { broadcastPageView, registeredAdapters } from '@/lib/adapters';
+import { ClickHouseAdapter } from '@/lib/adapters/clickhouse';
+import { MotherDuckAdapter } from '@/lib/adapters/motherduck';
+import type { PageViewEvent } from '@/lib/adapters/types';
+import { WebhookAdapter } from '@/lib/adapters/webhook';
 
 // Mock PageView Event
 const mockEvent: PageViewEvent = {
@@ -33,123 +31,123 @@ const mockEvent: PageViewEvent = {
   screenHeight: 1080,
   language: 'en-US',
   utmSource: 'news',
-}
+};
 
 describe('PageView Multi-Adapter Broadcast System', () => {
-  const originalFetch = global.fetch
+  const originalFetch = global.fetch;
 
   beforeEach(() => {
     // Clear out env variables before each run
-    delete process.env.CLICKHOUSE_URL
-    delete process.env.WEBHOOK_URL
-    delete process.env.WEBHOOK_SECRET
-    delete process.env.MOTHERDUCK_TOKEN
-    delete process.env.ENABLE_DUCKDB
-    delete process.env.ENABLE_POSTGRES
-  })
+    delete process.env.CLICKHOUSE_URL;
+    delete process.env.WEBHOOK_URL;
+    delete process.env.WEBHOOK_SECRET;
+    delete process.env.MOTHERDUCK_TOKEN;
+    delete process.env.ENABLE_DUCKDB;
+    delete process.env.ENABLE_POSTGRES;
+  });
 
   afterEach(() => {
-    global.fetch = originalFetch
-    vi.restoreAllMocks()
-  })
+    global.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
 
   describe('ClickHouse Adapter', () => {
     it('should parse CLICKHOUSE_URL correctly and register endpoint', () => {
       process.env.CLICKHOUSE_URL =
-        'http://admin:secret@clickhouse.host:8123/analytics?table=custom_pageviews'
+        'http://admin:secret@clickhouse.host:8123/analytics?table=custom_pageviews';
 
-      const adapter = new ClickHouseAdapter()
-      expect(adapter.enabled).toBe(true)
+      const adapter = new ClickHouseAdapter();
+      expect(adapter.enabled).toBe(true);
 
       // Accessing internal private properties via cast
-      const privateAdapter = adapter as any
-      expect(privateAdapter.database).toBe('analytics')
-      expect(privateAdapter.table).toBe('custom_pageviews')
-      expect(privateAdapter.authHeader).toBe('Basic YWRtaW46c2VjcmV0') // base64 admin:secret
+      const privateAdapter = adapter as any;
+      expect(privateAdapter.database).toBe('analytics');
+      expect(privateAdapter.table).toBe('custom_pageviews');
+      expect(privateAdapter.authHeader).toBe('Basic YWRtaW46c2VjcmV0'); // base64 admin:secret
       expect(privateAdapter.endpoint).toContain(
-        'INSERT+INTO+analytics.custom_pageviews+FORMAT+JSONEachRow'
-      )
-    })
+        'INSERT+INTO+analytics.custom_pageviews+FORMAT+JSONEachRow',
+      );
+    });
 
     it('should perform POST fetch request on broadcast', async () => {
-      process.env.CLICKHOUSE_URL = 'http://localhost:8123/'
+      process.env.CLICKHOUSE_URL = 'http://localhost:8123/';
       const mockFetch = vi.fn().mockImplementation(() =>
         Promise.resolve({
           ok: true,
           text: () => Promise.resolve('ok'),
-        } as Response)
-      )
-      global.fetch = mockFetch
+        } as Response),
+      );
+      global.fetch = mockFetch;
 
-      const adapter = new ClickHouseAdapter()
-      await adapter.broadcast(mockEvent)
+      const adapter = new ClickHouseAdapter();
+      await adapter.broadcast(mockEvent);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-      const callArgs = mockFetch.mock.calls[0]
-      expect(callArgs[1].method).toBe('POST')
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const callArgs = mockFetch.mock.calls[0];
+      expect(callArgs[1].method).toBe('POST');
 
-      const parsedBody = JSON.parse(callArgs[1].body.trim())
-      expect(parsedBody.id).toBe(mockEvent.id)
-      expect(parsedBody.host).toBe(mockEvent.host)
-      expect(parsedBody.title).toBe(mockEvent.title)
-    })
-  })
+      const parsedBody = JSON.parse(callArgs[1].body.trim());
+      expect(parsedBody.id).toBe(mockEvent.id);
+      expect(parsedBody.host).toBe(mockEvent.host);
+      expect(parsedBody.title).toBe(mockEvent.title);
+    });
+  });
 
   describe('Webhook Adapter', () => {
     it('should POST JSON body to target URL and sign with HMAC SHA256 signature when secret is set', async () => {
-      process.env.WEBHOOK_URL = 'https://mywebhook.receiver/events'
-      process.env.WEBHOOK_SECRET = 'super-secret-key'
+      process.env.WEBHOOK_URL = 'https://mywebhook.receiver/events';
+      process.env.WEBHOOK_SECRET = 'super-secret-key';
 
       const mockFetch = vi.fn().mockImplementation(() =>
         Promise.resolve({
           ok: true,
           text: () => Promise.resolve('success'),
-        } as Response)
-      )
-      global.fetch = mockFetch
+        } as Response),
+      );
+      global.fetch = mockFetch;
 
-      const adapter = new WebhookAdapter()
-      await adapter.broadcast(mockEvent)
+      const adapter = new WebhookAdapter();
+      await adapter.broadcast(mockEvent);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-      const [targetUrl, reqConfig] = mockFetch.mock.calls[0]
-      expect(targetUrl).toBe('https://mywebhook.receiver/events')
-      expect(reqConfig.method).toBe('POST')
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const [targetUrl, reqConfig] = mockFetch.mock.calls[0];
+      expect(targetUrl).toBe('https://mywebhook.receiver/events');
+      expect(reqConfig.method).toBe('POST');
 
       // Verify HMAC signature
       const expectedSignature = crypto
         .createHmac('sha256', 'super-secret-key')
         .update(JSON.stringify(mockEvent))
-        .digest('hex')
+        .digest('hex');
 
-      expect(reqConfig.headers['X-Webhook-Signature']).toBe(expectedSignature)
-    })
-  })
+      expect(reqConfig.headers['X-Webhook-Signature']).toBe(expectedSignature);
+    });
+  });
 
   describe('MotherDuck/DuckDB Adapter', () => {
     it('should fallback to local JSONL buffer mode when native duckdb package is absent', async () => {
-      process.env.ENABLE_DUCKDB = 'true'
+      process.env.ENABLE_DUCKDB = 'true';
 
       // Mock write files
       const appendSpy = vi
         .spyOn(fs.promises, 'appendFile')
-        .mockImplementation(() => Promise.resolve())
+        .mockImplementation(() => Promise.resolve());
 
-      const adapter = new MotherDuckAdapter()
-      await adapter.initialize() // Triggers initialization check
+      const adapter = new MotherDuckAdapter();
+      await adapter.initialize(); // Triggers initialization check
 
-      await adapter.broadcast(mockEvent)
-      expect(appendSpy).toHaveBeenCalledTimes(1)
+      await adapter.broadcast(mockEvent);
+      expect(appendSpy).toHaveBeenCalledTimes(1);
 
-      const [filePath, fileContent] = appendSpy.mock.calls[0]
-      expect(filePath as string).toContain('duckdb_buffer.jsonl')
+      const [filePath, fileContent] = appendSpy.mock.calls[0];
+      expect(filePath as string).toContain('duckdb_buffer.jsonl');
 
-      const parsedRecord = JSON.parse((fileContent as string).trim())
-      expect(parsedRecord.id).toBe(mockEvent.id)
-      expect(parsedRecord.browser).toBe(mockEvent.browser)
-      expect(parsedRecord.utmSource).toBe(mockEvent.utmSource)
-    })
-  })
+      const parsedRecord = JSON.parse((fileContent as string).trim());
+      expect(parsedRecord.id).toBe(mockEvent.id);
+      expect(parsedRecord.browser).toBe(mockEvent.browser);
+      expect(parsedRecord.utmSource).toBe(mockEvent.utmSource);
+    });
+  });
 
   describe('Adapter Hub Orchestrator', () => {
     it('should aggregate enabled adapters and broadcast in parallel', async () => {
@@ -159,32 +157,32 @@ describe('PageView Multi-Adapter Broadcast System', () => {
         enabled: true,
         initialize: vi.fn().mockResolvedValue(undefined),
         broadcast: vi.fn().mockResolvedValue(undefined),
-      }
+      };
       const dummyAdapter2 = {
         name: 'Mock2',
         enabled: true,
         initialize: vi.fn().mockResolvedValue(undefined),
         broadcast: vi.fn().mockRejectedValue(new Error('Broadcast failed')),
-      }
+      };
 
       // Temporarily overwrite registeredAdapters
-      const originalAdapters = [...registeredAdapters]
-      registeredAdapters.length = 0
-      registeredAdapters.push(dummyAdapter1 as any, dummyAdapter2 as any)
+      const originalAdapters = [...registeredAdapters];
+      registeredAdapters.length = 0;
+      registeredAdapters.push(dummyAdapter1 as any, dummyAdapter2 as any);
 
       // Run broadcast
       const errorLogSpy = vi
         .spyOn(console, 'error')
-        .mockImplementation(() => {})
-      await broadcastPageView(mockEvent)
+        .mockImplementation(() => {});
+      await broadcastPageView(mockEvent);
 
-      expect(dummyAdapter1.broadcast).toHaveBeenCalledWith(mockEvent)
-      expect(dummyAdapter2.broadcast).toHaveBeenCalledWith(mockEvent)
-      expect(errorLogSpy).toHaveBeenCalled() // verifies the failure from dummyAdapter2 is caught and logged but does not disrupt dummyAdapter1
+      expect(dummyAdapter1.broadcast).toHaveBeenCalledWith(mockEvent);
+      expect(dummyAdapter2.broadcast).toHaveBeenCalledWith(mockEvent);
+      expect(errorLogSpy).toHaveBeenCalled(); // verifies the failure from dummyAdapter2 is caught and logged but does not disrupt dummyAdapter1
 
       // Restore registeredAdapters
-      registeredAdapters.length = 0
-      registeredAdapters.push(...originalAdapters)
-    })
-  })
-})
+      registeredAdapters.length = 0;
+      registeredAdapters.push(...originalAdapters);
+    });
+  });
+});

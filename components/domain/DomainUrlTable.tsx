@@ -1,6 +1,7 @@
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -8,20 +9,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+} from '@/components/ui/table';
 
 type UrlStat = {
-  id: number
-  url: string
+  id: number;
+  url: string;
   _count: {
-    pageViews: number
-  }
-}
+    pageViews: number;
+  };
+};
 
 interface DomainUrlTableProps {
-  urlStats: UrlStat[]
-  totalPageviews: number
+  urlStats: UrlStat[];
+  totalPageviews: number;
 }
 
 export function DomainUrlTable({
@@ -43,7 +43,7 @@ export function DomainUrlTable({
           <p>No URLs tracked yet</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -70,7 +70,7 @@ export function DomainUrlTable({
             const percentage =
               totalPageviews > 0
                 ? ((urlStat._count.pageViews / totalPageviews) * 100).toFixed(1)
-                : 0
+                : 0;
 
             return (
               <TableRow key={urlStat.id} className="group">
@@ -105,10 +105,10 @@ export function DomainUrlTable({
                   </Link>
                 </TableCell>
               </TableRow>
-            )
+            );
           })}
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

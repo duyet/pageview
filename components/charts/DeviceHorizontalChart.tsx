@@ -1,9 +1,9 @@
-import { DeviceData } from '@/app/api/analytics/devices/route'
+import type { DeviceData } from '@/app/api/analytics/devices/route';
 
 interface DeviceHorizontalChartProps {
-  data: DeviceData[]
-  title: string
-  loading?: boolean
+  data: DeviceData[];
+  title: string;
+  loading?: boolean;
 }
 
 const COLORS = [
@@ -17,7 +17,7 @@ const COLORS = [
   '#f97316', // orange
   '#ec4899', // pink
   '#14b8a6', // teal
-]
+];
 
 export function DeviceHorizontalChart({
   data,
@@ -31,7 +31,7 @@ export function DeviceHorizontalChart({
           Loading {title.toLowerCase()}...
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -41,31 +41,31 @@ export function DeviceHorizontalChart({
           No {title.toLowerCase()} data
         </div>
       </div>
-    )
+    );
   }
 
   // Take top 8 items
-  const topItems = data.slice(0, 8)
-  const maxValue = Math.max(...topItems.map((item) => item.value))
+  const topItems = data.slice(0, 8);
+  const maxValue = Math.max(...topItems.map((item) => item.value));
 
   return (
     <div className="space-y-3">
       {topItems.map((item, index) => {
-        const percentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0
-        const color = COLORS[index % COLORS.length]
+        const percentage = maxValue > 0 ? (item.value / maxValue) * 100 : 0;
+        const color = COLORS[index % COLORS.length];
 
         // Determine text colors based on bar width
         // If bar is too short, label will be on neutral background
-        const labelOnBar = percentage > 35
+        const labelOnBar = percentage > 35;
         // If bar is wide enough, value might be on colored background
-        const valueOnBar = percentage > 75
+        const valueOnBar = percentage > 75;
 
         const labelColor = labelOnBar
           ? 'text-white'
-          : 'text-neutral-900 dark:text-neutral-100'
+          : 'text-neutral-900 dark:text-neutral-100';
         const valueColor = valueOnBar
           ? 'text-white'
-          : 'text-neutral-900 dark:text-neutral-100'
+          : 'text-neutral-900 dark:text-neutral-100';
 
         return (
           <div key={index} className="group">
@@ -89,8 +89,8 @@ export function DeviceHorizontalChart({
               </div>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

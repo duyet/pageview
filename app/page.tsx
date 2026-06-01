@@ -1,19 +1,18 @@
-import { headers } from 'next/headers'
-import type { Metadata } from 'next'
-
-import prisma from '@/lib/prisma'
-import { groupDomains, isPreviewDomain } from '@/lib/domainGrouping'
-import { HomepageClient } from './homepage-client'
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { groupDomains, isPreviewDomain } from '@/lib/domainGrouping';
+import prisma from '@/lib/prisma';
+import { HomepageClient } from './homepage-client';
 
 export const metadata: Metadata = {
   title: 'PageView Analytics - Website Traffic Tracker',
   description:
     'Modern analytics without the tracking baggage. Privacy-first pageview tracking via script, REST API, or backend. Minimal cookies, no user profiling. Open source and transparent.',
-}
+};
 
 export default async function Page() {
-  const headersList = await headers()
-  const currentHost = headersList.get('host') || ''
+  const headersList = await headers();
+  const currentHost = headersList.get('host') || '';
 
   // OPTIMIZED: Get domains with stats using joins (NO N+1)
   const hosts = await prisma.host.findMany({
@@ -31,7 +30,7 @@ export default async function Page() {
         },
       },
     },
-  })
+  });
 
   // Build host data with stats
   const hostData = hosts.map((host: any) => ({
@@ -40,56 +39,56 @@ export default async function Page() {
     urlCount: host.urls.length,
     pageViews: host.urls.reduce(
       (sum: number, url: any) => sum + url._count.pageViews,
-      0
+      0,
     ),
-  }))
+  }));
 
   // Use intelligent grouping algorithm
   const allHosts = hostData.map(
     (h: {
-      hostId: number
-      host: string
-      urlCount: number
-      pageViews: number
-    }) => h.host
-  )
-  const domainGroups = groupDomains(allHosts)
+      hostId: number;
+      host: string;
+      urlCount: number;
+      pageViews: number;
+    }) => h.host,
+  );
+  const domainGroups = groupDomains(allHosts);
 
   // Build domain stats with grouping
-  const groupedDomains = new Map<string, any>()
+  const groupedDomains = new Map<string, any>();
 
   domainGroups.forEach((groupMembers, canonical) => {
     // Find all hosts in this group
     const groupHosts = hostData.filter(
       (h: {
-        hostId: number
-        host: string
-        urlCount: number
-        pageViews: number
-      }) => groupMembers.includes(h.host)
-    )
+        hostId: number;
+        host: string;
+        urlCount: number;
+        pageViews: number;
+      }) => groupMembers.includes(h.host),
+    );
 
-    if (groupHosts.length === 0) return
+    if (groupHosts.length === 0) return;
 
     // Calculate totals for the group
     const totalUrls = groupHosts.reduce(
       (sum: number, h: { urlCount: number }) => sum + h.urlCount,
-      0
-    )
+      0,
+    );
     const totalPageViews = groupHosts.reduce(
       (sum: number, h: { pageViews: number }) => sum + h.pageViews,
-      0
-    )
+      0,
+    );
 
     // Count preview deployments (exclude canonical)
     const previewCount = groupHosts.filter(
-      (h: { host: string }) => h.host !== canonical && isPreviewDomain(h.host)
-    ).length
+      (h: { host: string }) => h.host !== canonical && isPreviewDomain(h.host),
+    ).length;
 
     // Find the main host (prefer canonical, or first one)
     const mainHost =
       groupHosts.find((h: { host: string }) => h.host === canonical) ||
-      groupHosts[0]
+      groupHosts[0];
 
     groupedDomains.set(canonical, {
       hostId: mainHost.hostId,
@@ -98,13 +97,13 @@ export default async function Page() {
       pageViews: totalPageViews,
       previewCount: previewCount > 0 ? previewCount : undefined,
       isGroup: groupMembers.length > 1,
-    })
-  })
+    });
+  });
 
-  const domainStats = Array.from(groupedDomains.values())
+  const domainStats = Array.from(groupedDomains.values());
 
-  const totalPageViews = await prisma.pageView.count()
-  const totalUrls = await prisma.url.count()
+  const totalPageViews = await prisma.pageView.count();
+  const totalUrls = await prisma.url.count();
 
   return (
     <HomepageClient
@@ -113,5 +112,5 @@ export default async function Page() {
       totalPageViews={totalPageViews}
       totalUrls={totalUrls}
     />
-  )
+  );
 }

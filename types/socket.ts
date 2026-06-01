@@ -1,28 +1,28 @@
-import { NextApiResponse } from 'next'
-import { Server as SocketIOServer } from 'socket.io'
-import { Server as NetServer, Socket } from 'net'
+import type { Server as NetServer, Socket } from 'node:net';
+import type { NextApiResponse } from 'next';
+import type { Server as SocketIOServer } from 'socket.io';
 
 export type NextApiResponseServerIO = NextApiResponse & {
   socket: Socket & {
     server: NetServer & {
-      io: SocketIOServer
-    }
-  }
-}
+      io: SocketIOServer;
+    };
+  };
+};
 
 export interface RealtimeMetrics {
-  totalViews: number
-  uniqueVisitors: number
+  totalViews: number;
+  uniqueVisitors: number;
   activePages: Array<{
-    path: string
-    views: number
-  }>
+    path: string;
+    views: number;
+  }>;
   recentCountries: Array<{
-    country: string
-    count: number
-  }>
+    country: string;
+    count: number;
+  }>;
   hourlyViews: Array<{
-    hour: string
-    views: number
-  }>
+    hour: string;
+    views: number;
+  }>;
 }

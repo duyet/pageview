@@ -1,27 +1,27 @@
-import { useState } from 'react'
+import { format, parseISO } from 'date-fns';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { format, parseISO } from 'date-fns'
-import { Loader2 } from 'lucide-react'
-import { TrendData } from '@/app/api/analytics/trends/route'
+} from 'recharts';
+import type { TrendData } from '@/app/api/analytics/trends/route';
 
 interface TrendsChartProps {
-  data: TrendData[]
-  loading?: boolean
-  totalPageviews?: number
-  totalUniqueVisitors?: number
-  activeMetric?: 'pageviews' | 'uniqueVisitors'
-  onMetricChange?: (metric: 'pageviews' | 'uniqueVisitors') => void
+  data: TrendData[];
+  loading?: boolean;
+  totalPageviews?: number;
+  totalUniqueVisitors?: number;
+  activeMetric?: 'pageviews' | 'uniqueVisitors';
+  onMetricChange?: (metric: 'pageviews' | 'uniqueVisitors') => void;
 }
 
-type MetricType = 'pageviews' | 'uniqueVisitors'
+type MetricType = 'pageviews' | 'uniqueVisitors';
 
 export function TrendsChart({
   data,
@@ -32,15 +32,15 @@ export function TrendsChart({
   onMetricChange,
 }: TrendsChartProps) {
   const [internalActiveMetric, setInternalActiveMetric] =
-    useState<MetricType>('pageviews')
+    useState<MetricType>('pageviews');
 
   // Use external metric if provided, otherwise use internal state
-  const activeMetric = externalActiveMetric || internalActiveMetric
+  const activeMetric = externalActiveMetric || internalActiveMetric;
 
-  const handleMetricChange = (metric: MetricType) => {
-    setInternalActiveMetric(metric)
-    onMetricChange?.(metric)
-  }
+  const _handleMetricChange = (metric: MetricType) => {
+    setInternalActiveMetric(metric);
+    onMetricChange?.(metric);
+  };
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
@@ -49,7 +49,7 @@ export function TrendsChart({
           <span>Loading trends...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -59,13 +59,13 @@ export function TrendsChart({
           No data available
         </div>
       </div>
-    )
+    );
   }
 
   const chartData = data.map((item) => ({
     ...item,
     formattedDate: format(parseISO(item.date), 'MMM dd'),
-  }))
+  }));
 
   const metricConfig = {
     pageviews: {
@@ -78,9 +78,9 @@ export function TrendsChart({
       color: '#10b981',
       dataKey: 'uniqueVisitors',
     },
-  }
+  };
 
-  const currentConfig = metricConfig[activeMetric]
+  const currentConfig = metricConfig[activeMetric];
 
   return (
     <div className="h-80">
@@ -106,7 +106,7 @@ export function TrendsChart({
           />
           <Tooltip
             content={({ active, payload, label }) => {
-              if (active && payload && payload.length) {
+              if (active && payload?.length) {
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -123,9 +123,9 @@ export function TrendsChart({
                       </span>
                     </p>
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
           />
           <Bar
@@ -137,15 +137,15 @@ export function TrendsChart({
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
 
 // Compact metric toggle for use in card headers
 interface MetricToggleProps {
-  activeMetric: 'pageviews' | 'uniqueVisitors'
-  onMetricChange: (metric: 'pageviews' | 'uniqueVisitors') => void
-  totalPageviews?: number
-  totalUniqueVisitors?: number
+  activeMetric: 'pageviews' | 'uniqueVisitors';
+  onMetricChange: (metric: 'pageviews' | 'uniqueVisitors') => void;
+  totalPageviews?: number;
+  totalUniqueVisitors?: number;
 }
 
 export function MetricToggle({
@@ -187,5 +187,5 @@ export function MetricToggle({
         )}
       </button>
     </div>
-  )
+  );
 }

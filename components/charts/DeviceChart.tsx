@@ -1,18 +1,11 @@
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from 'recharts'
-import { Loader2 } from 'lucide-react'
-import { DeviceData } from '@/app/api/analytics/devices/route'
+import { Loader2 } from 'lucide-react';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import type { DeviceData } from '@/app/api/analytics/devices/route';
 
 interface DeviceChartProps {
-  data: DeviceData[]
-  title: string
-  loading?: boolean
+  data: DeviceData[];
+  title: string;
+  loading?: boolean;
 }
 
 const COLORS = [
@@ -26,7 +19,7 @@ const COLORS = [
   '#f97316', // orange
   '#ec4899', // pink
   '#14b8a6', // teal
-]
+];
 
 export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (loading) {
@@ -37,7 +30,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
           <span>Loading {title.toLowerCase()}...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -47,27 +40,27 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
           No {title.toLowerCase()} data
         </div>
       </div>
-    )
+    );
   }
 
   // Take top 8 items and group the rest as "Others"
-  const topItems = data.slice(0, 8)
-  const otherItems = data.slice(8)
+  const topItems = data.slice(0, 8);
+  const otherItems = data.slice(8);
 
-  let chartData = [...topItems]
+  const chartData = [...topItems];
 
   if (otherItems.length > 0) {
-    const othersValue = otherItems.reduce((sum, item) => sum + item.value, 0)
+    const othersValue = otherItems.reduce((sum, item) => sum + item.value, 0);
     const othersPercentage = otherItems.reduce(
       (sum, item) => sum + item.percentage,
-      0
-    )
+      0,
+    );
 
     chartData.push({
       name: 'Others',
       value: othersValue,
       percentage: othersPercentage,
-    })
+    });
   }
 
   return (
@@ -84,7 +77,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
             fill="#8884d8"
             dataKey="value"
           >
-            {chartData.map((entry, index) => (
+            {chartData.map((_entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
@@ -93,8 +86,8 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
           </Pie>
           <Tooltip
             content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const data = payload[0].payload
+              if (active && payload?.length) {
+                const data = payload[0].payload;
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -104,13 +97,13 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
           />
         </PieChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

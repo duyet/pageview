@@ -11,6 +11,6 @@ const nextConfig = {
   },
   serverExternalPackages: ['duckdb'],
   turbopack: {},
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

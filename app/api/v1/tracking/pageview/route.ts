@@ -3,13 +3,10 @@
  * Track a pageview with privacy-compliant IP hashing
  */
 
-import normalizeUrl from 'normalize-url'
-import {
-  successResponse,
-  badRequestResponse,
-} from '@/lib/api/app-response'
-import { hashIp, isBotUserAgent } from '@/lib/privacy/hash'
-import prisma from '@/lib/prisma'
+import normalizeUrl from 'normalize-url';
+import { badRequestResponse, successResponse } from '@/lib/api/app-response';
+import prisma from '@/lib/prisma';
+import { hashIp, isBotUserAgent } from '@/lib/privacy/hash';
 
 /**
  * Extract URL from request (body, query, or referer header)
@@ -17,29 +14,29 @@ import prisma from '@/lib/prisma'
 function extractUrl(
   body: Record<string, unknown> | null,
   searchParams: URLSearchParams,
-  headers: Headers
+  headers: Headers,
 ): string | null {
   // Priority 1: Request body
   if (body?.url) {
-    console.log('[Tracking] URL from body:', body.url)
-    return body.url as string
+    console.log('[Tracking] URL from body:', body.url);
+    return body.url as string;
   }
 
   // Priority 2: Query parameter
-  const queryUrl = searchParams.get('url')
+  const queryUrl = searchParams.get('url');
   if (queryUrl) {
-    console.log('[Tracking] URL from query:', queryUrl)
-    return queryUrl
+    console.log('[Tracking] URL from query:', queryUrl);
+    return queryUrl;
   }
 
   // Priority 3: Referer header
-  const referer = headers.get('referer')
+  const referer = headers.get('referer');
   if (referer) {
-    console.log('[Tracking] URL from referer:', referer)
-    return referer
+    console.log('[Tracking] URL from referer:', referer);
+    return referer;
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -58,49 +55,49 @@ function parseUserAgent(searchParams: URLSearchParams) {
     deviceModel: String(searchParams.get('deviceModel') || ''),
     deviceType: String(searchParams.get('deviceType') || ''),
     isBot: searchParams.get('isBot') === 'true',
-  }
+  };
 }
 
 export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const headers = request.headers
+  const { searchParams } = new URL(request.url);
+  const headers = request.headers;
 
   // Parse body (may be empty for beacon requests)
-  let body: Record<string, unknown> | null = null
+  let body: Record<string, unknown> | null = null;
   try {
-    body = await request.json()
+    body = await request.json();
   } catch {
     // Body may be empty
   }
 
   // Extract URL from request
-  const url = extractUrl(body, searchParams, headers)
+  const url = extractUrl(body, searchParams, headers);
 
   if (!url) {
     return badRequestResponse(
-      'URL is required (provide via body, query, or referer header)'
-    )
+      'URL is required (provide via body, query, or referer header)',
+    );
   }
 
   // Validate URL format
   try {
-    new URL(url)
+    new URL(url);
   } catch {
-    return badRequestResponse('Invalid URL format')
+    return badRequestResponse('Invalid URL format');
   }
 
   // Check if bot (optional filtering)
   const userAgentString = String(
-    searchParams.get('ua') || headers.get('user-agent') || ''
-  )
-  const isBot = isBotUserAgent(userAgentString)
+    searchParams.get('ua') || headers.get('user-agent') || '',
+  );
+  const isBot = isBotUserAgent(userAgentString);
 
   if (isBot) {
-    console.log('[Tracking] Bot detected, skipping:', userAgentString)
+    console.log('[Tracking] Bot detected, skipping:', userAgentString);
     return successResponse(
       { id: 'bot-filtered', timestamp: new Date().toISOString() },
-      201
-    )
+      201,
+    );
   }
 
   // Normalize URL (remove tracking parameters)
@@ -114,20 +111,20 @@ export async function POST(request: Request) {
       'mc_',
       'source',
     ],
-  })
+  });
 
-  console.log(`[Tracking] Normalized: ${url} -> ${normalizedUrl}`)
+  console.log(`[Tracking] Normalized: ${url} -> ${normalizedUrl}`);
 
-  const parsedUrl = new URL(normalizedUrl)
-  const userAgent = parseUserAgent(searchParams)
+  const parsedUrl = new URL(normalizedUrl);
+  const userAgent = parseUserAgent(searchParams);
 
   // Hash IP address for privacy compliance (GDPR)
-  const rawIp = searchParams.get('ip')
-  const ipHash = hashIp(rawIp)
+  const rawIp = searchParams.get('ip');
+  const ipHash = hashIp(rawIp);
 
   console.log(
-    `[Tracking] IP hashed: ${rawIp?.substring(0, 8)}... -> ${ipHash?.substring(0, 16)}...`
-  )
+    `[Tracking] IP hashed: ${rawIp?.substring(0, 8)}... -> ${ipHash?.substring(0, 16)}...`,
+  );
 
   // Create pageview record with normalized relationships
   try {
@@ -189,19 +186,19 @@ export async function POST(request: Request) {
         id: true,
         createdAt: true,
       },
-    })
+    });
 
-    console.log('[Tracking] Pageview recorded:', pageview.id)
+    console.log('[Tracking] Pageview recorded:', pageview.id);
 
     return successResponse(
       {
         id: pageview.id,
         timestamp: pageview.createdAt.toISOString(),
       },
-      201
-    )
+      201,
+    );
   } catch (error) {
-    console.error('[Tracking] Database error:', error)
-    throw error
+    console.error('[Tracking] Database error:', error);
+    throw error;
   }
 }

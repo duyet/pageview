@@ -1,17 +1,17 @@
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { BarChart3, Home, Activity } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { DataSourceSelector } from './DataSourceSelector'
+import { Activity, BarChart3, Home } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { DataSourceSelector } from './DataSourceSelector';
 
 export const Header = () => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const navItems = [
     { href: '/', icon: Home, label: 'Dashboard' },
     { href: '/analytics', icon: BarChart3, label: 'Analytics' },
     { href: '/realtime', icon: Activity, label: 'Real-time' },
-  ]
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-neutral-800 dark:bg-slate-900/95 dark:supports-[backdrop-filter]:bg-slate-900/80">
@@ -46,7 +46,7 @@ export const Header = () => {
           <div className="flex items-center gap-4">
             <nav className="flex items-center gap-1">
               {navItems.map(({ href, icon: Icon, label }) => {
-                const isActive = pathname === href
+                const isActive = pathname === href;
                 return (
                   <Link
                     key={href}
@@ -55,13 +55,13 @@ export const Header = () => {
                       'group relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all',
                       isActive
                         ? 'bg-neutral-100 text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-neutral-100'
-                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-100'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-100',
                     )}
                   >
                     <Icon
                       className={cn(
                         'size-4 transition-transform group-hover:scale-110',
-                        isActive && 'text-neutral-900 dark:text-neutral-100'
+                        isActive && 'text-neutral-900 dark:text-neutral-100',
                       )}
                     />
                     <span className="hidden sm:inline">{label}</span>
@@ -69,7 +69,7 @@ export const Header = () => {
                       <div className="absolute -bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-neutral-900 dark:bg-neutral-100" />
                     )}
                   </Link>
-                )
+                );
               })}
             </nav>
 
@@ -79,5 +79,5 @@ export const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};

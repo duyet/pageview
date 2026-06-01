@@ -1,19 +1,19 @@
+import { Loader2 } from 'lucide-react';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { Loader2 } from 'lucide-react'
-import { LocationData } from '@/app/api/analytics/locations/route'
+} from 'recharts';
+import type { LocationData } from '@/app/api/analytics/locations/route';
 
 interface LocationChartProps {
-  data: LocationData[]
-  title: string
-  loading?: boolean
+  data: LocationData[];
+  title: string;
+  loading?: boolean;
 }
 
 export function LocationChart({ data, title, loading }: LocationChartProps) {
@@ -25,7 +25,7 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
           <span>Loading {title.toLowerCase()}...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -35,11 +35,11 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
           No {title.toLowerCase()} data
         </div>
       </div>
-    )
+    );
   }
 
   // Take top 10 items for better readability
-  const chartData = data.slice(0, 10)
+  const chartData = data.slice(0, 10);
 
   return (
     <div className="h-80">
@@ -77,8 +77,8 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
           />
           <Tooltip
             content={({ active, payload, label }) => {
-              if (active && payload && payload.length) {
-                const data = payload[0].payload
+              if (active && payload?.length) {
+                const data = payload[0].payload;
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -88,14 +88,14 @@ export function LocationChart({ data, title, loading }: LocationChartProps) {
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
           />
           <Bar dataKey="value" fill="#6366f1" radius={[0, 6, 6, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

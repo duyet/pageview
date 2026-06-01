@@ -1,107 +1,100 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { format, subDays } from 'date-fns'
-import { DateRange } from 'react-day-picker'
-import { Bot } from 'lucide-react'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DateRangePicker } from '@/components/DateRangePicker'
-import { TrendsChart, MetricToggle } from '@/components/charts/TrendsChart'
-import { DeviceChart } from '@/components/charts/DeviceChart'
-import { LocationChart } from '@/components/charts/LocationChart'
-import { ChartTitle } from '@/components/charts/ChartTitle'
+import { format, subDays } from 'date-fns';
+import { Bot } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import { AudienceListChart } from '@/components/charts/AudienceChart';
 import {
   BotOverviewChart,
   BotTypeChart,
   TopBotsChart,
-} from '@/components/charts/BotChart'
+} from '@/components/charts/BotChart';
+import { ChartTitle } from '@/components/charts/ChartTitle';
+import { DeviceChart } from '@/components/charts/DeviceChart';
+import { LocationChart } from '@/components/charts/LocationChart';
+import { MetricToggle, TrendsChart } from '@/components/charts/TrendsChart';
+import { DateRangePicker } from '@/components/DateRangePicker';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  useTrendsData,
+  useAudienceData,
+  useBotsData,
   useDevicesData,
   useLocationsData,
-  useBotsData,
-  useAudienceData,
-} from '@/hooks/useAnalytics'
-import { AudienceListChart } from '@/components/charts/AudienceChart'
+  useTrendsData,
+} from '@/hooks/useAnalytics';
 
 export function AnalyticsClient() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
-  })
+  });
 
   const [activeMetric, setActiveMetric] = useState<
     'pageviews' | 'uniqueVisitors'
-  >('pageviews')
+  >('pageviews');
 
-  const [excludeBots, setExcludeBots] = useState(false)
+  const [excludeBots, setExcludeBots] = useState(false);
 
   // Calculate days from date range
   const days = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return 30
+    if (!dateRange?.from || !dateRange?.to) return 30;
     return Math.ceil(
       (dateRange.to.getTime() - dateRange.from.getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
-  }, [dateRange])
+        (1000 * 60 * 60 * 24),
+    );
+  }, [dateRange]);
 
   // Use React Query hooks for data fetching
   const {
     data: trendsResult,
     isLoading: loadingTrends,
     isFetching: fetchingTrends,
-  } = useTrendsData(days, { excludeBots })
+  } = useTrendsData(days, { excludeBots });
 
   const {
     data: devicesResult,
     isLoading: loadingDevices,
     isFetching: fetchingDevices,
-  } = useDevicesData(days, { excludeBots })
+  } = useDevicesData(days, { excludeBots });
 
   const {
     data: locationsResult,
     isLoading: loadingLocations,
     isFetching: fetchingLocations,
-  } = useLocationsData(days, { excludeBots })
+  } = useLocationsData(days, { excludeBots });
 
   const {
     data: botsResult,
     isLoading: loadingBots,
     isFetching: fetchingBots,
-  } = useBotsData(days)
+  } = useBotsData(days);
 
   const {
     data: audienceResult,
     isLoading: loadingAudience,
     isFetching: fetchingAudience,
-  } = useAudienceData(days, { excludeBots })
+  } = useAudienceData(days, { excludeBots });
 
-  const trendsData = trendsResult?.trends || []
+  const trendsData = trendsResult?.trends || [];
   const trendsTotals = {
     totalPageviews: trendsResult?.totalPageviews || 0,
     totalUniqueVisitors: trendsResult?.totalUniqueVisitors || 0,
-  }
+  };
   const devicesData = {
     browsers: devicesResult?.browsers || [],
     os: devicesResult?.os || [],
     devices: devicesResult?.devices || [],
-  }
+  };
   const locationsData = {
     countries: locationsResult?.countries || [],
     cities: locationsResult?.cities || [],
-  }
+  };
 
   const formatDateRange = () => {
-    if (!dateRange?.from || !dateRange?.to) return ''
-    return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd, yyyy')}`
-  }
+    if (!dateRange?.from || !dateRange?.to) return '';
+    return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd, yyyy')}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -323,5 +316,5 @@ export function AnalyticsClient() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,14 +1,13 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
+import { Toaster } from 'sonner';
+import { CommandPalette } from '@/components/CommandPalette';
+import { DataSourceProvider } from '@/components/DataSourceContext';
+import { Header } from '@/components/Header';
 
-import { Header } from '@/components/Header'
-import { CommandPalette } from '@/components/CommandPalette'
-import { DataSourceProvider } from '@/components/DataSourceContext'
-
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_MEASUREMENT_ID;
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -22,8 +21,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: 1,
           },
         },
-      })
-  )
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,5 +62,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
         />
       </DataSourceProvider>
     </QueryClientProvider>
-  )
+  );
 }

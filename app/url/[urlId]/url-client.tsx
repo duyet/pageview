@@ -1,47 +1,47 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
-import { subDays } from 'date-fns'
-import { DateRange } from 'react-day-picker'
-import { ArrowLeft, ExternalLink, Calendar, TrendingUp } from 'lucide-react'
-import type { Url, Host } from '@prisma/client'
-import dayjs from '@/lib/dayjs'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { UrlTrendsSection } from '@/components/url/UrlTrendsSection'
-import { UrlAnalyticsSection } from '@/components/url/UrlAnalyticsSection'
-import { useTrendsData } from '@/hooks/useAnalytics'
+import type { Host, Url } from '@prisma/client';
+import { subDays } from 'date-fns';
+import { ArrowLeft, Calendar, ExternalLink, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { UrlAnalyticsSection } from '@/components/url/UrlAnalyticsSection';
+import { UrlTrendsSection } from '@/components/url/UrlTrendsSection';
+import { useTrendsData } from '@/hooks/useAnalytics';
+import dayjs from '@/lib/dayjs';
 
 type UrlWithHost = Url & {
-  host: Host
-}
+  host: Host;
+};
 
 type PageViewStats = {
-  _count: number
+  _count: number;
   _min: {
-    createdAt: Date | null
-  }
+    createdAt: Date | null;
+  };
   _max: {
-    createdAt: Date | null
-  }
-}
+    createdAt: Date | null;
+  };
+};
 
 type StatItem = {
-  name: string
-  count: number
-  percentage: number
-}
+  name: string;
+  count: number;
+  percentage: number;
+};
 
 interface UrlClientProps {
-  url: UrlWithHost
-  pageviewStats: PageViewStats
-  topCountries: StatItem[]
-  topBrowsers: StatItem[]
-  topOS: StatItem[]
-  topDevices: StatItem[]
-  topEngines: StatItem[]
+  url: UrlWithHost;
+  pageviewStats: PageViewStats;
+  topCountries: StatItem[];
+  topBrowsers: StatItem[];
+  topOS: StatItem[];
+  topDevices: StatItem[];
+  topEngines: StatItem[];
 }
 
 function StatBar({ name, count, percentage }: StatItem) {
@@ -60,7 +60,7 @@ function StatBar({ name, count, percentage }: StatItem) {
       </div>
       <Progress value={percentage} className="h-2" />
     </div>
-  )
+  );
 }
 
 export function UrlClient({
@@ -75,25 +75,25 @@ export function UrlClient({
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
-  })
+  });
 
   // Calculate days from date range
   const days = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return 30
+    if (!dateRange?.from || !dateRange?.to) return 30;
     return Math.ceil(
       (dateRange.to.getTime() - dateRange.from.getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
-  }, [dateRange])
+        (1000 * 60 * 60 * 24),
+    );
+  }, [dateRange]);
 
   // Use React Query hook for trends data
   const {
     data: trendsResult,
     isLoading: loading,
     isFetching: fetching,
-  } = useTrendsData(days, { urlId: url.id })
+  } = useTrendsData(days, { urlId: url.id });
 
-  const trendsData = trendsResult?.trends || []
+  const trendsData = trendsResult?.trends || [];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -153,7 +153,7 @@ export function UrlClient({
               {pageviewStats._min.createdAt && (
                 <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
                   {dayjs(pageviewStats._min.createdAt).format(
-                    'MMM D, YYYY h:mm A'
+                    'MMM D, YYYY h:mm A',
                   )}
                 </p>
               )}
@@ -182,7 +182,7 @@ export function UrlClient({
               {pageviewStats._max.createdAt && (
                 <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
                   {dayjs(pageviewStats._max.createdAt).format(
-                    'MMM D, YYYY h:mm A'
+                    'MMM D, YYYY h:mm A',
                   )}
                 </p>
               )}
@@ -323,5 +323,5 @@ export function UrlClient({
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -10,29 +10,29 @@
  *   npx tsx scripts/init-motherduck.ts --sync --batch 1000
  */
 
-import { loadEnvConfig } from '@next/env'
-import prisma from '../lib/prisma'
+import { loadEnvConfig } from '@next/env';
+import prisma from '../lib/prisma';
 
-loadEnvConfig(process.cwd())
+loadEnvConfig(process.cwd());
 
-const args = process.argv.slice(2)
-const SYNC = args.includes('--sync')
+const args = process.argv.slice(2);
+const SYNC = args.includes('--sync');
 const BATCH_SIZE = (() => {
-  const idx = args.indexOf('--batch')
-  return idx !== -1 && args[idx + 1] ? parseInt(args[idx + 1], 10) : 500
-})()
+  const idx = args.indexOf('--batch');
+  return idx !== -1 && args[idx + 1] ? parseInt(args[idx + 1], 10) : 500;
+})();
 
-const MOTHERDUCK_TOKEN = process.env.MOTHERDUCK_TOKEN
-const DATABASE_NAME = process.env.MOTHERDUCK_DATABASE || 'my_db'
-const TABLE_NAME = process.env.MOTHERDUCK_TABLE || 'pageviews'
+const MOTHERDUCK_TOKEN = process.env.MOTHERDUCK_TOKEN;
+const DATABASE_NAME = process.env.MOTHERDUCK_DATABASE || 'my_db';
+const TABLE_NAME = process.env.MOTHERDUCK_TABLE || 'pageviews';
 
 if (!MOTHERDUCK_TOKEN) {
-  console.error('\n❌ ERROR: MOTHERDUCK_TOKEN is not set in .env.local\n')
-  process.exit(1)
+  console.error('\n❌ ERROR: MOTHERDUCK_TOKEN is not set in .env.local\n');
+  process.exit(1);
 }
 
 // MotherDuck HTTP API endpoint
-const MD_ENDPOINT = `https://app.motherduck.com/execute`
+const MD_ENDPOINT = `https://app.motherduck.com/execute`;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -46,14 +46,14 @@ async function mdQuery(sql: string): Promise<any> {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ query: sql }),
-  })
+  });
   if (!res.ok) {
-    const text = await res.text()
+    const text = await res.text();
     throw new Error(
-      `MotherDuck query failed (${res.status}): ${text.substring(0, 500)}`
-    )
+      `MotherDuck query failed (${res.status}): ${text.substring(0, 500)}`,
+    );
   }
-  return res.json()
+  return res.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS ${DATABASE_NAME}.${TABLE_NAME} (
     utmTerm VARCHAR,
     utmContent VARCHAR
 )
-`
+`;
 
 // ---------------------------------------------------------------------------
 // Main
@@ -106,14 +106,14 @@ CREATE TABLE IF NOT EXISTS ${DATABASE_NAME}.${TABLE_NAME} (
 
 async function initTable() {
   console.log(
-    `\n📦 Initializing MotherDuck table "${DATABASE_NAME}.${TABLE_NAME}"...`
-  )
-  await mdQuery(DDL)
-  console.log(`✅ Table "${DATABASE_NAME}.${TABLE_NAME}" is ready.`)
+    `\n📦 Initializing MotherDuck table "${DATABASE_NAME}.${TABLE_NAME}"...`,
+  );
+  await mdQuery(DDL);
+  console.log(`✅ Table "${DATABASE_NAME}.${TABLE_NAME}" is ready.`);
 }
 
 async function getTotalCount(): Promise<number> {
-  return prisma.pageView.count()
+  return prisma.pageView.count();
 }
 
 async function syncBatch(offset: number, limit: number): Promise<number> {
@@ -127,146 +127,146 @@ async function syncBatch(offset: number, limit: number): Promise<number> {
       country: true,
       city: true,
     },
-  })
+  });
 
-  if (rows.length === 0) return 0
+  if (rows.length === 0) return 0;
 
   // Build VALUES for a single INSERT statement (batch insert)
-  const escape = (v: any): string => {
-    if (v === null || v === undefined) return 'NULL'
-    if (typeof v === 'boolean') return v ? 'true' : 'false'
-    if (typeof v === 'number') return String(v)
+  const escapeValue = (v: any): string => {
+    if (v === null || v === undefined) return 'NULL';
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    if (typeof v === 'number') return String(v);
     if (v instanceof Date)
-      return `'${v.toISOString().replace('T', ' ').replace('Z', '')}'`
+      return `'${v.toISOString().replace('T', ' ').replace('Z', '')}'`;
     // Escape single quotes in strings
-    return `'${String(v).replace(/'/g, "''")}'`
-  }
+    return `'${String(v).replace(/'/g, "''")}'`;
+  };
 
   const valueRows = rows.map((pv) => {
-    const ua = pv.ua
-    const host = pv.url?.host?.host ?? ''
-    const path = pv.url?.slug?.slug ?? ''
-    const url = pv.url?.url ?? ''
-    const country = pv.country?.country ?? null
-    const city = pv.city?.city ?? null
+    const ua = pv.ua;
+    const host = pv.url?.host?.host ?? '';
+    const path = pv.url?.slug?.slug ?? '';
+    const url = pv.url?.url ?? '';
+    const country = pv.country?.country ?? null;
+    const city = pv.city?.city ?? null;
 
     return `(${[
-      escape('mig-' + pv.id), // id
-      escape(pv.sessionId), // sessionId
-      escape(url), // url
-      escape(host), // host
-      escape(path), // path
-      escape(pv.title), // title
-      escape(pv.referrer), // referrer
-      escape(pv.createdAt), // timestamp
-      escape(ua?.ua ?? null), // ua
-      escape(ua?.browser ?? null), // browser
-      escape(ua?.browserVersion ?? null), // browserVersion
-      escape(ua?.os ?? null), // os
-      escape(ua?.osVersion ?? null), // osVersion
-      escape(ua?.engine ?? null), // engine
-      escape(ua?.engineVersion ?? null), // engineVersion
-      escape(ua?.device ?? null), // device
-      escape(ua?.deviceModel ?? null), // deviceModel
-      escape(ua?.deviceType ?? null), // deviceType
-      escape(ua?.isBot ?? false), // isBot
-      escape(ua?.botType ?? null), // botType
-      escape(ua?.botName ?? null), // botName
-      escape(pv.ip), // ip
-      escape(country), // country
-      escape(city), // city
-      escape(pv.region), // region
-      escape(pv.latitude), // latitude
-      escape(pv.longitude), // longitude
-      escape(pv.screenWidth), // screenWidth
-      escape(pv.screenHeight), // screenHeight
-      escape(pv.language), // language
-      escape(pv.utmSource), // utmSource
-      escape(pv.utmMedium), // utmMedium
-      escape(pv.utmCampaign), // utmCampaign
-      escape(pv.utmTerm), // utmTerm
-      escape(pv.utmContent), // utmContent
-    ].join(', ')})`
-  })
+      escapeValue(`mig-${pv.id}`), // id
+      escapeValue(pv.sessionId), // sessionId
+      escapeValue(url), // url
+      escapeValue(host), // host
+      escapeValue(path), // path
+      escapeValue(pv.title), // title
+      escapeValue(pv.referrer), // referrer
+      escapeValue(pv.createdAt), // timestamp
+      escapeValue(ua?.ua ?? null), // ua
+      escapeValue(ua?.browser ?? null), // browser
+      escapeValue(ua?.browserVersion ?? null), // browserVersion
+      escapeValue(ua?.os ?? null), // os
+      escapeValue(ua?.osVersion ?? null), // osVersion
+      escapeValue(ua?.engine ?? null), // engine
+      escapeValue(ua?.engineVersion ?? null), // engineVersion
+      escapeValue(ua?.device ?? null), // device
+      escapeValue(ua?.deviceModel ?? null), // deviceModel
+      escapeValue(ua?.deviceType ?? null), // deviceType
+      escapeValue(ua?.isBot ?? false), // isBot
+      escapeValue(ua?.botType ?? null), // botType
+      escapeValue(ua?.botName ?? null), // botName
+      escapeValue(pv.ip), // ip
+      escapeValue(country), // country
+      escapeValue(city), // city
+      escapeValue(pv.region), // region
+      escapeValue(pv.latitude), // latitude
+      escapeValue(pv.longitude), // longitude
+      escapeValue(pv.screenWidth), // screenWidth
+      escapeValue(pv.screenHeight), // screenHeight
+      escapeValue(pv.language), // language
+      escapeValue(pv.utmSource), // utmSource
+      escapeValue(pv.utmMedium), // utmMedium
+      escapeValue(pv.utmCampaign), // utmCampaign
+      escapeValue(pv.utmTerm), // utmTerm
+      escapeValue(pv.utmContent), // utmContent
+    ].join(', ')})`;
+  });
 
   const insertSql = `
     INSERT INTO ${DATABASE_NAME}.${TABLE_NAME} VALUES
     ${valueRows.join(',\n')}
-  `
+  `;
 
-  await mdQuery(insertSql)
-  return rows.length
+  await mdQuery(insertSql);
+  return rows.length;
 }
 
 async function run() {
-  console.log('\n🦆 MotherDuck Init & Sync Script')
-  console.log(`   Database : ${DATABASE_NAME}`)
-  console.log(`   Table    : ${TABLE_NAME}`)
+  console.log('\n🦆 MotherDuck Init & Sync Script');
+  console.log(`   Database : ${DATABASE_NAME}`);
+  console.log(`   Table    : ${TABLE_NAME}`);
   console.log(
-    `   Sync     : ${SYNC ? `yes (batch=${BATCH_SIZE})` : 'no (init only)'}`
-  )
+    `   Sync     : ${SYNC ? `yes (batch=${BATCH_SIZE})` : 'no (init only)'}`,
+  );
 
   try {
-    await initTable()
+    await initTable();
 
     if (!SYNC) {
       console.log(
-        '\n✅ Done. Run with --sync to also migrate data from Postgres.\n'
-      )
-      return
+        '\n✅ Done. Run with --sync to also migrate data from Postgres.\n',
+      );
+      return;
     }
 
-    console.log('\n📡 Connecting to Postgres to count records...')
-    const total = await getTotalCount()
-    console.log(`   Total Postgres records: ${total.toLocaleString()}`)
+    console.log('\n📡 Connecting to Postgres to count records...');
+    const total = await getTotalCount();
+    console.log(`   Total Postgres records: ${total.toLocaleString()}`);
 
     if (total === 0) {
-      console.log('   Nothing to migrate.\n')
-      return
+      console.log('   Nothing to migrate.\n');
+      return;
     }
 
-    let offset = 0
-    let migrated = 0
-    let errors = 0
-    const startTime = Date.now()
+    let offset = 0;
+    let migrated = 0;
+    let errors = 0;
+    const startTime = Date.now();
 
-    console.log(`\n🚀 Starting migration in batches of ${BATCH_SIZE}...\n`)
+    console.log(`\n🚀 Starting migration in batches of ${BATCH_SIZE}...\n`);
 
     while (offset < total) {
       try {
-        const count = await syncBatch(offset, BATCH_SIZE)
-        migrated += count
-        offset += BATCH_SIZE
+        const count = await syncBatch(offset, BATCH_SIZE);
+        migrated += count;
+        offset += BATCH_SIZE;
 
-        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
-        const pct = Math.min(100, Math.round((migrated / total) * 100))
-        const rate = Math.round(migrated / parseFloat(elapsed))
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        const pct = Math.min(100, Math.round((migrated / total) * 100));
+        const rate = Math.round(migrated / parseFloat(elapsed));
         process.stdout.write(
-          `\r   Progress: ${migrated.toLocaleString()}/${total.toLocaleString()} (${pct}%) — ${rate} rows/s — ${elapsed}s elapsed   `
-        )
+          `\r   Progress: ${migrated.toLocaleString()}/${total.toLocaleString()} (${pct}%) — ${rate} rows/s — ${elapsed}s elapsed   `,
+        );
 
-        if (count < BATCH_SIZE) break
+        if (count < BATCH_SIZE) break;
       } catch (err: any) {
-        errors++
+        errors++;
         console.error(
-          `\n   ⚠️  Batch at offset ${offset} failed: ${err.message}`
-        )
-        offset += BATCH_SIZE // Skip failed batch and continue
+          `\n   ⚠️  Batch at offset ${offset} failed: ${err.message}`,
+        );
+        offset += BATCH_SIZE; // Skip failed batch and continue
       }
     }
 
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
-    console.log(`\n\n🎉 Migration complete!`)
-    console.log(`   Migrated : ${migrated.toLocaleString()} rows`)
-    console.log(`   Errors   : ${errors} batches skipped`)
-    console.log(`   Time     : ${elapsed}s`)
-    console.log(`   Table    : ${DATABASE_NAME}.${TABLE_NAME}\n`)
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`\n\n🎉 Migration complete!`);
+    console.log(`   Migrated : ${migrated.toLocaleString()} rows`);
+    console.log(`   Errors   : ${errors} batches skipped`);
+    console.log(`   Time     : ${elapsed}s`);
+    console.log(`   Table    : ${DATABASE_NAME}.${TABLE_NAME}\n`);
   } catch (err: any) {
-    console.error('\n❌ FATAL ERROR:', err.message)
-    process.exit(1)
+    console.error('\n❌ FATAL ERROR:', err.message);
+    process.exit(1);
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }
 
-run()
+run();

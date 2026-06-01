@@ -1,14 +1,14 @@
-import { useMemo } from 'react'
-import { DateRange } from 'react-day-picker'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DeviceHorizontalChart } from '@/components/charts/DeviceHorizontalChart'
-import { LocationChart } from '@/components/charts/LocationChart'
-import { ChartTitle } from '@/components/charts/ChartTitle'
-import { useDevicesData, useLocationsData } from '@/hooks/useAnalytics'
+import { useMemo } from 'react';
+import type { DateRange } from 'react-day-picker';
+import { ChartTitle } from '@/components/charts/ChartTitle';
+import { DeviceHorizontalChart } from '@/components/charts/DeviceHorizontalChart';
+import { LocationChart } from '@/components/charts/LocationChart';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useDevicesData, useLocationsData } from '@/hooks/useAnalytics';
 
 interface DomainAnalyticsSectionProps {
-  domain: string
-  dateRange: DateRange | undefined
+  domain: string;
+  dateRange: DateRange | undefined;
 }
 
 export function DomainAnalyticsSection({
@@ -17,36 +17,36 @@ export function DomainAnalyticsSection({
 }: DomainAnalyticsSectionProps) {
   // Calculate days from date range
   const days = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return 30
+    if (!dateRange?.from || !dateRange?.to) return 30;
     return Math.ceil(
       (dateRange.to.getTime() - dateRange.from.getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
-  }, [dateRange])
+        (1000 * 60 * 60 * 24),
+    );
+  }, [dateRange]);
 
   // Use React Query hooks for data fetching
   const {
     data: devicesResult,
     isLoading: loadingDevices,
     isFetching: fetchingDevices,
-  } = useDevicesData(days, { host: domain })
+  } = useDevicesData(days, { host: domain });
 
   const {
     data: locationsResult,
     isLoading: loadingLocations,
     isFetching: fetchingLocations,
-  } = useLocationsData(days, { host: domain })
+  } = useLocationsData(days, { host: domain });
 
   const devicesData = {
     browsers: devicesResult?.browsers || [],
     os: devicesResult?.os || [],
     devices: devicesResult?.devices || [],
-  }
+  };
 
   const locationsData = {
     countries: locationsResult?.countries || [],
     cities: locationsResult?.cities || [],
-  }
+  };
 
   return (
     <Tabs defaultValue="devices" className="space-y-4">
@@ -132,5 +132,5 @@ export function DomainAnalyticsSection({
         </div>
       </TabsContent>
     </Tabs>
-  )
+  );
 }

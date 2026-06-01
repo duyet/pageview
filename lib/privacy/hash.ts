@@ -3,14 +3,14 @@
  * IP hashing and GDPR compliance
  */
 
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto';
 
 /**
  * Salt for IP hashing (should be in environment variable in production)
  * Generate with: openssl rand -hex 32
  */
 const IP_SALT =
-  process.env.IP_HASH_SALT || 'default-salt-please-change-in-production'
+  process.env.IP_HASH_SALT || 'default-salt-please-change-in-production';
 
 /**
  * Hash IP address for privacy compliance
@@ -21,13 +21,13 @@ const IP_SALT =
  */
 export function hashIp(ip: string | null | undefined): string | null {
   if (!ip || ip === 'unknown' || ip === '') {
-    return null
+    return null;
   }
 
   // Create SHA-256 hash with salt
-  const hash = createHash('sha256')
-  hash.update(ip + IP_SALT)
-  return hash.digest('hex')
+  const hash = createHash('sha256');
+  hash.update(ip + IP_SALT);
+  return hash.digest('hex');
 }
 
 /**
@@ -39,27 +39,27 @@ export function hashIp(ip: string | null | undefined): string | null {
  */
 export function anonymizeIp(ip: string | null | undefined): string | null {
   if (!ip || ip === 'unknown' || ip === '') {
-    return null
+    return null;
   }
 
   // IPv4: Remove last octet (e.g., 192.168.1.100 -> 192.168.1.0)
   if (ip.includes('.')) {
-    const parts = ip.split('.')
+    const parts = ip.split('.');
     if (parts.length === 4) {
-      parts[3] = '0'
-      return parts.join('.')
+      parts[3] = '0';
+      return parts.join('.');
     }
   }
 
   // IPv6: Remove last 80 bits (keep first 48 bits)
   if (ip.includes(':')) {
-    const parts = ip.split(':')
+    const parts = ip.split(':');
     if (parts.length >= 3) {
-      return parts.slice(0, 3).join(':') + '::0'
+      return `${parts.slice(0, 3).join(':')}::0`;
     }
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -70,8 +70,8 @@ export function anonymizeIp(ip: string | null | undefined): string | null {
  * @returns Session identifier (first 16 characters of hash)
  */
 export function getSessionId(ip: string | null | undefined): string | null {
-  const hashed = hashIp(ip)
-  return hashed ? hashed.substring(0, 16) : null
+  const hashed = hashIp(ip);
+  return hashed ? hashed.substring(0, 16) : null;
 }
 
 /**
@@ -81,16 +81,16 @@ export function getSessionId(ip: string | null | undefined): string | null {
  * @returns true if valid IP address
  */
 export function isValidIp(ip: string | null | undefined): boolean {
-  if (!ip) return false
+  if (!ip) return false;
 
   // IPv4 regex
   const ipv4Regex =
-    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
   // IPv6 regex (simplified)
-  const ipv6Regex = /^(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/
+  const ipv6Regex = /^(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/;
 
-  return ipv4Regex.test(ip) || ipv6Regex.test(ip)
+  return ipv4Regex.test(ip) || ipv6Regex.test(ip);
 }
 
 /**
@@ -101,7 +101,7 @@ export function isValidIp(ip: string | null | undefined): boolean {
  * @returns true if likely a bot
  */
 export function isBotUserAgent(userAgent: string | null | undefined): boolean {
-  if (!userAgent) return false
+  if (!userAgent) return false;
 
   const botPatterns = [
     /bot/i,
@@ -113,9 +113,9 @@ export function isBotUserAgent(userAgent: string | null | undefined): boolean {
     /python/i,
     /java/i,
     /http/i,
-  ]
+  ];
 
-  return botPatterns.some((pattern) => pattern.test(userAgent))
+  return botPatterns.some((pattern) => pattern.test(userAgent));
 }
 
 /**
@@ -129,7 +129,7 @@ export async function exportUserData(ipHash: string) {
     ipHash,
     note: 'User data export for GDPR compliance',
     // Add actual data here
-  }
+  };
 }
 
 /**
@@ -143,7 +143,7 @@ export async function deleteUserData(ipHash: string) {
     ipHash,
     deleted: true,
     note: 'User data deleted for GDPR compliance',
-  }
+  };
 }
 
 /**
@@ -151,11 +151,11 @@ export async function deleteUserData(ipHash: string) {
  * Validates that user has consented to tracking
  */
 export function hasTrackingConsent(cookies: string | undefined): boolean {
-  if (!cookies) return false
+  if (!cookies) return false;
 
   // Check for consent cookie
   // Format: pageview_consent=true
-  return cookies.includes('pageview_consent=true')
+  return cookies.includes('pageview_consent=true');
 }
 
 /**
@@ -181,5 +181,5 @@ export function getCookieConsentScript(): string {
         banner.remove();
       };
     })();
-  `
+  `;
 }

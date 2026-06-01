@@ -1,16 +1,16 @@
-import { ClickHouseAdapter } from '../lib/adapters/clickhouse'
-import { PageViewEvent } from '../lib/adapters/types'
-import dotenv from 'dotenv'
-import path from 'path'
+import path from 'node:path';
+import dotenv from 'dotenv';
+import { ClickHouseAdapter } from '../lib/adapters/clickhouse';
+import type { PageViewEvent } from '../lib/adapters/types';
 
 // Load env variables
-dotenv.config({ path: path.join(__dirname, '../.env.local') })
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 
-console.log('Testing ClickHouse Connection...')
-console.log('CLICKHOUSE_URL:', process.env.CLICKHOUSE_URL)
+console.log('Testing ClickHouse Connection...');
+console.log('CLICKHOUSE_URL:', process.env.CLICKHOUSE_URL);
 
 const testEvent: PageViewEvent = {
-  id: 'test-ch-' + Math.random().toString(36).substring(2, 9),
+  id: `test-ch-${Math.random().toString(36).substring(2, 9)}`,
   sessionId: 'sess-ch-test',
   url: 'https://mysite.com/test-clickhouse',
   host: 'mysite.com',
@@ -32,30 +32,30 @@ const testEvent: PageViewEvent = {
   screenHeight: 1080,
   language: 'en-US',
   utmSource: 'clickhouse-test',
-}
+};
 
 async function run() {
-  const adapter = new ClickHouseAdapter()
+  const adapter = new ClickHouseAdapter();
 
-  console.log('Adapter enabled:', adapter.enabled)
+  console.log('Adapter enabled:', adapter.enabled);
 
   // Cast to access internal properties
-  const priv = adapter as any
-  console.log('Parsed database:', priv.database)
-  console.log('Parsed table:', priv.table)
-  console.log('Target endpoint:', priv.endpoint)
+  const priv = adapter as any;
+  console.log('Parsed database:', priv.database);
+  console.log('Parsed table:', priv.table);
+  console.log('Target endpoint:', priv.endpoint);
 
   try {
-    console.log('Initializing ClickHouse adapter...')
-    await adapter.initialize()
+    console.log('Initializing ClickHouse adapter...');
+    await adapter.initialize();
 
-    console.log('Broadcasting test pageview...')
-    await adapter.broadcast(testEvent)
-    console.log('SUCCESS! Pageview broadcast completed.')
+    console.log('Broadcasting test pageview...');
+    await adapter.broadcast(testEvent);
+    console.log('SUCCESS! Pageview broadcast completed.');
   } catch (err: any) {
-    console.error('FAILED ClickHouse Broadcast:', err.message)
-    if (err.stack) console.error(err.stack)
+    console.error('FAILED ClickHouse Broadcast:', err.message);
+    if (err.stack) console.error(err.stack);
   }
 }
 
-run()
+run();

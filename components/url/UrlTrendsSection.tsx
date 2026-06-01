@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { format } from 'date-fns'
-import { DateRange } from 'react-day-picker'
-import { DateRangePicker } from '@/components/DateRangePicker'
-import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart'
-import { ChartTitle } from '@/components/charts/ChartTitle'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendData } from '@/app/api/analytics/trends/route'
+import { format } from 'date-fns';
+import { useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import type { TrendData } from '@/app/api/analytics/trends/route';
+import { ChartTitle } from '@/components/charts/ChartTitle';
+import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart';
+import { DateRangePicker } from '@/components/DateRangePicker';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export type MetricView = 'pageviews' | 'visitors'
+export type MetricView = 'pageviews' | 'visitors';
 
 interface UrlTrendsSectionProps {
-  urlId: number
-  urlString: string
-  dateRange: DateRange | undefined
-  onDateRangeChange: (range: DateRange | undefined) => void
-  trendsData: TrendData[]
-  loading: boolean
-  fetching?: boolean
+  urlId: number;
+  urlString: string;
+  dateRange: DateRange | undefined;
+  onDateRangeChange: (range: DateRange | undefined) => void;
+  trendsData: TrendData[];
+  loading: boolean;
+  fetching?: boolean;
 }
 
 export function UrlTrendsSection({
@@ -28,12 +28,12 @@ export function UrlTrendsSection({
   loading,
   fetching = false,
 }: UrlTrendsSectionProps) {
-  const [metricView, setMetricView] = useState<MetricView>('pageviews')
+  const [metricView, setMetricView] = useState<MetricView>('pageviews');
 
   const formatDateRange = () => {
-    if (!dateRange?.from || !dateRange?.to) return ''
-    return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd, yyyy')}`
-  }
+    if (!dateRange?.from || !dateRange?.to) return '';
+    return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd, yyyy')}`;
+  };
 
   return (
     <>
@@ -73,5 +73,5 @@ export function UrlTrendsSection({
         />
       </div>
     </>
-  )
+  );
 }

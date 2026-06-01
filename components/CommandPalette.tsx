@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Activity, BarChart3, Home } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -7,29 +8,28 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from './ui/command'
-import { Home, BarChart3, Activity, Globe } from 'lucide-react'
+} from './ui/command';
 
 export function CommandPalette() {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
+        e.preventDefault();
+        setOpen((open) => !open);
       }
-    }
+    };
 
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
 
   const navigate = (path: string) => {
-    router.push(path)
-    setOpen(false)
-  }
+    router.push(path);
+    setOpen(false);
+  };
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
@@ -52,5 +52,5 @@ export function CommandPalette() {
         </CommandGroup>
       </CommandList>
     </CommandDialog>
-  )
+  );
 }

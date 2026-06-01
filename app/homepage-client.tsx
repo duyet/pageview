@@ -1,39 +1,30 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 import {
-  ArrowRight,
-  ArrowUpDown,
-  ArrowUp,
   ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpDown,
   BarChart3,
+  ChevronDown,
+  ChevronUp,
+  Clock,
   Globe,
   Link as LinkIcon,
   Search,
+  Shield,
   TrendingUp,
   Zap,
-  Shield,
-  Clock,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react'
-
-import { Usage } from '@/components/Usage'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { AnimatedNumber } from '@/components/AnimatedNumber'
-import { TrendBadge } from '@/components/TrendBadge'
-import { Sparkline } from '@/components/Sparkline'
-import { EmptyState } from '@/components/EmptyState'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
+import { ChartTitle } from '@/components/charts/ChartTitle';
+import { MetricToggle, TrendsChart } from '@/components/charts/TrendsChart';
+import { EmptyState } from '@/components/EmptyState';
+import { Usage } from '@/components/Usage';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -41,25 +32,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { TrendsChart, MetricToggle } from '@/components/charts/TrendsChart'
-import { ChartTitle } from '@/components/charts/ChartTitle'
-import { useTrendsData } from '@/hooks/useAnalytics'
+} from '@/components/ui/table';
+import { useTrendsData } from '@/hooks/useAnalytics';
 
 type DomainStat = {
-  hostId: number
-  host: string
-  _count: number
-  pageViews: number
-  previewCount?: number
-  isGroup?: boolean
-}
+  hostId: number;
+  host: string;
+  _count: number;
+  pageViews: number;
+  previewCount?: number;
+  isGroup?: boolean;
+};
 
 export interface HomepageProps {
-  domainStats: DomainStat[]
-  currentHost: string
-  totalPageViews: number
-  totalUrls: number
+  domainStats: DomainStat[];
+  currentHost: string;
+  totalPageViews: number;
+  totalUrls: number;
 }
 
 const container = {
@@ -70,15 +59,15 @@ const container = {
       staggerChildren: 0.05,
     },
   },
-}
+};
 
 const item = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0 },
-}
+};
 
-type SortColumn = 'domain' | 'urls' | 'pageviews'
-type SortDirection = 'asc' | 'desc'
+type SortColumn = 'domain' | 'urls' | 'pageviews';
+type SortDirection = 'asc' | 'desc';
 
 export function HomepageClient({
   domainStats,
@@ -86,79 +75,79 @@ export function HomepageClient({
   totalPageViews,
   totalUrls,
 }: HomepageProps) {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('');
   const [activeMetric, setActiveMetric] = useState<
     'pageviews' | 'uniqueVisitors'
-  >('pageviews')
-  const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
-  const [isIntegrationOpen, setIsIntegrationOpen] = useState(true)
+  >('pageviews');
+  const [sortColumn, setSortColumn] = useState<SortColumn>('pageviews');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [isIntegrationOpen, setIsIntegrationOpen] = useState(true);
 
   // Fetch trends data for last 30 days using React Query
   const {
     data: trendsResult,
     isLoading: loadingTrends,
     isFetching: fetchingTrends,
-  } = useTrendsData(30)
+  } = useTrendsData(30);
 
-  const trendsData = trendsResult?.trends || []
+  const trendsData = trendsResult?.trends || [];
   const trendsTotals = {
     totalPageviews: trendsResult?.totalPageviews || 0,
     totalUniqueVisitors: trendsResult?.totalUniqueVisitors || 0,
-  }
+  };
 
   // Handle sort toggle
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortColumn(column)
-      setSortDirection('desc')
+      setSortColumn(column);
+      setSortDirection('desc');
     }
-  }
+  };
 
   // Filter and sort domains
   const filteredDomains = domainStats
     .filter((domain) =>
-      domain.host.toLowerCase().includes(searchQuery.toLowerCase())
+      domain.host.toLowerCase().includes(searchQuery.toLowerCase()),
     )
     .sort((a, b) => {
-      let compareA: string | number
-      let compareB: string | number
+      let compareA: string | number;
+      let compareB: string | number;
 
       switch (sortColumn) {
         case 'domain':
-          compareA = a.host.toLowerCase()
-          compareB = b.host.toLowerCase()
-          break
+          compareA = a.host.toLowerCase();
+          compareB = b.host.toLowerCase();
+          break;
         case 'urls':
-          compareA = typeof a._count === 'number' ? a._count : 0
-          compareB = typeof b._count === 'number' ? b._count : 0
-          break
+          compareA = typeof a._count === 'number' ? a._count : 0;
+          compareB = typeof b._count === 'number' ? b._count : 0;
+          break;
         case 'pageviews':
-          compareA = a.pageViews || 0
-          compareB = b.pageViews || 0
-          break
+          compareA = a.pageViews || 0;
+          compareB = b.pageViews || 0;
+          break;
         default:
-          return 0
+          return 0;
       }
 
-      if (compareA < compareB) return sortDirection === 'asc' ? -1 : 1
-      if (compareA > compareB) return sortDirection === 'asc' ? 1 : -1
-      return 0
-    })
+      if (compareA < compareB) return sortDirection === 'asc' ? -1 : 1;
+      if (compareA > compareB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   // Render sort icon
   const SortIcon = ({ column }: { column: SortColumn }) => {
     if (sortColumn !== column) {
-      return <ArrowUpDown className="ml-1 size-3.5 opacity-40" />
+      return <ArrowUpDown className="ml-1 size-3.5 opacity-40" />;
     }
     return sortDirection === 'asc' ? (
       <ArrowUp className="ml-1 size-3.5" />
     ) : (
       <ArrowDown className="ml-1 size-3.5" />
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -400,8 +389,8 @@ export function HomepageClient({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredDomains.map((row, index) => {
-                    const hostName = row.host
+                  {filteredDomains.map((row, _index) => {
+                    const hostName = row.host;
 
                     return (
                       <TableRow key={row.hostId} className="group">
@@ -441,7 +430,7 @@ export function HomepageClient({
                           </Link>
                         </TableCell>
                       </TableRow>
-                    )
+                    );
                   })}
                 </TableBody>
               </Table>
@@ -450,5 +439,5 @@ export function HomepageClient({
         </div>
       </section>
     </div>
-  )
+  );
 }

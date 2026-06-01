@@ -1,26 +1,26 @@
-import { loadEnvConfig } from '@next/env'
-import prisma from '../lib/prisma'
-import { ClickHouseAdapter } from '../lib/adapters/clickhouse'
-import { MotherDuckAdapter } from '../lib/adapters/motherduck'
-import { PageViewEvent } from '../lib/adapters/types'
-import fs from 'fs'
+import fs from 'node:fs';
+import { loadEnvConfig } from '@next/env';
+import { ClickHouseAdapter } from '../lib/adapters/clickhouse';
+import { MotherDuckAdapter } from '../lib/adapters/motherduck';
+import type { PageViewEvent } from '../lib/adapters/types';
+import prisma from '../lib/prisma';
 
 // Load environment variables automatically using Next.js native loader
-loadEnvConfig(process.cwd())
+loadEnvConfig(process.cwd());
 
-const target = (process.argv[2] || '').trim().toLowerCase()
+const target = (process.argv[2] || '').trim().toLowerCase();
 
 if (target !== 'clickhouse' && target !== 'duckdb') {
-  console.error('\n❌ ERROR: Please specify a valid target storage.')
-  console.error('Usage:')
-  console.error('  npx tsx scripts/migrate-data.ts clickhouse')
-  console.error('  npx tsx scripts/migrate-data.ts duckdb\n')
-  process.exit(1)
+  console.error('\n❌ ERROR: Please specify a valid target storage.');
+  console.error('Usage:');
+  console.error('  npx tsx scripts/migrate-data.ts clickhouse');
+  console.error('  npx tsx scripts/migrate-data.ts duckdb\n');
+  process.exit(1);
 }
 
 function mapToEvent(pv: any): PageViewEvent {
   return {
-    id: 'mig-' + pv.id,
+    id: `mig-${pv.id}`,
     sessionId: pv.sessionId,
     url: pv.url.url,
     host: pv.url.host.host,
@@ -59,37 +59,37 @@ function mapToEvent(pv: any): PageViewEvent {
     utmCampaign: pv.utmCampaign,
     utmTerm: pv.utmTerm,
     utmContent: pv.utmContent,
-  }
+  };
 }
 
 async function run() {
   console.log(
-    `\n🚀 Starting OPTIMIZED batch data migration from PostgreSQL ➡️  ${target === 'clickhouse' ? 'ClickHouse' : 'MotherDuck/DuckDB'}...`
-  )
+    `\n🚀 Starting OPTIMIZED batch data migration from PostgreSQL ➡️  ${target === 'clickhouse' ? 'ClickHouse' : 'MotherDuck/DuckDB'}...`,
+  );
 
   // 1. Instantiate the target adapter
   const adapter =
-    target === 'clickhouse' ? new ClickHouseAdapter() : new MotherDuckAdapter()
+    target === 'clickhouse' ? new ClickHouseAdapter() : new MotherDuckAdapter();
 
   if (!adapter.enabled) {
-    console.error(`❌ ERROR: Target adapter "${adapter.name}" is not enabled.`)
+    console.error(`❌ ERROR: Target adapter "${adapter.name}" is not enabled.`);
     console.error(
-      `Please configure the required environment variables in .env.local first.`
-    )
-    process.exit(1)
+      `Please configure the required environment variables in .env.local first.`,
+    );
+    process.exit(1);
   }
 
   // 2. Initialize the adapter (auto-provisions tables/databases)
-  console.log(`⚙️  Initializing ${adapter.name} schema...`)
-  await adapter.initialize()
+  console.log(`⚙️  Initializing ${adapter.name} schema...`);
+  await adapter.initialize();
 
   // 3. Migrate historical pageview records in large optimized batches
-  const batchSize = 500
-  let skip = 0
-  let migratedCount = 0
-  let failedCount = 0
+  const batchSize = 500;
+  let skip = 0;
+  let migratedCount = 0;
+  let failedCount = 0;
 
-  console.log('\n📥 Querying historical records from PostgreSQL...')
+  console.log('\n📥 Querying historical records from PostgreSQL...');
 
   while (true) {
     try {
@@ -108,20 +108,20 @@ async function run() {
           country: true,
           city: true,
         },
-      })
+      });
 
       if (pageviews.length === 0) {
-        break
+        break;
       }
 
       console.log(
-        `📦 Fetched batch of ${pageviews.length} records (skip: ${skip}). Bulk inserting...`
-      )
+        `📦 Fetched batch of ${pageviews.length} records (skip: ${skip}). Bulk inserting...`,
+      );
 
       // --- ClickHouse Bulk Insert ---
       if (target === 'clickhouse') {
         const records = pageviews.map((pv) => {
-          const event = mapToEvent(pv)
+          const event = mapToEvent(pv);
           return {
             id: event.id,
             sessionId: event.sessionId || null,
@@ -161,47 +161,46 @@ async function run() {
             utmCampaign: event.utmCampaign || null,
             utmTerm: event.utmTerm || null,
             utmContent: event.utmContent || null,
-          }
-        })
+          };
+        });
 
         // ClickHouse HTTP API parses newline-delimited JSON objects via FORMAT JSONEachRow
-        const bodyContent =
-          records.map((r) => JSON.stringify(r)).join('\n') + '\n'
+        const bodyContent = `${records.map((r) => JSON.stringify(r)).join('\n')}\n`;
 
         try {
           const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-          }
-          const authHeader = (adapter as any).authHeader
+          };
+          const authHeader = (adapter as any).authHeader;
           if (authHeader) {
-            headers['Authorization'] = authHeader
+            headers.Authorization = authHeader;
           }
 
           const response = await fetch((adapter as any).endpoint, {
             method: 'POST',
             headers,
             body: bodyContent,
-          })
+          });
 
           if (!response.ok) {
-            const text = await response.text()
-            throw new Error(`HTTP status ${response.status}: ${text}`)
+            const text = await response.text();
+            throw new Error(`HTTP status ${response.status}: ${text}`);
           }
 
-          migratedCount += records.length
+          migratedCount += records.length;
         } catch (err: any) {
-          console.error(`   ❌ Failed to migrate batch:`, err.message)
-          failedCount += records.length
+          console.error(`   ❌ Failed to migrate batch:`, err.message);
+          failedCount += records.length;
         }
       }
 
       // --- MotherDuck/DuckDB Bulk Insert ---
       else if (target === 'duckdb') {
-        const isNative = (adapter as any).isNativeAvailable
+        const isNative = (adapter as any).isNativeAvailable;
         if (!isNative) {
           // Optimized JSONL bulk file append (Fallback Mode)
           const records = pageviews.map((pv) => {
-            const event = mapToEvent(pv)
+            const event = mapToEvent(pv);
             return {
               id: event.id,
               sessionId: event.sessionId || null,
@@ -238,51 +237,50 @@ async function run() {
               utmCampaign: event.utmCampaign || null,
               utmTerm: event.utmTerm || null,
               utmContent: event.utmContent || null,
-            }
-          })
+            };
+          });
 
-          const bodyContent =
-            records.map((r) => JSON.stringify(r)).join('\n') + '\n'
-          const localBufferPath = (adapter as any).localBufferPath
+          const bodyContent = `${records.map((r) => JSON.stringify(r)).join('\n')}\n`;
+          const localBufferPath = (adapter as any).localBufferPath;
 
           try {
-            await fs.promises.appendFile(localBufferPath, bodyContent, 'utf-8')
-            migratedCount += records.length
+            await fs.promises.appendFile(localBufferPath, bodyContent, 'utf-8');
+            migratedCount += records.length;
           } catch (err: any) {
-            console.error(`   ❌ Failed to append batch:`, err.message)
-            failedCount += records.length
+            console.error(`   ❌ Failed to append batch:`, err.message);
+            failedCount += records.length;
           }
         } else {
           // If native driver is present, broadcast individually
           const broadcastPromises = pageviews.map(async (pv) => {
-            const event = mapToEvent(pv)
+            const event = mapToEvent(pv);
             try {
-              await adapter.broadcast(event)
-              migratedCount++
+              await adapter.broadcast(event);
+              migratedCount++;
             } catch (err: any) {
               console.error(
                 `   ❌ Failed to migrate record ID ${pv.id}:`,
-                err.message
-              )
-              failedCount++
+                err.message,
+              );
+              failedCount++;
             }
-          })
-          await Promise.all(broadcastPromises)
+          });
+          await Promise.all(broadcastPromises);
         }
       }
 
-      skip += batchSize
+      skip += batchSize;
     } catch (err: any) {
-      console.error('❌ Batch query or migration fatal error:', err.message)
-      process.exit(1)
+      console.error('❌ Batch query or migration fatal error:', err.message);
+      process.exit(1);
     }
   }
 
-  console.log('\n🏁 MIGRATION COMPLETED!')
-  console.log(`----------------------`)
-  console.log(`✅ Successfully Migrated : ${migratedCount} records`)
-  console.log(`❌ Failed Broadcasts    : ${failedCount} records`)
-  console.log(`➡️  Target Storage      : ${adapter.name}\n`)
+  console.log('\n🏁 MIGRATION COMPLETED!');
+  console.log(`----------------------`);
+  console.log(`✅ Successfully Migrated : ${migratedCount} records`);
+  console.log(`❌ Failed Broadcasts    : ${failedCount} records`);
+  console.log(`➡️  Target Storage      : ${adapter.name}\n`);
 }
 
-run()
+run();

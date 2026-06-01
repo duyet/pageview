@@ -1,12 +1,12 @@
-import { ArrowUp, ArrowDown, Minus } from 'lucide-react'
-import { Badge } from './ui/badge'
-import { cn } from '../lib/utils'
+import { ArrowDown, ArrowUp, Minus } from 'lucide-react';
+import { cn } from '../lib/utils';
+import { Badge } from './ui/badge';
 
 interface TrendBadgeProps {
-  value: number
-  suffix?: string
-  className?: string
-  showZero?: boolean
+  value: number;
+  suffix?: string;
+  className?: string;
+  showZero?: boolean;
 }
 
 export function TrendBadge({
@@ -15,13 +15,13 @@ export function TrendBadge({
   className,
   showZero = true,
 }: TrendBadgeProps) {
-  if (value === 0 && !showZero) return null
+  if (value === 0 && !showZero) return null;
 
-  const isPositive = value > 0
-  const isNegative = value < 0
-  const isNeutral = value === 0
+  const isPositive = value > 0;
+  const isNegative = value < 0;
+  const isNeutral = value === 0;
 
-  const Icon = isPositive ? ArrowUp : isNegative ? ArrowDown : Minus
+  const Icon = isPositive ? ArrowUp : isNegative ? ArrowDown : Minus;
 
   return (
     <Badge
@@ -31,7 +31,7 @@ export function TrendBadge({
       className={cn(
         'gap-1 font-medium',
         isNeutral && 'bg-muted text-muted-foreground',
-        className
+        className,
       )}
     >
       <Icon className="size-3" />
@@ -40,5 +40,5 @@ export function TrendBadge({
         {suffix}
       </span>
     </Badge>
-  )
+  );
 }

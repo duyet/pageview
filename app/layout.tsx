@@ -1,7 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { Providers } from './providers'
-import './globals.css'
+import { Providers } from './providers';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'PageView Analytics',
@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -25,5 +25,5 @@ export default function RootLayout({
         </main>
       </body>
     </html>
-  )
+  );
 }

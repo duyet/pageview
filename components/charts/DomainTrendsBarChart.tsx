@@ -1,19 +1,19 @@
+import { format, parseISO } from 'date-fns';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { format, parseISO } from 'date-fns'
-import { TrendData } from '@/app/api/analytics/trends/route'
-import { MetricView } from '../domain/DomainTrendsSection'
+} from 'recharts';
+import type { TrendData } from '@/app/api/analytics/trends/route';
+import type { MetricView } from '../domain/DomainTrendsSection';
 
 interface DomainTrendsBarChartProps {
-  data: TrendData[]
-  loading?: boolean
-  metricView?: MetricView
+  data: TrendData[];
+  loading?: boolean;
+  metricView?: MetricView;
 }
 
 export function DomainTrendsBarChart({
@@ -28,7 +28,7 @@ export function DomainTrendsBarChart({
           Loading trends...
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -38,15 +38,15 @@ export function DomainTrendsBarChart({
           No data available
         </div>
       </div>
-    )
+    );
   }
 
   const chartData = data.map((item) => ({
     ...item,
     formattedDate: format(parseISO(item.date), 'MMM dd'),
-  }))
+  }));
 
-  const isPageViewsMode = metricView === 'pageviews'
+  const isPageViewsMode = metricView === 'pageviews';
 
   return (
     <div className="h-80">
@@ -67,7 +67,7 @@ export function DomainTrendsBarChart({
           />
           <Tooltip
             content={({ active, payload, label }) => {
-              if (active && payload && payload.length) {
+              if (active && payload?.length) {
                 return (
                   <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
                     <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
@@ -89,9 +89,9 @@ export function DomainTrendsBarChart({
                       </p>
                     ))}
                   </div>
-                )
+                );
               }
-              return null
+              return null;
             }}
             animationDuration={0}
           />
@@ -105,5 +105,5 @@ export function DomainTrendsBarChart({
         </BarChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Database, Zap, Bird, ChevronDown } from 'lucide-react'
-import { useDataSource, DataSource } from './DataSourceContext'
-import { cn } from '@/lib/utils'
+import { Bird, ChevronDown, Database, Zap } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { type DataSource, useDataSource } from './DataSourceContext';
 
 const SOURCES = [
   {
@@ -28,14 +28,14 @@ const SOURCES = [
     hoverColor: 'hover:bg-yellow-50/50 dark:hover:bg-yellow-950/20',
     description: 'Embedded DuckDB / MotherDuck',
   },
-]
+];
 
 export const DataSourceSelector = () => {
-  const { dataSource, setDataSource } = useDataSource()
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const { dataSource, setDataSource } = useDataSource();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const activeSource = SOURCES.find((s) => s.id === dataSource) || SOURCES[0]
+  const activeSource = SOURCES.find((s) => s.id === dataSource) || SOURCES[0];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,17 +43,17 @@ export const DataSourceSelector = () => {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <div className="relative z-[60]" ref={dropdownRef}>
@@ -64,7 +64,7 @@ export const DataSourceSelector = () => {
           'flex items-center gap-2.5 rounded-xl border px-3 py-1.5 text-sm font-medium transition-all shadow-sm duration-200',
           isOpen
             ? 'border-neutral-300 bg-neutral-50 shadow-inner dark:border-neutral-700 dark:bg-neutral-800'
-            : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700 dark:hover:bg-neutral-800/80'
+            : 'border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-neutral-700 dark:hover:bg-neutral-800/80',
         )}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -72,7 +72,7 @@ export const DataSourceSelector = () => {
         <span
           className={cn(
             'flex size-5.5 items-center justify-center rounded-lg p-0.5 shadow-sm transition-transform duration-300 group-hover:scale-105',
-            activeSource.color
+            activeSource.color,
           )}
         >
           <activeSource.icon className="size-4" />
@@ -83,7 +83,7 @@ export const DataSourceSelector = () => {
         <ChevronDown
           className={cn(
             'size-4 text-neutral-400 transition-transform duration-200',
-            isOpen && 'rotate-180'
+            isOpen && 'rotate-180',
           )}
         />
       </button>
@@ -99,13 +99,13 @@ export const DataSourceSelector = () => {
 
           <div className="space-y-1" role="listbox">
             {SOURCES.map((source) => {
-              const isSelected = source.id === dataSource
+              const isSelected = source.id === dataSource;
               return (
                 <button
                   key={source.id}
                   onClick={() => {
-                    setDataSource(source.id)
-                    setIsOpen(false)
+                    setDataSource(source.id);
+                    setIsOpen(false);
                   }}
                   role="option"
                   aria-selected={isSelected}
@@ -114,13 +114,13 @@ export const DataSourceSelector = () => {
                     isSelected
                       ? 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-white'
                       : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200',
-                    source.hoverColor
+                    source.hoverColor,
                   )}
                 >
                   <span
                     className={cn(
                       'flex size-8 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-300 group-hover:scale-105',
-                      source.color
+                      source.color,
                     )}
                   >
                     <source.icon className="size-[18px]" />
@@ -140,11 +140,11 @@ export const DataSourceSelector = () => {
                     </span>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};

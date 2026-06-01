@@ -3,32 +3,29 @@
  * Get detailed analytics for a specific URL
  */
 
-import { subDays, format } from 'date-fns'
-import {
-  successResponse,
-  notFoundResponse,
-} from '@/lib/api/app-response'
+import { format, subDays } from 'date-fns';
+import { notFoundResponse, successResponse } from '@/lib/api/app-response';
+import prisma from '@/lib/prisma';
 import {
   analyticsUrlParamsSchema,
   analyticsUrlQuerySchema,
-} from '@/lib/validation/schemas'
-import prisma from '@/lib/prisma'
+} from '@/lib/validation/schemas';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ urlId: string }> }
+  { params }: { params: Promise<{ urlId: string }> },
 ) {
-  const { urlId: urlIdParam } = await params
-  const urlId = Number(urlIdParam)
+  const { urlId: urlIdParam } = await params;
+  const urlId = Number(urlIdParam);
 
   // Validate parameters
-  analyticsUrlParamsSchema.parse({ urlId: urlIdParam })
+  analyticsUrlParamsSchema.parse({ urlId: urlIdParam });
 
-  const { searchParams } = new URL(request.url)
-  const query = Object.fromEntries(searchParams.entries())
+  const { searchParams } = new URL(request.url);
+  const query = Object.fromEntries(searchParams.entries());
 
-  const validated = analyticsUrlQuerySchema.parse(query)
-  const { days = 30 } = validated
+  const validated = analyticsUrlQuerySchema.parse(query);
+  const { days = 30 } = validated;
 
   // Get URL details
   const url = await prisma.url.findUnique({
@@ -47,23 +44,23 @@ export async function GET(
         },
       },
     },
-  })
+  });
 
   if (!url) {
-    return notFoundResponse('URL')
+    return notFoundResponse('URL');
   }
 
-  const startDate = days ? subDays(new Date(), days) : undefined
+  const startDate = days ? subDays(new Date(), days) : undefined;
 
   // Build where clause
   const whereClause: any = {
     urlId: url.id,
-  }
+  };
 
   if (startDate) {
     whereClause.createdAt = {
       gte: startDate,
-    }
+    };
   }
 
   // Parallel queries for analytics
@@ -97,25 +94,25 @@ export async function GET(
       orderBy: { _count: { id: 'desc' } },
       take: 10,
     }),
-  ])
+  ]);
 
   // Get browser details
-  const uaIds = browserStats.map((s) => s.uAId).filter(Boolean) as number[]
+  const uaIds = browserStats.map((s) => s.uAId).filter(Boolean) as number[];
   const browsers = await prisma.uA.findMany({
     where: { id: { in: uaIds } },
     select: { id: true, browser: true },
-  })
-  const browserMap = new Map(browsers.map((b) => [b.id, b.browser]))
+  });
+  const browserMap = new Map(browsers.map((b) => [b.id, b.browser]));
 
   // Get country details
   const countryIds = countryStats
     .map((s) => s.countryId)
-    .filter(Boolean) as number[]
+    .filter(Boolean) as number[];
   const countries = await prisma.country.findMany({
     where: { id: { in: countryIds } },
     select: { id: true, country: true },
-  })
-  const countryMap = new Map(countries.map((c) => [c.id, c.country]))
+  });
+  const countryMap = new Map(countries.map((c) => [c.id, c.country]));
 
   // Format browser stats
   const topBrowsers = browserStats
@@ -124,7 +121,7 @@ export async function GET(
       name: browserMap.get(s.uAId!) || 'Unknown',
       count: s._count.id,
       percentage: Math.round((s._count.id / totalPageviews) * 1000) / 10,
-    }))
+    }));
 
   // Format country stats
   const topCountries = countryStats
@@ -133,18 +130,18 @@ export async function GET(
       name: countryMap.get(s.countryId!) || 'Unknown',
       count: s._count.id,
       percentage: Math.round((s._count.id / totalPageviews) * 1000) / 10,
-    }))
+    }));
 
   // Daily trend
-  const dailyMap = new Map<string, number>()
+  const dailyMap = new Map<string, number>();
   pageviews.forEach((pv) => {
-    const date = format(pv.createdAt, 'yyyy-MM-dd')
-    dailyMap.set(date, (dailyMap.get(date) || 0) + 1)
-  })
+    const date = format(pv.createdAt, 'yyyy-MM-dd');
+    dailyMap.set(date, (dailyMap.get(date) || 0) + 1);
+  });
 
   const trends = Array.from(dailyMap.entries())
     .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, count]) => ({ date, pageviews: count }))
+    .map(([date, count]) => ({ date, pageviews: count }));
 
   return successResponse(
     {
@@ -172,6 +169,6 @@ export async function GET(
       headers: {
         'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
       },
-    }
-  )
+    },
+  );
 }

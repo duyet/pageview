@@ -1,12 +1,12 @@
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface DomainHeaderProps {
-  domain: string
-  totalPageviews: number
-  totalUrls: number
-  previewCount: number
+  domain: string;
+  totalPageviews: number;
+  totalUrls: number;
+  previewCount: number;
 }
 
 export function DomainHeader({
@@ -61,5 +61,5 @@ export function DomainHeader({
         </div>
       </div>
     </div>
-  )
+  );
 }

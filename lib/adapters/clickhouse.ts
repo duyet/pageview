@@ -1,111 +1,112 @@
-import { PageViewAdapter, PageViewEvent } from './types'
+import type { PageViewAdapter, PageViewEvent } from './types';
 
 export class ClickHouseAdapter implements PageViewAdapter {
-  name = 'ClickHouse'
-  enabled = !!process.env.CLICKHOUSE_URL
+  name = 'ClickHouse';
+  enabled = !!process.env.CLICKHOUSE_URL;
 
-  private connectionUrl = process.env.CLICKHOUSE_URL || ''
-  private database = 'default'
-  private table = 'pageviews'
-  private endpoint = ''
-  private authHeader = ''
+  private connectionUrl = process.env.CLICKHOUSE_URL || '';
+  private database = 'default';
+  private table = 'pageviews';
+  private endpoint = '';
+  private authHeader = '';
 
   constructor() {
     if (this.enabled) {
-      this.parseUrl()
+      this.parseUrl();
     }
   }
 
   private parseUrl() {
     try {
-      const parsed = new URL(this.connectionUrl)
+      const parsed = new URL(this.connectionUrl);
 
       // Extract custom database name from path, default to 'default'
-      const pathDb = parsed.pathname.replace(/^\//, '')
-      this.database = parsed.searchParams.get('database') || pathDb || 'default'
+      const pathDb = parsed.pathname.replace(/^\//, '');
+      this.database =
+        parsed.searchParams.get('database') || pathDb || 'default';
 
       // Extract custom table name from search params, default to 'pageviews'
-      this.table = parsed.searchParams.get('table') || 'pageviews'
+      this.table = parsed.searchParams.get('table') || 'pageviews';
 
       // Construct ClickHouse HTTP endpoint without credentials
-      const targetUrl = new URL(parsed.origin)
-      targetUrl.pathname = '/'
+      const targetUrl = new URL(parsed.origin);
+      targetUrl.pathname = '/';
       targetUrl.searchParams.set(
         'query',
-        `INSERT INTO ${this.database}.${this.table} FORMAT JSONEachRow`
-      )
-      this.endpoint = targetUrl.toString()
+        `INSERT INTO ${this.database}.${this.table} FORMAT JSONEachRow`,
+      );
+      this.endpoint = targetUrl.toString();
 
       // Parse and construct basic authentication
       if (parsed.username || parsed.password) {
         const credentials = Buffer.from(
-          `${decodeURIComponent(parsed.username)}:${decodeURIComponent(parsed.password)}`
-        ).toString('base64')
-        this.authHeader = `Basic ${credentials}`
+          `${decodeURIComponent(parsed.username)}:${decodeURIComponent(parsed.password)}`,
+        ).toString('base64');
+        this.authHeader = `Basic ${credentials}`;
       }
     } catch (err) {
-      console.error('ClickHouse URL parsing failed, disabling adapter:', err)
-      this.enabled = false
+      console.error('ClickHouse URL parsing failed, disabling adapter:', err);
+      this.enabled = false;
     }
   }
 
   async initialize(): Promise<void> {
-    if (!this.enabled) return
+    if (!this.enabled) return;
 
     console.log(
-      `ClickHouse HTTP Adapter configured for database: "${this.database}", table: "${this.table}"`
-    )
+      `ClickHouse HTTP Adapter configured for database: "${this.database}", table: "${this.table}"`,
+    );
 
     // In production, the schema is already provisioned — skip DDL to avoid
     // slow cold-start latency (5-8s) that causes Prisma transaction timeouts.
     if (process.env.NODE_ENV === 'production') {
       console.log(
-        `[ClickHouse] Production mode: skipping DDL initialization. Schema assumed to be pre-provisioned.`
-      )
-      return
+        `[ClickHouse] Production mode: skipping DDL initialization. Schema assumed to be pre-provisioned.`,
+      );
+      return;
     }
 
     try {
-      const parsed = new URL(this.connectionUrl)
-      const targetUrl = new URL(parsed.origin)
-      targetUrl.pathname = '/'
+      const parsed = new URL(this.connectionUrl);
+      const targetUrl = new URL(parsed.origin);
+      targetUrl.pathname = '/';
 
       const headers: Record<string, string> = {
         'Content-Type': 'text/plain',
-      }
+      };
 
       if (this.authHeader) {
-        headers['Authorization'] = this.authHeader
+        headers.Authorization = this.authHeader;
       }
 
       // 1. Auto-create database if not using 'default'
       if (this.database && this.database !== 'default') {
         console.log(
-          `[ClickHouse] Attempting to auto-create database "${this.database}" if not exists...`
-        )
-        const createDbQuery = `CREATE DATABASE IF NOT EXISTS ${this.database}`
+          `[ClickHouse] Attempting to auto-create database "${this.database}" if not exists...`,
+        );
+        const createDbQuery = `CREATE DATABASE IF NOT EXISTS ${this.database}`;
         const dbRes = await fetch(targetUrl.toString(), {
           method: 'POST',
           headers,
           body: createDbQuery,
-        })
+        });
         if (!dbRes.ok) {
-          const dbErr = await dbRes.text()
+          const dbErr = await dbRes.text();
           console.warn(
             `[ClickHouse] Database auto-creation warning (could be permission related):`,
-            dbErr
-          )
+            dbErr,
+          );
         } else {
           console.log(
-            `[ClickHouse] Database "${this.database}" verified/created.`
-          )
+            `[ClickHouse] Database "${this.database}" verified/created.`,
+          );
         }
       }
 
       // 2. Auto-create table
       console.log(
-        `[ClickHouse] Attempting to auto-create table "${this.database}.${this.table}" if not exists...`
-      )
+        `[ClickHouse] Attempting to auto-create table "${this.database}.${this.table}" if not exists...`,
+      );
       const ddl = `
         CREATE TABLE IF NOT EXISTS ${this.database}.${this.table} (
             id String,
@@ -145,35 +146,35 @@ export class ClickHouseAdapter implements PageViewAdapter {
             utmContent LowCardinality(Nullable(String))
         ) ENGINE = MergeTree()
         ORDER BY (host, timestamp, id)
-      `
+      `;
 
       const tableRes = await fetch(targetUrl.toString(), {
         method: 'POST',
         headers,
         body: ddl,
-      })
+      });
 
       if (!tableRes.ok) {
-        const tableErr = await tableRes.text()
+        const tableErr = await tableRes.text();
         console.warn(
           `[ClickHouse] Table auto-creation warning (could be permission related):`,
-          tableErr
-        )
+          tableErr,
+        );
       } else {
         console.log(
-          `[ClickHouse] Table "${this.database}.${this.table}" verified/created successfully.`
-        )
+          `[ClickHouse] Table "${this.database}.${this.table}" verified/created successfully.`,
+        );
       }
     } catch (err: any) {
       console.warn(
         '[ClickHouse] Automatic schema initialization failed or was skipped:',
-        err.message
-      )
+        err.message,
+      );
     }
   }
 
   async broadcast(event: PageViewEvent): Promise<void> {
-    if (!this.enabled) return
+    if (!this.enabled) return;
 
     try {
       // Map event model properties to a clean flat JSON representation for ClickHouse
@@ -216,32 +217,32 @@ export class ClickHouseAdapter implements PageViewAdapter {
         utmCampaign: event.utmCampaign || null,
         utmTerm: event.utmTerm || null,
         utmContent: event.utmContent || null,
-      }
+      };
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-      }
+      };
 
       if (this.authHeader) {
-        headers['Authorization'] = this.authHeader
+        headers.Authorization = this.authHeader;
       }
 
       const response = await fetch(this.endpoint, {
         method: 'POST',
         headers,
-        body: JSON.stringify(record) + '\n',
-      })
+        body: `${JSON.stringify(record)}\n`,
+      });
 
       if (!response.ok) {
-        const text = await response.text()
+        const text = await response.text();
         throw new Error(
-          `HTTP status ${response.status} ${response.statusText}: ${text}`
-        )
+          `HTTP status ${response.status} ${response.statusText}: ${text}`,
+        );
       }
     } catch (err) {
-      console.error('ClickHouse broadcast failed:', err)
+      console.error('ClickHouse broadcast failed:', err);
       // Throwing error allows the orchestrator to capture settled promises and log failures
-      throw err
+      throw err;
     }
   }
 }

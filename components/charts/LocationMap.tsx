@@ -1,12 +1,12 @@
-import { useMemo } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
 
 interface LocationMapProps {
   data: Array<{
-    country: string
-    count: number
-  }>
-  loading?: boolean
+    country: string;
+    count: number;
+  }>;
+  loading?: boolean;
 }
 
 // Country code to full name mapping for display
@@ -66,21 +66,21 @@ const countryNames: Record<string, string> = {
   SA: 'Saudi Arabia',
   PK: 'Pakistan',
   BD: 'Bangladesh',
-}
+};
 
 export function LocationMap({ data, loading }: LocationMapProps) {
   const { maxCount, colorScale } = useMemo(() => {
-    if (!data || data.length === 0) return { maxCount: 0, colorScale: [] }
+    if (!data || data.length === 0) return { maxCount: 0, colorScale: [] };
 
-    const max = Math.max(...data.map((d) => d.count))
+    const max = Math.max(...data.map((d) => d.count));
     const scale = data.map((item) => ({
       ...item,
       intensity: item.count / max,
       name: countryNames[item.country] || item.country,
-    }))
+    }));
 
-    return { maxCount: max, colorScale: scale }
-  }, [data])
+    return { maxCount: max, colorScale: scale };
+  }, [data]);
 
   if (loading) {
     return (
@@ -90,7 +90,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
           <span>Loading location data...</span>
         </div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -100,7 +100,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
           No location data
         </div>
       </div>
-    )
+    );
   }
 
   // Get color based on intensity (0-1)
@@ -113,14 +113,14 @@ export function LocationMap({ data, loading }: LocationMapProps) {
       'bg-indigo-500 dark:bg-indigo-600',
       'bg-indigo-600 dark:bg-indigo-500',
       'bg-indigo-700 dark:bg-indigo-400',
-    ]
+    ];
 
     const index = Math.min(
       Math.floor(intensity * colors.length),
-      colors.length - 1
-    )
-    return colors[index]
-  }
+      colors.length - 1,
+    );
+    return colors[index];
+  };
 
   return (
     <div className="space-y-4">
@@ -167,5 +167,5 @@ export function LocationMap({ data, loading }: LocationMapProps) {
         <span>More traffic</span>
       </div>
     </div>
-  )
+  );
 }

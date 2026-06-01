@@ -180,4 +180,4 @@ export const genScript = (endpoint: string) => `
   // Start tracking
   init()
 })(window, document)
-`
+`;

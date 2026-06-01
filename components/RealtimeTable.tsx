@@ -1,3 +1,5 @@
+import type { RealtimeMetrics } from '../types/socket';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
   Table,
   TableBody,
@@ -5,21 +7,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from './ui/table'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { RealtimeMetrics } from '../types/socket'
+} from './ui/table';
 
 interface RealtimeTableProps {
-  title: string
+  title: string;
   data: Array<{
-    name?: string
-    path?: string
-    country?: string
-    views?: number
-    count?: number
-  }>
-  loading?: boolean
-  emptyMessage?: string
+    name?: string;
+    path?: string;
+    country?: string;
+    views?: number;
+    count?: number;
+  }>;
+  loading?: boolean;
+  emptyMessage?: string;
 }
 
 export function RealtimeTable({
@@ -45,7 +45,7 @@ export function RealtimeTable({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
@@ -60,7 +60,7 @@ export function RealtimeTable({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -95,7 +95,7 @@ export function RealtimeTable({
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Pre-configured tables for common use cases
@@ -103,8 +103,8 @@ export function ActivePagesTable({
   data,
   loading,
 }: {
-  data: RealtimeMetrics['activePages']
-  loading?: boolean
+  data: RealtimeMetrics['activePages'];
+  loading?: boolean;
 }) {
   return (
     <RealtimeTable
@@ -113,15 +113,15 @@ export function ActivePagesTable({
       loading={loading}
       emptyMessage="No active pages in the last hour"
     />
-  )
+  );
 }
 
 export function RecentCountriesTable({
   data,
   loading,
 }: {
-  data: RealtimeMetrics['recentCountries']
-  loading?: boolean
+  data: RealtimeMetrics['recentCountries'];
+  loading?: boolean;
 }) {
   return (
     <RealtimeTable
@@ -130,5 +130,5 @@ export function RecentCountriesTable({
       loading={loading}
       emptyMessage="No recent visitors from any countries"
     />
-  )
+  );
 }

@@ -1,25 +1,25 @@
-import prisma from '../prisma'
-import { PageViewAdapter, PageViewEvent } from './types'
+import prisma from '../prisma';
+import type { PageViewAdapter, PageViewEvent } from './types';
 
 export class PostgresAdapter implements PageViewAdapter {
-  name = 'Postgres'
-  enabled = process.env.ENABLE_POSTGRES !== 'false'
+  name = 'Postgres';
+  enabled = process.env.ENABLE_POSTGRES !== 'false';
 
   async initialize(): Promise<void> {
     // Prisma manages DB schema initialization automatically
     if (this.enabled) {
-      console.log('Postgres/Prisma adapter initialized.')
+      console.log('Postgres/Prisma adapter initialized.');
     }
   }
 
   async broadcast(event: PageViewEvent): Promise<void> {
-    if (!this.enabled) return
+    if (!this.enabled) return;
 
-    const hostName = event.host
-    const pathName = event.path
-    const uaString = event.ua || 'Unknown'
-    const countryName = event.country || 'Unknown'
-    const cityName = event.city || 'Unknown'
+    const hostName = event.host;
+    const pathName = event.path;
+    const uaString = event.ua || 'Unknown';
+    const countryName = event.country || 'Unknown';
+    const cityName = event.city || 'Unknown';
 
     // Use transaction to write normalized relational models & PageView event
     await prisma.$transaction(async (tx) => {
@@ -64,7 +64,7 @@ export class PostgresAdapter implements PageViewAdapter {
           update: {},
           create: { city: cityName },
         }),
-      ])
+      ]);
 
       // Upsert the Url record
       const urlRecord = await tx.url.upsert({
@@ -75,7 +75,7 @@ export class PostgresAdapter implements PageViewAdapter {
           hostId: host.id,
           slugId: slug.id,
         },
-      })
+      });
 
       // Create the PageView record with all normalized foreign keys and enriched fields
       await tx.pageView.create({
@@ -104,7 +104,7 @@ export class PostgresAdapter implements PageViewAdapter {
 
           createdAt: event.timestamp,
         },
-      })
-    })
+      });
+    });
   }
 }

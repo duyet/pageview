@@ -8,10 +8,10 @@
  * Used across all API endpoints for consistency
  */
 export interface ApiResponse<T = unknown> {
-  success: boolean
-  data?: T
-  error?: ApiError
-  meta: ApiMeta
+  success: boolean;
+  data?: T;
+  error?: ApiError;
+  meta: ApiMeta;
 }
 
 /**
@@ -19,10 +19,10 @@ export interface ApiResponse<T = unknown> {
  * Structured error information for client consumption
  */
 export interface ApiError {
-  code: string
-  message: string
-  details?: Record<string, unknown>
-  field?: string // For validation errors
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+  field?: string; // For validation errors
 }
 
 /**
@@ -30,10 +30,10 @@ export interface ApiError {
  * Additional information about the response
  */
 export interface ApiMeta {
-  timestamp: string
-  requestId: string
-  version: string
-  page?: PaginationMeta
+  timestamp: string;
+  requestId: string;
+  version: string;
+  page?: PaginationMeta;
 }
 
 /**
@@ -41,38 +41,38 @@ export interface ApiMeta {
  * Used for paginated endpoints
  */
 export interface PaginationMeta {
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPreviousPage: boolean
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 /**
  * Pagination Request Parameters
  */
 export interface PaginationParams {
-  page?: number
-  pageSize?: number
-  cursor?: string
+  page?: number;
+  pageSize?: number;
+  cursor?: string;
 }
 
 /**
  * Sort Parameters
  */
 export interface SortParams {
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
  * Filter Parameters
  */
 export interface FilterParams {
-  search?: string
-  startDate?: string
-  endDate?: string
+  search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 /**
@@ -88,113 +88,113 @@ export interface QueryParams
  * Pageview Tracking Request
  */
 export interface PageviewTrackingRequest {
-  url: string
-  referrer?: string
-  userAgent?: string
+  url: string;
+  referrer?: string;
+  userAgent?: string;
 }
 
 /**
  * Analytics Date Range Request
  */
 export interface AnalyticsDateRangeRequest {
-  startDate?: string
-  endDate?: string
-  days?: number
-  domain?: string
+  startDate?: string;
+  endDate?: string;
+  days?: number;
+  domain?: string;
 }
 
 /**
  * Trend Data Point
  */
 export interface TrendDataPoint {
-  date: string
-  pageviews: number
-  uniqueVisitors: number
+  date: string;
+  pageviews: number;
+  uniqueVisitors: number;
 }
 
 /**
  * Device Analytics
  */
 export interface DeviceAnalytics {
-  browser: string
-  os: string
-  device: string
-  count: number
-  percentage: number
+  browser: string;
+  os: string;
+  device: string;
+  count: number;
+  percentage: number;
 }
 
 /**
  * Location Analytics
  */
 export interface LocationAnalytics {
-  country: string
-  countryName: string
-  city?: string
-  count: number
-  percentage: number
+  country: string;
+  countryName: string;
+  city?: string;
+  count: number;
+  percentage: number;
 }
 
 /**
  * Domain Statistics
  */
 export interface DomainStats {
-  domain: string
-  totalPageviews: number
-  uniqueVisitors: number
-  urls: number
-  trend?: number
-  lastPageview?: string
+  domain: string;
+  totalPageviews: number;
+  uniqueVisitors: number;
+  urls: number;
+  trend?: number;
+  lastPageview?: string;
 }
 
 /**
  * URL Statistics
  */
 export interface UrlStats {
-  id: string
-  url: string
-  domain: string
-  path: string
-  totalPageviews: number
-  uniqueVisitors: number
-  trend?: number
-  lastPageview?: string
-  avgTimeOnPage?: number
+  id: string;
+  url: string;
+  domain: string;
+  path: string;
+  totalPageviews: number;
+  uniqueVisitors: number;
+  trend?: number;
+  lastPageview?: string;
+  avgTimeOnPage?: number;
 }
 
 /**
  * Real-time Metrics
  */
 export interface RealtimeMetrics {
-  activeVisitors: number
-  pageviewsLast24h: number
-  uniqueVisitorsLast24h: number
+  activeVisitors: number;
+  pageviewsLast24h: number;
+  uniqueVisitorsLast24h: number;
   topPages: Array<{
-    url: string
-    count: number
-  }>
+    url: string;
+    count: number;
+  }>;
   recentPageviews: Array<{
-    url: string
-    country: string
-    timestamp: string
-    browser: string
-  }>
+    url: string;
+    country: string;
+    timestamp: string;
+    browser: string;
+  }>;
 }
 
 /**
  * Health Check Response
  */
 export interface HealthCheckResponse {
-  status: 'ok' | 'degraded' | 'down'
-  timestamp: string
-  uptime: number
+  status: 'ok' | 'degraded' | 'down';
+  timestamp: string;
+  uptime: number;
   database: {
-    connected: boolean
-    latency?: number
-  }
+    connected: boolean;
+    latency?: number;
+  };
   redis?: {
-    connected: boolean
-    latency?: number
-  }
+    connected: boolean;
+    latency?: number;
+  };
 }
 
 /**
@@ -221,7 +221,7 @@ export enum ErrorCode {
 /**
  * API Version
  */
-export const API_VERSION = 'v1' as const
+export const API_VERSION = 'v1' as const;
 
 /**
  * HTTP Status Codes

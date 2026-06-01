@@ -3,18 +3,18 @@
  * Runs before all tests
  */
 
-import '@testing-library/jest-dom'
-import { afterEach, beforeAll, afterAll, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
+import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 // Cleanup after each test
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+});
 
 // Mock environment variables
 // NODE_ENV is automatically set to 'test' by Vitest
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
 
 // Mock Next.js router
 vi.mock('next/router', () => ({
@@ -39,15 +39,15 @@ vi.mock('next/router', () => ({
     isReady: true,
     isPreview: false,
   }),
-}))
+}));
 
 // Mock Next.js Image
 vi.mock('next/image', () => ({
   default: () => null,
-}))
+}));
 
 // Suppress console errors in tests
-const originalError = console.error
+const originalError = console.error;
 beforeAll(() => {
   console.error = (...args: any[]) => {
     if (
@@ -55,12 +55,12 @@ beforeAll(() => {
       (args[0].includes('Warning: ReactDOM.render') ||
         args[0].includes('Not implemented: HTMLFormElement.prototype.submit'))
     ) {
-      return
+      return;
     }
-    originalError.call(console, ...args)
-  }
-})
+    originalError.call(console, ...args);
+  };
+});
 
 afterAll(() => {
-  console.error = originalError
-})
+  console.error = originalError;
+});

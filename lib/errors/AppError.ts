@@ -3,33 +3,33 @@
  * Structured error handling with proper HTTP status codes
  */
 
-import { ErrorCode } from '@/types/api'
+import { ErrorCode } from '@/types/api';
 
 /**
  * Base Application Error
  */
 export class AppError extends Error {
-  public readonly code: ErrorCode
-  public readonly statusCode: number
-  public readonly details?: Record<string, unknown>
-  public readonly isOperational: boolean
+  public readonly code: ErrorCode;
+  public readonly statusCode: number;
+  public readonly details?: Record<string, unknown>;
+  public readonly isOperational: boolean;
 
   constructor(
     message: string,
     code: ErrorCode = ErrorCode.INTERNAL_ERROR,
     statusCode: number = 500,
     details?: Record<string, unknown>,
-    isOperational: boolean = true
+    isOperational: boolean = true,
   ) {
-    super(message)
-    Object.setPrototypeOf(this, new.target.prototype)
+    super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
 
-    this.code = code
-    this.statusCode = statusCode
-    this.details = details
-    this.isOperational = isOperational
+    this.code = code;
+    this.statusCode = statusCode;
+    this.details = details;
+    this.isOperational = isOperational;
 
-    Error.captureStackTrace(this)
+    Error.captureStackTrace(this);
   }
 }
 
@@ -39,10 +39,10 @@ export class AppError extends Error {
 export class ValidationError extends AppError {
   constructor(
     message: string = 'Validation failed',
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
-    super(message, ErrorCode.VALIDATION_ERROR, 400, details)
-    this.name = 'ValidationError'
+    super(message, ErrorCode.VALIDATION_ERROR, 400, details);
+    this.name = 'ValidationError';
   }
 }
 
@@ -51,8 +51,8 @@ export class ValidationError extends AppError {
  */
 export class AuthenticationError extends AppError {
   constructor(message: string = 'Authentication required') {
-    super(message, ErrorCode.UNAUTHORIZED, 401)
-    this.name = 'AuthenticationError'
+    super(message, ErrorCode.UNAUTHORIZED, 401);
+    this.name = 'AuthenticationError';
   }
 }
 
@@ -61,8 +61,8 @@ export class AuthenticationError extends AppError {
  */
 export class AuthorizationError extends AppError {
   constructor(message: string = 'Insufficient permissions') {
-    super(message, ErrorCode.FORBIDDEN, 403)
-    this.name = 'AuthorizationError'
+    super(message, ErrorCode.FORBIDDEN, 403);
+    this.name = 'AuthorizationError';
   }
 }
 
@@ -71,8 +71,8 @@ export class AuthorizationError extends AppError {
  */
 export class NotFoundError extends AppError {
   constructor(resource: string = 'Resource') {
-    super(`${resource} not found`, ErrorCode.NOT_FOUND, 404)
-    this.name = 'NotFoundError'
+    super(`${resource} not found`, ErrorCode.NOT_FOUND, 404);
+    this.name = 'NotFoundError';
   }
 }
 
@@ -81,8 +81,8 @@ export class NotFoundError extends AppError {
  */
 export class ConflictError extends AppError {
   constructor(message: string = 'Resource already exists') {
-    super(message, ErrorCode.CONFLICT, 409)
-    this.name = 'ConflictError'
+    super(message, ErrorCode.CONFLICT, 409);
+    this.name = 'ConflictError';
   }
 }
 
@@ -90,17 +90,17 @@ export class ConflictError extends AppError {
  * Rate Limit Error (429)
  */
 export class RateLimitError extends AppError {
-  public readonly retryAfter?: number
+  public readonly retryAfter?: number;
 
   constructor(message: string = 'Too many requests', retryAfter?: number) {
     super(
       message,
       ErrorCode.RATE_LIMIT_EXCEEDED,
       429,
-      retryAfter ? { retryAfter } : undefined
-    )
-    this.name = 'RateLimitError'
-    this.retryAfter = retryAfter
+      retryAfter ? { retryAfter } : undefined,
+    );
+    this.name = 'RateLimitError';
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -110,7 +110,7 @@ export class RateLimitError extends AppError {
 export class DatabaseError extends AppError {
   constructor(
     message: string = 'Database operation failed',
-    originalError?: unknown
+    originalError?: unknown,
   ) {
     super(
       message,
@@ -119,9 +119,9 @@ export class DatabaseError extends AppError {
       process.env.NODE_ENV === 'development' && originalError
         ? { originalError: String(originalError) }
         : undefined,
-      true
-    )
-    this.name = 'DatabaseError'
+      true,
+    );
+    this.name = 'DatabaseError';
   }
 }
 
@@ -132,7 +132,7 @@ export class ExternalServiceError extends AppError {
   constructor(
     service: string,
     message: string = 'External service unavailable',
-    originalError?: unknown
+    originalError?: unknown,
   ) {
     super(
       message,
@@ -144,9 +144,9 @@ export class ExternalServiceError extends AppError {
           ? { originalError: String(originalError) }
           : {}),
       },
-      true
-    )
-    this.name = 'ExternalServiceError'
+      true,
+    );
+    this.name = 'ExternalServiceError';
   }
 }
 
@@ -159,9 +159,9 @@ export class TimeoutError extends AppError {
       message,
       ErrorCode.TIMEOUT,
       504,
-      operation ? { operation } : undefined
-    )
-    this.name = 'TimeoutError'
+      operation ? { operation } : undefined,
+    );
+    this.name = 'TimeoutError';
   }
 }
 
@@ -171,10 +171,10 @@ export class TimeoutError extends AppError {
 export class BadRequestError extends AppError {
   constructor(
     message: string = 'Bad request',
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
-    super(message, ErrorCode.BAD_REQUEST, 400, details)
-    this.name = 'BadRequestError'
+    super(message, ErrorCode.BAD_REQUEST, 400, details);
+    this.name = 'BadRequestError';
   }
 }
 
@@ -182,7 +182,7 @@ export class BadRequestError extends AppError {
  * Type guard to check if error is an AppError
  */
 export function isAppError(error: unknown): error is AppError {
-  return error instanceof AppError
+  return error instanceof AppError;
 }
 
 /**
@@ -190,9 +190,9 @@ export function isAppError(error: unknown): error is AppError {
  */
 export function isOperationalError(error: unknown): boolean {
   if (isAppError(error)) {
-    return error.isOperational
+    return error.isOperational;
   }
-  return false
+  return false;
 }
 
 /**
@@ -201,7 +201,7 @@ export function isOperationalError(error: unknown): boolean {
  */
 export function normalizeError(error: unknown): AppError {
   if (isAppError(error)) {
-    return error
+    return error;
   }
 
   if (error instanceof Error) {
@@ -212,8 +212,8 @@ export function normalizeError(error: unknown): AppError {
       process.env.NODE_ENV === 'development'
         ? { stack: error.stack }
         : undefined,
-      false
-    )
+      false,
+    );
   }
 
   return new AppError(
@@ -221,8 +221,8 @@ export function normalizeError(error: unknown): AppError {
     ErrorCode.INTERNAL_ERROR,
     500,
     undefined,
-    false
-  )
+    false,
+  );
 }
 
 /**
@@ -230,9 +230,9 @@ export function normalizeError(error: unknown): AppError {
  */
 export function logError(
   error: unknown,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): void {
-  const normalizedError = normalizeError(error)
+  const normalizedError = normalizeError(error);
 
   const logData = {
     name: normalizedError.name,
@@ -243,11 +243,11 @@ export function logError(
     stack: normalizedError.stack,
     context,
     timestamp: new Date().toISOString(),
-  }
+  };
 
   if (normalizedError.isOperational) {
-    console.warn('[Operational Error]', logData)
+    console.warn('[Operational Error]', logData);
   } else {
-    console.error('[Critical Error]', logData)
+    console.error('[Critical Error]', logData);
   }
 }

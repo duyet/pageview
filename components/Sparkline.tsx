@@ -1,9 +1,9 @@
-import { Line, LineChart, ResponsiveContainer } from 'recharts'
+import { Line, LineChart, ResponsiveContainer } from 'recharts';
 
 interface SparklineProps {
-  data: number[]
-  color?: string
-  className?: string
+  data: number[];
+  color?: string;
+  className?: string;
 }
 
 export function Sparkline({
@@ -11,7 +11,7 @@ export function Sparkline({
   color = '#3b82f6',
   className,
 }: SparklineProps) {
-  const chartData = data.map((value, index) => ({ value, index }))
+  const chartData = data.map((value, index) => ({ value, index }));
 
   return (
     <ResponsiveContainer width="100%" height="100%" className={className}>
@@ -26,5 +26,5 @@ export function Sparkline({
         />
       </LineChart>
     </ResponsiveContainer>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Activity, Eye, Users, Globe } from 'lucide-react'
+import { Activity, Eye, Globe, Users } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 interface MetricCardProps {
-  title: string
-  value: string | number
-  icon: React.ReactNode
-  change?: string
-  trend?: 'up' | 'down' | 'neutral'
-  loading?: boolean
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  loading?: boolean;
 }
 
 export function RealtimeMetricCard({
@@ -32,7 +32,7 @@ export function RealtimeMetricCard({
           )}
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const trendColor =
@@ -40,7 +40,7 @@ export function RealtimeMetricCard({
       ? 'text-green-600'
       : trend === 'down'
         ? 'text-red-600'
-        : 'text-muted-foreground'
+        : 'text-muted-foreground';
 
   return (
     <Card>
@@ -55,7 +55,7 @@ export function RealtimeMetricCard({
         {change && <p className={`text-xs ${trendColor} mt-1`}>{change}</p>}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Pre-configured metric cards for common use cases
@@ -63,8 +63,8 @@ export function PageViewsCard({
   value,
   loading,
 }: {
-  value: number
-  loading?: boolean
+  value: number;
+  loading?: boolean;
 }) {
   return (
     <RealtimeMetricCard
@@ -73,15 +73,15 @@ export function PageViewsCard({
       icon={<Eye className="size-4 text-muted-foreground" />}
       loading={loading}
     />
-  )
+  );
 }
 
 export function UniqueVisitorsCard({
   value,
   loading,
 }: {
-  value: number
-  loading?: boolean
+  value: number;
+  loading?: boolean;
 }) {
   return (
     <RealtimeMetricCard
@@ -90,15 +90,15 @@ export function UniqueVisitorsCard({
       icon={<Users className="size-4 text-muted-foreground" />}
       loading={loading}
     />
-  )
+  );
 }
 
 export function ActivePagesCard({
   value,
   loading,
 }: {
-  value: number
-  loading?: boolean
+  value: number;
+  loading?: boolean;
 }) {
   return (
     <RealtimeMetricCard
@@ -107,15 +107,15 @@ export function ActivePagesCard({
       icon={<Activity className="size-4 text-muted-foreground" />}
       loading={loading}
     />
-  )
+  );
 }
 
 export function CountriesCard({
   value,
   loading,
 }: {
-  value: number
-  loading?: boolean
+  value: number;
+  loading?: boolean;
 }) {
   return (
     <RealtimeMetricCard
@@ -124,5 +124,5 @@ export function CountriesCard({
       icon={<Globe className="size-4 text-muted-foreground" />}
       loading={loading}
     />
-  )
+  );
 }

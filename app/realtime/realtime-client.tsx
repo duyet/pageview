@@ -1,37 +1,37 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { RefreshCw, Wifi, WifiOff } from 'lucide-react'
-import { useRealtimeMetrics } from '@/hooks/useRealtimeMetrics'
-import { RealtimeChart } from '@/components/charts/RealtimeChart'
-import { LocationMap } from '@/components/charts/LocationMap'
+import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { LocationMap } from '@/components/charts/LocationMap';
+import { RealtimeChart } from '@/components/charts/RealtimeChart';
 import {
-  PageViewsCard,
-  UniqueVisitorsCard,
   ActivePagesCard,
   CountriesCard,
-} from '@/components/RealtimeMetricCard'
+  PageViewsCard,
+  UniqueVisitorsCard,
+} from '@/components/RealtimeMetricCard';
 import {
   ActivePagesTable,
   RecentCountriesTable,
-} from '@/components/RealtimeTable'
+} from '@/components/RealtimeTable';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useRealtimeMetrics } from '@/hooks/useRealtimeMetrics';
 
 export function RealtimeClient() {
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const { metrics, loading, error, isConnected, refetch } =
-    useRealtimeMetrics(30000) // 30 seconds
+    useRealtimeMetrics(30000); // 30 seconds
 
   useEffect(() => {
     if (metrics) {
-      setLastUpdated(new Date())
+      setLastUpdated(new Date());
     }
-  }, [metrics])
+  }, [metrics]);
 
   const handleRefresh = () => {
-    refetch()
-  }
+    refetch();
+  };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -86,10 +86,7 @@ export function RealtimeClient() {
 
           {/* Metrics Cards */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <PageViewsCard
-              value={metrics?.totalViews || 0}
-              loading={loading}
-            />
+            <PageViewsCard value={metrics?.totalViews || 0} loading={loading} />
             <UniqueVisitorsCard
               value={metrics?.uniqueVisitors || 0}
               loading={loading}
@@ -158,5 +155,5 @@ export function RealtimeClient() {
         </div>
       </div>
     </div>
-  )
+  );
 }

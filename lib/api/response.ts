@@ -3,9 +3,9 @@
  * Consistent response formatting across all endpoints
  */
 
-import { NextApiResponse } from 'next'
-import type { ApiResponse, ApiError, ApiMeta, HttpStatus } from '@/types/api'
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
+import type { NextApiResponse } from 'next';
+import type { ApiError, ApiMeta, ApiResponse } from '@/types/api';
 
 /**
  * Creates standardized API metadata
@@ -16,7 +16,7 @@ export function createApiMeta(additionalMeta?: Partial<ApiMeta>): ApiMeta {
     requestId: nanoid(),
     version: 'v1',
     ...additionalMeta,
-  }
+  };
 }
 
 /**
@@ -26,15 +26,15 @@ export function successResponse<T>(
   res: NextApiResponse,
   data: T,
   status: number = 200,
-  meta?: Partial<ApiMeta>
+  meta?: Partial<ApiMeta>,
 ): void {
   const response: ApiResponse<T> = {
     success: true,
     data,
     meta: createApiMeta(meta),
-  }
+  };
 
-  res.status(status).json(response)
+  res.status(status).json(response);
 }
 
 /**
@@ -44,15 +44,15 @@ export function errorResponse(
   res: NextApiResponse,
   error: ApiError,
   status: number = 500,
-  meta?: Partial<ApiMeta>
+  meta?: Partial<ApiMeta>,
 ): void {
   const response: ApiResponse = {
     success: false,
     error,
     meta: createApiMeta(meta),
-  }
+  };
 
-  res.status(status).json(response)
+  res.status(status).json(response);
 }
 
 /**
@@ -61,7 +61,7 @@ export function errorResponse(
 export function validationErrorResponse(
   res: NextApiResponse,
   message: string = 'Validation failed',
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): void {
   errorResponse(
     res,
@@ -70,8 +70,8 @@ export function validationErrorResponse(
       message,
       details,
     },
-    400
-  )
+    400,
+  );
 }
 
 /**
@@ -79,7 +79,7 @@ export function validationErrorResponse(
  */
 export function notFoundResponse(
   res: NextApiResponse,
-  resource: string = 'Resource'
+  resource: string = 'Resource',
 ): void {
   errorResponse(
     res,
@@ -87,8 +87,8 @@ export function notFoundResponse(
       code: 'NOT_FOUND',
       message: `${resource} not found`,
     },
-    404
-  )
+    404,
+  );
 }
 
 /**
@@ -96,7 +96,7 @@ export function notFoundResponse(
  */
 export function unauthorizedResponse(
   res: NextApiResponse,
-  message: string = 'Unauthorized'
+  message: string = 'Unauthorized',
 ): void {
   errorResponse(
     res,
@@ -104,8 +104,8 @@ export function unauthorizedResponse(
       code: 'UNAUTHORIZED',
       message,
     },
-    401
-  )
+    401,
+  );
 }
 
 /**
@@ -113,7 +113,7 @@ export function unauthorizedResponse(
  */
 export function forbiddenResponse(
   res: NextApiResponse,
-  message: string = 'Forbidden'
+  message: string = 'Forbidden',
 ): void {
   errorResponse(
     res,
@@ -121,8 +121,8 @@ export function forbiddenResponse(
       code: 'FORBIDDEN',
       message,
     },
-    403
-  )
+    403,
+  );
 }
 
 /**
@@ -130,10 +130,10 @@ export function forbiddenResponse(
  */
 export function rateLimitResponse(
   res: NextApiResponse,
-  retryAfter?: number
+  retryAfter?: number,
 ): void {
   if (retryAfter) {
-    res.setHeader('Retry-After', retryAfter.toString())
+    res.setHeader('Retry-After', retryAfter.toString());
   }
 
   errorResponse(
@@ -143,8 +143,8 @@ export function rateLimitResponse(
       message: 'Too many requests',
       details: retryAfter ? { retryAfter } : undefined,
     },
-    429
-  )
+    429,
+  );
 }
 
 /**
@@ -153,18 +153,18 @@ export function rateLimitResponse(
 export function internalErrorResponse(
   res: NextApiResponse,
   message: string = 'Internal server error',
-  error?: unknown
+  error?: unknown,
 ): void {
   // Log the actual error for debugging
   if (error) {
-    console.error('[Internal Error]', error)
+    console.error('[Internal Error]', error);
   }
 
   // Don't expose internal error details to client in production
   const details =
     process.env.NODE_ENV === 'development' && error
       ? { error: String(error) }
-      : undefined
+      : undefined;
 
   errorResponse(
     res,
@@ -173,8 +173,8 @@ export function internalErrorResponse(
       message,
       details,
     },
-    500
-  )
+    500,
+  );
 }
 
 /**
@@ -182,9 +182,9 @@ export function internalErrorResponse(
  */
 export function methodNotAllowedResponse(
   res: NextApiResponse,
-  allowedMethods: string[]
+  allowedMethods: string[],
 ): void {
-  res.setHeader('Allow', allowedMethods.join(', '))
+  res.setHeader('Allow', allowedMethods.join(', '));
 
   errorResponse(
     res,
@@ -193,8 +193,8 @@ export function methodNotAllowedResponse(
       message: 'Method not allowed',
       details: { allowedMethods },
     },
-    405
-  )
+    405,
+  );
 }
 
 /**
@@ -203,7 +203,7 @@ export function methodNotAllowedResponse(
 export function badRequestResponse(
   res: NextApiResponse,
   message: string = 'Bad request',
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): void {
   errorResponse(
     res,
@@ -212,8 +212,8 @@ export function badRequestResponse(
       message,
       details,
     },
-    400
-  )
+    400,
+  );
 }
 
 /**
@@ -221,7 +221,7 @@ export function badRequestResponse(
  */
 export function conflictResponse(
   res: NextApiResponse,
-  message: string = 'Resource already exists'
+  message: string = 'Resource already exists',
 ): void {
   errorResponse(
     res,
@@ -229,8 +229,8 @@ export function conflictResponse(
       code: 'CONFLICT',
       message,
     },
-    409
-  )
+    409,
+  );
 }
 
 /**
@@ -238,7 +238,7 @@ export function conflictResponse(
  */
 export function serviceUnavailableResponse(
   res: NextApiResponse,
-  message: string = 'Service temporarily unavailable'
+  message: string = 'Service temporarily unavailable',
 ): void {
   errorResponse(
     res,
@@ -246,8 +246,8 @@ export function serviceUnavailableResponse(
       code: 'SERVICE_UNAVAILABLE',
       message,
     },
-    503
-  )
+    503,
+  );
 }
 
 /**
@@ -257,12 +257,12 @@ export function paginatedResponse<T>(
   res: NextApiResponse,
   data: T[],
   pagination: {
-    total: number
-    page: number
-    pageSize: number
-  }
+    total: number;
+    page: number;
+    pageSize: number;
+  },
 ): void {
-  const totalPages = Math.ceil(pagination.total / pagination.pageSize)
+  const totalPages = Math.ceil(pagination.total / pagination.pageSize);
 
   successResponse(res, data, 200, {
     page: {
@@ -273,14 +273,14 @@ export function paginatedResponse<T>(
       hasNextPage: pagination.page < totalPages,
       hasPreviousPage: pagination.page > 1,
     },
-  })
+  });
 }
 
 /**
  * No Content Response (204)
  */
 export function noContentResponse(res: NextApiResponse): void {
-  res.status(204).end()
+  res.status(204).end();
 }
 
 /**
@@ -289,13 +289,13 @@ export function noContentResponse(res: NextApiResponse): void {
 export function createdResponse<T>(
   res: NextApiResponse,
   data: T,
-  location?: string
+  location?: string,
 ): void {
   if (location) {
-    res.setHeader('Location', location)
+    res.setHeader('Location', location);
   }
 
-  successResponse(res, data, 201)
+  successResponse(res, data, 201);
 }
 
 /**
@@ -303,21 +303,21 @@ export function createdResponse<T>(
  * Catches async errors and returns proper error response
  */
 export function asyncHandler(
-  handler: (req: any, res: NextApiResponse) => Promise<void>
+  handler: (req: any, res: NextApiResponse) => Promise<void>,
 ) {
   return async (req: any, res: NextApiResponse) => {
     try {
-      await handler(req, res)
+      await handler(req, res);
     } catch (error) {
-      console.error('[API Error]', error)
+      console.error('[API Error]', error);
 
       if (error instanceof Error) {
-        internalErrorResponse(res, error.message, error)
+        internalErrorResponse(res, error.message, error);
       } else {
-        internalErrorResponse(res, 'An unexpected error occurred', error)
+        internalErrorResponse(res, 'An unexpected error occurred', error);
       }
     }
-  }
+  };
 }
 
 /**
@@ -325,23 +325,23 @@ export function asyncHandler(
  */
 export function setCorsHeaders(
   res: NextApiResponse,
-  allowedOrigins: string[] = ['*']
+  allowedOrigins: string[] = ['*'],
 ): void {
-  const origin = allowedOrigins.includes('*') ? '*' : allowedOrigins.join(', ')
+  const origin = allowedOrigins.includes('*') ? '*' : allowedOrigins.join(', ');
 
-  res.setHeader('Access-Control-Allow-Origin', origin)
+  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader(
     'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS'
-  )
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  res.setHeader('Access-Control-Max-Age', '86400') // 24 hours
+    'GET, POST, PUT, DELETE, OPTIONS',
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
 }
 
 /**
  * Handle OPTIONS preflight
  */
 export function handleOptions(res: NextApiResponse): void {
-  setCorsHeaders(res)
-  noContentResponse(res)
+  setCorsHeaders(res);
+  noContentResponse(res);
 }

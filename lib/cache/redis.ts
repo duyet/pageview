@@ -3,7 +3,7 @@
  * For caching analytics data
  */
 
-import { Redis } from '@upstash/redis'
+import { Redis } from '@upstash/redis';
 
 /**
  * Redis client (configured via environment variables)
@@ -13,7 +13,7 @@ export const redis = process.env.UPSTASH_REDIS_REST_URL
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
     })
-  : null
+  : null;
 
 /**
  * Cache durations (in seconds)
@@ -23,20 +23,20 @@ export const CACHE_DURATION = {
   ANALYTICS: 300, // 5 minutes
   TRENDS: 600, // 10 minutes
   DOMAINS: 120, // 2 minutes
-} as const
+} as const;
 
 /**
  * Get cached data
  */
 export async function getCached<T>(key: string): Promise<T | null> {
-  if (!redis) return null
+  if (!redis) return null;
 
   try {
-    const data = await redis.get(key)
-    return data as T | null
+    const data = await redis.get(key);
+    return data as T | null;
   } catch (error) {
-    console.error('[Cache] Get error:', error)
-    return null
+    console.error('[Cache] Get error:', error);
+    return null;
   }
 }
 
@@ -46,14 +46,14 @@ export async function getCached<T>(key: string): Promise<T | null> {
 export async function setCached<T>(
   key: string,
   data: T,
-  ttl: number = CACHE_DURATION.ANALYTICS
+  ttl: number = CACHE_DURATION.ANALYTICS,
 ): Promise<void> {
-  if (!redis) return
+  if (!redis) return;
 
   try {
-    await redis.setex(key, ttl, JSON.stringify(data))
+    await redis.setex(key, ttl, JSON.stringify(data));
   } catch (error) {
-    console.error('[Cache] Set error:', error)
+    console.error('[Cache] Set error:', error);
   }
 }
 
@@ -61,15 +61,15 @@ export async function setCached<T>(
  * Invalidate cache by key pattern
  */
 export async function invalidateCache(pattern: string): Promise<void> {
-  if (!redis) return
+  if (!redis) return;
 
   try {
-    const keys = await redis.keys(pattern)
+    const keys = await redis.keys(pattern);
     if (keys.length > 0) {
-      await redis.del(...keys)
+      await redis.del(...keys);
     }
   } catch (error) {
-    console.error('[Cache] Invalidate error:', error)
+    console.error('[Cache] Invalidate error:', error);
   }
 }
 
@@ -80,7 +80,7 @@ export function cacheKey(
   prefix: string,
   ...parts: (string | number)[]
 ): string {
-  return `pageview:${prefix}:${parts.join(':')}`
+  return `pageview:${prefix}:${parts.join(':')}`;
 }
 
 /**
@@ -89,21 +89,21 @@ export function cacheKey(
 export async function withCache<T>(
   key: string,
   ttl: number,
-  fetcher: () => Promise<T>
+  fetcher: () => Promise<T>,
 ): Promise<T> {
   // Try cache first
-  const cached = await getCached<T>(key)
+  const cached = await getCached<T>(key);
   if (cached !== null) {
-    console.log('[Cache] HIT:', key)
-    return cached
+    console.log('[Cache] HIT:', key);
+    return cached;
   }
 
   // Fetch fresh data
-  console.log('[Cache] MISS:', key)
-  const data = await fetcher()
+  console.log('[Cache] MISS:', key);
+  const data = await fetcher();
 
   // Cache it
-  await setCached(key, data, ttl)
+  await setCached(key, data, ttl);
 
-  return data
+  return data;
 }

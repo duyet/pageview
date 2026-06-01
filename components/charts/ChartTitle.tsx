@@ -1,10 +1,10 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react';
 
 interface ChartTitleProps {
-  title: string
-  description?: string
-  loading?: boolean
-  children?: React.ReactNode
+  title: string;
+  description?: string;
+  loading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ChartTitle({
@@ -32,5 +32,5 @@ export function ChartTitle({
       </div>
       {children}
     </div>
-  )
+  );
 }

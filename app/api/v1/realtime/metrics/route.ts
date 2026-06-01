@@ -3,47 +3,47 @@
  * Get real-time metrics (last 24 hours)
  */
 
-import { subHours } from 'date-fns'
-import { successResponse } from '@/lib/api/app-response'
-import { realtimeMetricsQuerySchema } from '@/lib/validation/schemas'
-import prisma from '@/lib/prisma'
-import type { RealtimeMetrics } from '@/types/api'
+import { subHours } from 'date-fns';
+import { successResponse } from '@/lib/api/app-response';
+import prisma from '@/lib/prisma';
+import { realtimeMetricsQuerySchema } from '@/lib/validation/schemas';
+import type { RealtimeMetrics } from '@/types/api';
 
 // Cache for 30 seconds
-let cache: { data: RealtimeMetrics; timestamp: number } | null = null
-const CACHE_DURATION = 30 * 1000 // 30 seconds
+let cache: { data: RealtimeMetrics; timestamp: number } | null = null;
+const CACHE_DURATION = 30 * 1000; // 30 seconds
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const query = Object.fromEntries(searchParams.entries())
+  const { searchParams } = new URL(request.url);
+  const query = Object.fromEntries(searchParams.entries());
 
   // Validate query parameters
-  const validated = realtimeMetricsQuerySchema.parse(query)
-  const { domain } = validated
+  const validated = realtimeMetricsQuerySchema.parse(query);
+  const { domain } = validated;
 
   // Check cache
-  const now = Date.now()
+  const now = Date.now();
   if (cache && now - cache.timestamp < CACHE_DURATION && !domain) {
     return successResponse(cache.data, 200, {
       headers: { 'X-Cache': 'HIT' },
-    })
+    });
   }
 
-  const last24h = subHours(new Date(), 24)
-  const last5min = subHours(new Date(), 1 / 12) // 5 minutes
+  const last24h = subHours(new Date(), 24);
+  const last5min = subHours(new Date(), 1 / 12); // 5 minutes
 
   // Build where clause
   const whereClause: any = {
     createdAt: {
       gte: last24h,
     },
-  }
+  };
 
   const recentWhereClause: any = {
     createdAt: {
       gte: last5min,
     },
-  }
+  };
 
   // Filter by domain if specified
   if (domain) {
@@ -53,9 +53,9 @@ export async function GET(request: Request) {
           host: domain,
         },
       },
-    }
-    whereClause.url = domainFilter.url
-    recentWhereClause.url = domainFilter.url
+    };
+    whereClause.url = domainFilter.url;
+    recentWhereClause.url = domainFilter.url;
   }
 
   // Parallel queries for better performance
@@ -92,22 +92,22 @@ export async function GET(request: Request) {
         ua: { select: { browser: true } },
       },
     }),
-  ])
+  ]);
 
   // Get URL details for top pages
-  const urlIds = topPagesData.map((p) => p.urlId)
+  const urlIds = topPagesData.map((p) => p.urlId);
   const urls = await prisma.url.findMany({
     where: { id: { in: urlIds } },
     select: { id: true, url: true },
-  })
+  });
 
-  const urlMap = new Map(urls.map((u) => [u.id, u.url]))
+  const urlMap = new Map(urls.map((u) => [u.id, u.url]));
 
   // Format top pages
   const topPages = topPagesData.map((page) => ({
     url: urlMap.get(page.urlId) || 'Unknown',
     count: page._count.id,
-  }))
+  }));
 
   // Format recent pageviews
   const recentPageviews = recentPageviewsData.map((pv) => ({
@@ -115,7 +115,7 @@ export async function GET(request: Request) {
     country: pv.country?.country || 'Unknown',
     timestamp: pv.createdAt.toISOString(),
     browser: pv.ua?.browser || 'Unknown',
-  }))
+  }));
 
   const metrics: RealtimeMetrics = {
     activeVisitors,
@@ -123,11 +123,11 @@ export async function GET(request: Request) {
     uniqueVisitorsLast24h,
     topPages,
     recentPageviews,
-  }
+  };
 
   // Update cache if not filtering by domain
   if (!domain) {
-    cache = { data: metrics, timestamp: now }
+    cache = { data: metrics, timestamp: now };
   }
 
   return successResponse(metrics, 200, {
@@ -135,5 +135,5 @@ export async function GET(request: Request) {
       'X-Cache': 'MISS',
       'Cache-Control': 'public, max-age=30',
     },
-  })
+  });
 }

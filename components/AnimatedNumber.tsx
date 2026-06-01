@@ -1,14 +1,14 @@
-import { useEffect, useRef } from 'react'
-import CountUp from 'react-countup'
+import { useEffect, useRef } from 'react';
+import CountUp from 'react-countup';
 
 interface AnimatedNumberProps {
-  value: number
-  duration?: number
-  decimals?: number
-  prefix?: string
-  suffix?: string
-  className?: string
-  separator?: string
+  value: number;
+  duration?: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  className?: string;
+  separator?: string;
 }
 
 export function AnimatedNumber({
@@ -20,11 +20,11 @@ export function AnimatedNumber({
   className = '',
   separator = ',',
 }: AnimatedNumberProps) {
-  const previousValue = useRef(0)
+  const previousValue = useRef(0);
 
   useEffect(() => {
-    previousValue.current = value
-  }, [value])
+    previousValue.current = value;
+  }, [value]);
 
   return (
     <CountUp
@@ -38,5 +38,5 @@ export function AnimatedNumber({
       className={className}
       preserveValue
     />
-  )
+  );
 }

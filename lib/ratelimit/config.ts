@@ -3,8 +3,8 @@
  * Using Upstash Redis for distributed rate limiting
  */
 
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 /**
  * Redis client (configured via environment variables)
@@ -15,7 +15,7 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
     })
-  : undefined
+  : undefined;
 
 /**
  * Rate limiter for tracking endpoint
@@ -28,7 +28,7 @@ export const trackingRateLimiter = redis
       analytics: true,
       prefix: 'ratelimit:tracking',
     })
-  : null
+  : null;
 
 /**
  * Rate limiter for analytics endpoints
@@ -41,7 +41,7 @@ export const analyticsRateLimiter = redis
       analytics: true,
       prefix: 'ratelimit:analytics',
     })
-  : null
+  : null;
 
 /**
  * Rate limiter for realtime endpoints
@@ -54,7 +54,7 @@ export const realtimeRateLimiter = redis
       analytics: true,
       prefix: 'ratelimit:realtime',
     })
-  : null
+  : null;
 
 /**
  * Strict rate limiter for API abuse prevention
@@ -67,29 +67,29 @@ export const strictRateLimiter = redis
       analytics: true,
       prefix: 'ratelimit:strict',
     })
-  : null
+  : null;
 
 /**
  * Get identifier for rate limiting (IP address)
  */
 export function getRateLimitIdentifier(req: any): string {
   // Try various IP sources
-  const forwarded = req.headers['x-forwarded-for']
-  const realIp = req.headers['x-real-ip']
-  const ip = req.socket?.remoteAddress
+  const forwarded = req.headers['x-forwarded-for'];
+  const realIp = req.headers['x-real-ip'];
+  const ip = req.socket?.remoteAddress;
 
   if (forwarded) {
     // X-Forwarded-For can contain multiple IPs, use the first one
-    const ips = (forwarded as string).split(',')
-    return ips[0].trim()
+    const ips = (forwarded as string).split(',');
+    return ips[0].trim();
   }
 
-  return (realIp as string) || ip || 'unknown'
+  return (realIp as string) || ip || 'unknown';
 }
 
 /**
  * Check if Redis is configured
  */
 export function isRateLimitingEnabled(): boolean {
-  return !!redis
+  return !!redis;
 }

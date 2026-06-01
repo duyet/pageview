@@ -1,28 +1,27 @@
-'use client'
+'use client';
 
 /**
  * Domain Analytics Client Component
  * Interactive UI with React Query hooks and state management
  */
 
-import { useState, useMemo } from 'react'
-import { subDays } from 'date-fns'
-import { DateRange } from 'react-day-picker'
+import { subDays } from 'date-fns';
+import { useMemo, useState } from 'react';
+import type { DateRange } from 'react-day-picker';
+import { DomainAnalyticsSection } from '@/components/domain/DomainAnalyticsSection';
+import { DomainHeader } from '@/components/domain/DomainHeader';
+import { DomainTrendsSection } from '@/components/domain/DomainTrendsSection';
+import { DomainUrlTable } from '@/components/domain/DomainUrlTable';
+import { useTrendsData } from '@/hooks/useAnalytics';
 
-import { DomainHeader } from '@/components/domain/DomainHeader'
-import { DomainTrendsSection } from '@/components/domain/DomainTrendsSection'
-import { DomainAnalyticsSection } from '@/components/domain/DomainAnalyticsSection'
-import { DomainUrlTable } from '@/components/domain/DomainUrlTable'
-import { useTrendsData } from '@/hooks/useAnalytics'
-
-import type { UrlStat } from './page'
+import type { UrlStat } from './page';
 
 export type DomainClientProps = {
-  domain: string
-  urlStats: UrlStat[]
-  totalPageviews: number
-  previewCount: number
-}
+  domain: string;
+  urlStats: UrlStat[];
+  totalPageviews: number;
+  previewCount: number;
+};
 
 export function DomainClient({
   domain,
@@ -33,25 +32,25 @@ export function DomainClient({
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
-  })
+  });
 
   // Calculate days from date range
   const days = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to) return 30
+    if (!dateRange?.from || !dateRange?.to) return 30;
     return Math.ceil(
       (dateRange.to.getTime() - dateRange.from.getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
-  }, [dateRange])
+        (1000 * 60 * 60 * 24),
+    );
+  }, [dateRange]);
 
   // Use React Query hook for trends data
   const {
     data: trendsResult,
     isLoading: loading,
     isFetching: fetching,
-  } = useTrendsData(days, { host: domain })
+  } = useTrendsData(days, { host: domain });
 
-  const trendsData = trendsResult?.trends || []
+  const trendsData = trendsResult?.trends || [];
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
@@ -79,5 +78,5 @@ export function DomainClient({
         </div>
       </div>
     </div>
-  )
+  );
 }

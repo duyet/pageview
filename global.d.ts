@@ -1,3 +1,3 @@
-declare module globalThis {
-  var prisma: PrismaClient
+declare namespace globalThis {
+  var prisma: PrismaClient;
 }
