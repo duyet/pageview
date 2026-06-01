@@ -102,12 +102,12 @@ export function RealtimeClient() {
           </div>
 
           {/* Real-time Chart */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-border bg-card p-6">
             <div className="mb-4">
-              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+              <h2 className="text-sm font-medium text-foreground sm:text-base">
                 Hourly Traffic (Last 24h)
               </h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 Real-time traffic patterns
               </p>
             </div>
@@ -118,12 +118,12 @@ export function RealtimeClient() {
           </div>
 
           {/* Location Map */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+          <div className="rounded-lg border border-border bg-card p-6">
             <div className="mb-4">
-              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+              <h2 className="text-sm font-medium text-foreground sm:text-base">
                 Visitor Locations (Last Hour)
               </h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-muted-foreground">
                 Geographic distribution of recent visitors
               </p>
             </div>
@@ -146,8 +146,8 @@ export function RealtimeClient() {
           </div>
 
           {/* Status Footer */}
-          <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-            <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
               <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
               <div>Auto-refresh: 30s</div>
             </div>

@@ -53,7 +53,7 @@ export function DomainClient({
   const trendsData = trendsResult?.trends || [];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
           <DomainHeader

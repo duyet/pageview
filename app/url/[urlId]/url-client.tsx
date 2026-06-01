@@ -50,9 +50,7 @@ function StatBar({ name, count, percentage }: StatItem) {
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium">{name || 'Unknown'}</span>
         <div className="flex items-center gap-2">
-          <span className="text-neutral-600 dark:text-neutral-400">
-            {count}
-          </span>
+          <span className="text-muted-foreground">{count}</span>
           <Badge variant="secondary" className="text-xs">
             {percentage}%
           </Badge>
@@ -96,7 +94,7 @@ export function UrlClient({
   const trendsData = trendsResult?.trends || [];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
         <div className="flex flex-col space-y-4">
           {/* Header */}
@@ -114,24 +112,24 @@ export function UrlClient({
 
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h1 className="mb-2 text-xl font-normal tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                <h1 className="mb-2 text-xl font-normal tracking-tight text-foreground sm:text-2xl">
                   URL Analytics
                 </h1>
                 <a
                   href={url.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 break-all font-mono text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                  className="inline-flex items-center gap-1.5 break-all font-mono text-sm text-muted-foreground hover:text-foreground"
                 >
                   {url.url}
                   <ExternalLink className="size-3 shrink-0" />
                 </a>
               </div>
               <div className="text-right">
-                <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+                <div className="text-xl font-medium text-foreground sm:text-2xl">
                   {pageviewStats._count.toLocaleString()}
                 </div>
-                <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                <div className="text-sm text-muted-foreground">
                   Total Pageviews
                 </div>
               </div>
@@ -140,8 +138,8 @@ export function UrlClient({
 
           {/* Stats Summary */}
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="size-4" />
                 First Seen
               </div>
@@ -151,7 +149,7 @@ export function UrlClient({
                   : 'N/A'}
               </div>
               {pageviewStats._min.createdAt && (
-                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {dayjs(pageviewStats._min.createdAt).format(
                     'MMM D, YYYY h:mm A',
                   )}
@@ -159,18 +157,18 @@ export function UrlClient({
               )}
             </div>
 
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
                 <TrendingUp className="size-4" />
                 Total Pageviews
               </div>
-              <div className="text-xl font-medium text-neutral-900 dark:text-neutral-100 sm:text-2xl">
+              <div className="text-xl font-medium text-foreground sm:text-2xl">
                 {pageviewStats._count.toLocaleString()}
               </div>
             </div>
 
-            <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
-              <div className="mb-2 flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="size-4" />
                 Last Seen
               </div>
@@ -180,7 +178,7 @@ export function UrlClient({
                   : 'N/A'}
               </div>
               {pageviewStats._max.createdAt && (
-                <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {dayjs(pageviewStats._max.createdAt).format(
                     'MMM D, YYYY h:mm A',
                   )}
@@ -206,17 +204,17 @@ export function UrlClient({
           {/* Legacy Analytics Grid */}
           <div className="grid gap-4 md:grid-cols-2">
             {/* Top Countries */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-card p-6">
               <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Top Countries
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-muted-foreground">
                   Geographic distribution of visitors
                 </p>
               </div>
               {topCountries.length === 0 ? (
-                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No data available
                 </p>
               ) : (
@@ -229,17 +227,17 @@ export function UrlClient({
             </div>
 
             {/* Top Browsers */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-card p-6">
               <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Top Browsers
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-muted-foreground">
                   Browser distribution
                 </p>
               </div>
               {topBrowsers.length === 0 ? (
-                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No data available
                 </p>
               ) : (
@@ -252,17 +250,15 @@ export function UrlClient({
             </div>
 
             {/* Top Operating Systems */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-card p-6">
               <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Top Operating Systems
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  OS distribution
-                </p>
+                <p className="text-sm text-muted-foreground">OS distribution</p>
               </div>
               {topOS.length === 0 ? (
-                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No data available
                 </p>
               ) : (
@@ -275,17 +271,17 @@ export function UrlClient({
             </div>
 
             {/* Top Devices */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50">
+            <div className="rounded-lg border border-border bg-card p-6">
               <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Top Devices
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-muted-foreground">
                   Device type distribution
                 </p>
               </div>
               {topDevices.length === 0 ? (
-                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No data available
                 </p>
               ) : (
@@ -298,17 +294,17 @@ export function UrlClient({
             </div>
 
             {/* Top Engines */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-6 dark:border-neutral-700 dark:bg-neutral-800/50 md:col-span-2">
+            <div className="rounded-lg border border-border bg-card p-6 md:col-span-2">
               <div className="mb-4">
-                <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 sm:text-base">
+                <h2 className="text-sm font-medium text-foreground sm:text-base">
                   Top Browser Engines
                 </h2>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-muted-foreground">
                   Rendering engine distribution
                 </p>
               </div>
               {topEngines.length === 0 ? (
-                <p className="py-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No data available
                 </p>
               ) : (
