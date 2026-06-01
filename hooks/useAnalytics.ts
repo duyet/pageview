@@ -3,6 +3,7 @@ import { TrendData } from '@/pages/api/analytics/trends'
 import { DeviceData } from '@/pages/api/analytics/devices'
 import { LocationData } from '@/pages/api/analytics/locations'
 import { BotStatsData } from '@/pages/api/analytics/bots'
+import { useDataSource } from '../components/DataSourceContext'
 
 export interface AnalyticsFilters {
   host?: string
@@ -13,10 +14,15 @@ export interface AnalyticsFilters {
 // Hook for fetching trends data
 export function useTrendsData(days: number, filters?: AnalyticsFilters) {
   const { host, urlId, excludeBots } = filters || {}
+  const { dataSource } = useDataSource()
+
   return useQuery({
-    queryKey: ['trends', days, host, urlId, excludeBots],
+    queryKey: ['trends', days, host, urlId, excludeBots, dataSource],
     queryFn: async () => {
-      const params = new URLSearchParams({ days: days.toString() })
+      const params = new URLSearchParams({
+        days: days.toString(),
+        source: dataSource,
+      })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
       if (excludeBots) params.append('excludeBots', 'true')
@@ -38,10 +44,15 @@ export function useTrendsData(days: number, filters?: AnalyticsFilters) {
 // Hook for fetching devices data
 export function useDevicesData(days: number, filters?: AnalyticsFilters) {
   const { host, urlId, excludeBots } = filters || {}
+  const { dataSource } = useDataSource()
+
   return useQuery({
-    queryKey: ['devices', days, host, urlId, excludeBots],
+    queryKey: ['devices', days, host, urlId, excludeBots, dataSource],
     queryFn: async () => {
-      const params = new URLSearchParams({ days: days.toString() })
+      const params = new URLSearchParams({
+        days: days.toString(),
+        source: dataSource,
+      })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
       if (excludeBots) params.append('excludeBots', 'true')
@@ -63,10 +74,15 @@ export function useDevicesData(days: number, filters?: AnalyticsFilters) {
 // Hook for fetching locations data
 export function useLocationsData(days: number, filters?: AnalyticsFilters) {
   const { host, urlId, excludeBots } = filters || {}
+  const { dataSource } = useDataSource()
+
   return useQuery({
-    queryKey: ['locations', days, host, urlId, excludeBots],
+    queryKey: ['locations', days, host, urlId, excludeBots, dataSource],
     queryFn: async () => {
-      const params = new URLSearchParams({ days: days.toString() })
+      const params = new URLSearchParams({
+        days: days.toString(),
+        source: dataSource,
+      })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
       if (excludeBots) params.append('excludeBots', 'true')
@@ -87,10 +103,15 @@ export function useLocationsData(days: number, filters?: AnalyticsFilters) {
 // Hook for fetching bot analytics data
 export function useBotsData(days: number, filters?: AnalyticsFilters) {
   const { host, urlId } = filters || {}
+  const { dataSource } = useDataSource()
+
   return useQuery({
-    queryKey: ['bots', days, host, urlId],
+    queryKey: ['bots', days, host, urlId, dataSource],
     queryFn: async () => {
-      const params = new URLSearchParams({ days: days.toString() })
+      const params = new URLSearchParams({
+        days: days.toString(),
+        source: dataSource,
+      })
       if (host) params.append('host', host)
       if (urlId) params.append('urlId', urlId.toString())
 
@@ -98,6 +119,40 @@ export function useBotsData(days: number, filters?: AnalyticsFilters) {
       if (!response.ok) throw new Error('Failed to fetch bot analytics')
 
       return (await response.json()) as BotStatsData
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
+  })
+}
+
+export interface AudienceData {
+  utmSources: { name: string; value: number; percentage: number }[]
+  utmCampaigns: { name: string; value: number; percentage: number }[]
+  utmMediums: { name: string; value: number; percentage: number }[]
+  languages: { name: string; value: number; percentage: number }[]
+  viewports: { name: string; value: number; percentage: number }[]
+  total: number
+}
+
+// Hook for fetching audience & marketing data
+export function useAudienceData(days: number, filters?: AnalyticsFilters) {
+  const { host, urlId, excludeBots } = filters || {}
+  const { dataSource } = useDataSource()
+
+  return useQuery({
+    queryKey: ['audience', days, host, urlId, excludeBots, dataSource],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        days: days.toString(),
+        source: dataSource,
+      })
+      if (host) params.append('host', host)
+      if (urlId) params.append('urlId', urlId.toString())
+      if (excludeBots) params.append('excludeBots', 'true')
+
+      const response = await fetch(`/api/analytics/audience?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch audience analytics')
+
+      return (await response.json()) as AudienceData
     },
     staleTime: 5 * 60 * 1000, // 5 minutes - matches server cache TTL
   })

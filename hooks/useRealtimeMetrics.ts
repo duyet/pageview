@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
 import { RealtimeMetrics } from '../types/socket'
+import { useDataSource } from '../components/DataSourceContext'
 
 export const useRealtimeMetrics = (refreshInterval = 30000) => {
   const [metrics, setMetrics] = useState<RealtimeMetrics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isConnected, setIsConnected] = useState(false)
+  const { dataSource } = useDataSource()
 
   const fetchMetrics = async () => {
     try {
-      const response = await fetch('/api/realtime/metrics')
+      const response = await fetch(`/api/realtime/metrics?source=${dataSource}`)
       if (!response.ok) {
         throw new Error('Failed to fetch metrics')
       }
@@ -26,14 +28,14 @@ export const useRealtimeMetrics = (refreshInterval = 30000) => {
   }
 
   useEffect(() => {
-    // Initial fetch
+    // Initial fetch (and re-fetch when dataSource changes!)
     fetchMetrics()
 
     // Set up periodic refresh
     const interval = setInterval(fetchMetrics, refreshInterval)
 
     return () => clearInterval(interval)
-  }, [refreshInterval])
+  }, [refreshInterval, dataSource]) // Dependency on dataSource triggers instant refresh on database switch!
 
   return { metrics, loading, error, isConnected, refetch: fetchMetrics }
 }

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { BarChart3, Home, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DataSourceSelector } from './DataSourceSelector'
 
 export const Header = () => {
   const router = useRouter()
@@ -42,34 +43,39 @@ export const Header = () => {
           </Link>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-1">
-            {navItems.map(({ href, icon: Icon, label }) => {
-              const isActive = router.pathname === href
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    'group relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all',
-                    isActive
-                      ? 'bg-neutral-100 text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-neutral-100'
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-100'
-                  )}
-                >
-                  <Icon
+          <div className="flex items-center gap-4">
+            <nav className="flex items-center gap-1">
+              {navItems.map(({ href, icon: Icon, label }) => {
+                const isActive = router.pathname === href
+                return (
+                  <Link
+                    key={href}
+                    href={href}
                     className={cn(
-                      'size-4 transition-transform group-hover:scale-110',
-                      isActive && 'text-neutral-900 dark:text-neutral-100'
+                      'group relative inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+                      isActive
+                        ? 'bg-neutral-100 text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-neutral-100'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/50 dark:hover:text-neutral-100'
                     )}
-                  />
-                  <span className="hidden sm:inline">{label}</span>
-                  {isActive && (
-                    <div className="absolute -bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-neutral-900 dark:bg-neutral-100" />
-                  )}
-                </Link>
-              )
-            })}
-          </nav>
+                  >
+                    <Icon
+                      className={cn(
+                        'size-4 transition-transform group-hover:scale-110',
+                        isActive && 'text-neutral-900 dark:text-neutral-100'
+                      )}
+                    />
+                    <span className="hidden sm:inline">{label}</span>
+                    {isActive && (
+                      <div className="absolute -bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+                    )}
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {/* Global database source selector */}
+            <DataSourceSelector />
+          </div>
         </div>
       </div>
     </header>

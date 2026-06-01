@@ -26,7 +26,9 @@ import {
   useDevicesData,
   useLocationsData,
   useBotsData,
+  useAudienceData,
 } from '@/hooks/useAnalytics'
+import { AudienceListChart } from '@/components/charts/AudienceChart'
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -73,6 +75,12 @@ export default function Analytics() {
     isLoading: loadingBots,
     isFetching: fetchingBots,
   } = useBotsData(days)
+
+  const {
+    data: audienceResult,
+    isLoading: loadingAudience,
+    isFetching: fetchingAudience,
+  } = useAudienceData(days, { excludeBots })
 
   const trendsData = trendsResult?.trends || []
   const trendsTotals = {
@@ -166,12 +174,15 @@ export default function Analytics() {
 
             {/* Device, Location & Bot Analytics */}
             <Tabs defaultValue="devices" className="space-y-4">
-              <TabsList className="grid h-10 w-full grid-cols-3">
+              <TabsList className="grid h-10 w-full grid-cols-4">
                 <TabsTrigger value="devices" className="text-sm">
                   Devices
                 </TabsTrigger>
                 <TabsTrigger value="locations" className="text-sm">
                   Locations
+                </TabsTrigger>
+                <TabsTrigger value="audience" className="text-sm">
+                  Audience & UTMs
                 </TabsTrigger>
                 <TabsTrigger value="bots" className="text-sm">
                   Bots
@@ -246,6 +257,49 @@ export default function Analytics() {
                       data={locationsData.cities}
                       title="Cities"
                       loading={loadingLocations}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="audience" className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <ChartTitle
+                      title="UTM Campaigns"
+                      description="Traffic by UTM campaign"
+                      loading={fetchingAudience}
+                    />
+                    <AudienceListChart
+                      data={audienceResult?.utmCampaigns || []}
+                      title="Campaigns"
+                      loading={loadingAudience}
+                    />
+                  </div>
+
+                  <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <ChartTitle
+                      title="Languages"
+                      description="Browser locale preferences"
+                      loading={fetchingAudience}
+                    />
+                    <AudienceListChart
+                      data={audienceResult?.languages || []}
+                      title="Languages"
+                      loading={loadingAudience}
+                    />
+                  </div>
+
+                  <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                    <ChartTitle
+                      title="Screen Resolutions"
+                      description="Viewport width & height"
+                      loading={fetchingAudience}
+                    />
+                    <AudienceListChart
+                      data={audienceResult?.viewports || []}
+                      title="Resolutions"
+                      loading={loadingAudience}
                     />
                   </div>
                 </div>

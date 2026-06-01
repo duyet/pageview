@@ -108,25 +108,31 @@ export default async function handler(
   // Use custom data if provided, otherwise fall back to middleware-enriched data
   const uaString = hasCustomData
     ? customData.ua || req.headers['user-agent'] || ''
-    : String(req.query.ua || '')
+    : String(req.query.ua || '').trim() !== ''
+      ? String(req.query.ua)
+      : req.headers['user-agent'] || 'Unknown'
 
   // Convert empty string to null for proper database handling
   const ip = hasCustomData
     ? customData.ip || null
     : req.query.ip && String(req.query.ip).trim() !== ''
       ? String(req.query.ip)
-      : null
+      : req.socket?.remoteAddress || null
 
   const countryName = hasCustomData
     ? customData.country || 'Unknown'
-    : String(req.query.country || '')
+    : String(req.query.country || '').trim() !== ''
+      ? String(req.query.country)
+      : 'Unknown'
 
   const cityName = hasCustomData
     ? customData.city || 'Unknown'
-    : String(req.query.city || '')
+    : String(req.query.city || '').trim() !== ''
+      ? String(req.query.city)
+      : 'Unknown'
 
   // Skip empty or invalid entries (only for non-custom data)
-  if (!hasCustomData && (!uaString || !countryName || !cityName)) {
+  if (!hasCustomData && (!uaString || countryName === '' || cityName === '')) {
     return res.status(400).json({ msg: 'Missing required fields' })
   }
 

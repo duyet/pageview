@@ -340,9 +340,9 @@ export default function Home({
                   </p>
                 </div>
                 {isIntegrationOpen ? (
-                  <ChevronUp className="size-5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
+                  <ChevronUp className="size-5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                 ) : (
-                  <ChevronDown className="size-5 flex-shrink-0 text-neutral-500 dark:text-neutral-400" />
+                  <ChevronDown className="size-5 shrink-0 text-neutral-500 dark:text-neutral-400" />
                 )}
               </button>
               {isIntegrationOpen && (

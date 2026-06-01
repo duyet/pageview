@@ -23,7 +23,9 @@
     "type-check": "tsc --noEmit",
     "validate": "yarn type-check && yarn lint && yarn test",
     "prepare": "husky",
-    "clickhouse:init": "npx tsx scripts/init-clickhouse.ts"
+    "clickhouse:init": "npx tsx scripts/init-clickhouse.ts",
+    "clickhouse:migrate": "npx tsx scripts/migrate-data.ts clickhouse",
+    "duckdb:migrate": "npx tsx scripts/migrate-data.ts duckdb"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

@@ -1,18 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {
-  getLocationsData,
+  getAudienceData,
   DataSource,
 } from '../../../lib/analytics/dataSourceQuery'
 
-export type LocationData = {
+export type AudienceDetail = {
   name: string
   value: number
   percentage: number
 }
 
 type ResponseData = {
-  countries: LocationData[]
-  cities: LocationData[]
+  utmSources: AudienceDetail[]
+  utmCampaigns: AudienceDetail[]
+  utmMediums: AudienceDetail[]
+  languages: AudienceDetail[]
+  viewports: AudienceDetail[]
   total: number
 }
 
@@ -49,7 +52,7 @@ export default async function handler(
       : 'postgres'
 
     // Separate caches by active source
-    const cacheKey = `locations:${numDays}:${host || ''}:${urlId || ''}:${excludeBots || ''}:${activeSource}`
+    const cacheKey = `audience:${numDays}:${host || ''}:${urlId || ''}:${excludeBots || ''}:${activeSource}`
     const cached = cache.get(cacheKey)
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       res.setHeader(
@@ -62,20 +65,23 @@ export default async function handler(
     // Delegate execution to the SQL Router
     let responseData: ResponseData
     try {
-      responseData = await getLocationsData(activeSource, numDays, {
+      responseData = await getAudienceData(activeSource, numDays, {
         host: host as string,
         urlId: urlId ? parseInt(urlId as string, 10) : undefined,
         excludeBots: excludeBots === 'true',
       })
     } catch (dbErr) {
       console.error(
-        `Database error inside locations API [source: ${activeSource}]:`,
+        `Database error inside audience API [source: ${activeSource}]:`,
         dbErr
       )
       // Graceful fail-safe fallback
       responseData = {
-        countries: [],
-        cities: [],
+        utmSources: [],
+        utmCampaigns: [],
+        utmMediums: [],
+        languages: [],
+        viewports: [],
         total: 0,
       }
     }
@@ -99,7 +105,7 @@ export default async function handler(
     )
     res.status(200).json(responseData)
   } catch (error) {
-    console.error('Analytics locations API error:', error)
+    console.error('Analytics audience API error:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 }

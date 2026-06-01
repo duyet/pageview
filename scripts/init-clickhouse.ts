@@ -9,7 +9,8 @@ loadEnvConfig(process.cwd())
 const targetUrlString =
   process.argv[2] ||
   process.env.CLICKHOUSE_ADMIN_URL ||
-  process.env.CLICKHOUSE_URL
+  process.env.CLICKHOUSE_URL ||
+  ''
 
 if (!targetUrlString) {
   console.error('\n❌ ERROR: No ClickHouse connection URL found.')
@@ -68,10 +69,10 @@ async function run() {
 
   let parsed: URL
   try {
-    parsed = new URL(targetUrlString)
+    parsed = new URL(targetUrlString!)
   } catch (err) {
     console.error('❌ ERROR: Invalid ClickHouse URL format:', targetUrlString)
-    process.exit(1)
+    process.exit(1) as never
   }
 
   const pathDb = parsed.pathname.replace(/^\//, '')
