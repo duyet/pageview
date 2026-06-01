@@ -5,7 +5,7 @@ import { DateRangePicker } from '@/components/DateRangePicker'
 import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart'
 import { ChartTitle } from '@/components/charts/ChartTitle'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendData } from '@/pages/api/analytics/trends'
+import { TrendData } from '@/app/api/analytics/trends/route'
 
 export type MetricView = 'pageviews' | 'visitors'
 

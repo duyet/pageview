@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { BarChart3, Home, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DataSourceSelector } from './DataSourceSelector'
 
 export const Header = () => {
-  const router = useRouter()
+  const pathname = usePathname()
 
   const navItems = [
     { href: '/', icon: Home, label: 'Dashboard' },
@@ -46,7 +46,7 @@ export const Header = () => {
           <div className="flex items-center gap-4">
             <nav className="flex items-center gap-1">
               {navItems.map(({ href, icon: Icon, label }) => {
-                const isActive = router.pathname === href
+                const isActive = pathname === href
                 return (
                   <Link
                     key={href}

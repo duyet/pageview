@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { Loader2 } from 'lucide-react'
-import { LocationData } from '../../pages/api/analytics/locations'
+import { LocationData } from '@/app/api/analytics/locations/route'
 
 interface LocationChartProps {
   data: LocationData[]

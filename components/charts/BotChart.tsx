@@ -11,7 +11,23 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { Loader2, Bot, User } from 'lucide-react'
-import { BotData, BotStatsData } from '@/pages/api/analytics/bots'
+// TODO: Move to shared types file or app/api/analytics/bots/route.ts when created
+export interface BotData {
+  botType: string
+  botName: string
+  count: number
+  percentage: number
+}
+
+export interface BotStatsData {
+  totalPageviews: number
+  totalHumans: number
+  totalBots: number
+  humanPercentage: number
+  botPercentage: number
+  botsByType: BotData[]
+  topBots: BotData[]
+}
 
 interface BotChartProps {
   data: BotStatsData | undefined
@@ -172,7 +188,7 @@ export function BotTypeChart({ data, loading }: BotChartProps) {
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data.botsByType}
+            data={data.botsByType as any}
             cx="50%"
             cy="50%"
             labelLine={false}

@@ -1,4 +1,4 @@
-import { DeviceData } from '../../pages/api/analytics/devices'
+import { DeviceData } from '@/app/api/analytics/devices/route'
 
 interface DeviceHorizontalChartProps {
   data: DeviceData[]

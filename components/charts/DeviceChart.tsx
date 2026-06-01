@@ -7,7 +7,7 @@ import {
   Legend,
 } from 'recharts'
 import { Loader2 } from 'lucide-react'
-import { DeviceData } from '../../pages/api/analytics/devices'
+import { DeviceData } from '@/app/api/analytics/devices/route'
 
 interface DeviceChartProps {
   data: DeviceData[]

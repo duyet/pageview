@@ -10,7 +10,7 @@ import {
 } from 'recharts'
 import { format, parseISO } from 'date-fns'
 import { Loader2 } from 'lucide-react'
-import { TrendData } from '../../pages/api/analytics/trends'
+import { TrendData } from '@/app/api/analytics/trends/route'
 
 interface TrendsChartProps {
   data: TrendData[]

@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { TrendData } from '@/pages/api/analytics/trends'
-import { DeviceData } from '@/pages/api/analytics/devices'
-import { LocationData } from '@/pages/api/analytics/locations'
-import { BotStatsData } from '@/pages/api/analytics/bots'
+import { TrendData } from '@/app/api/analytics/trends/route'
+import { DeviceData } from '@/app/api/analytics/devices/route'
+import { LocationData } from '@/app/api/analytics/locations/route'
+import { BotStatsData } from '@/components/charts/BotChart'
 import { useDataSource } from '../components/DataSourceContext'
 
 export interface AnalyticsFilters {

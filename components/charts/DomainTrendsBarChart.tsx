@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { format, parseISO } from 'date-fns'
-import { TrendData } from '../../pages/api/analytics/trends'
+import { TrendData } from '@/app/api/analytics/trends/route'
 import { MetricView } from '../domain/DomainTrendsSection'
 
 interface DomainTrendsBarChartProps {
