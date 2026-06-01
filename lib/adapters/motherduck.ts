@@ -19,13 +19,10 @@ export class MotherDuckAdapter implements PageViewAdapter {
       this.databaseName = process.env.MOTHERDUCK_DATABASE || 'my_db'
       this.tableName = process.env.MOTHERDUCK_TABLE || 'pageviews'
 
-      // Determine local mock buffer path in case native DuckDB bindings are missing
-      const baseDir = process.cwd()
-      this.localBufferPath = path.join(
-        baseDir,
-        '.antigravitycli',
-        'duckdb_buffer.jsonl'
-      )
+      // Use /tmp for the buffer — it's the only writable directory on
+      // Vercel serverless. Falls back gracefully when DuckDB native bindings
+      // are absent (e.g. Vercel doesn't include the native C++ addon).
+      this.localBufferPath = path.join('/tmp', 'duckdb_buffer.jsonl')
     }
   }
 
