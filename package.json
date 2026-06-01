@@ -2,6 +2,9 @@
   "name": "pageview",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "dev": "prisma generate && next dev",
     "start": "next start",
