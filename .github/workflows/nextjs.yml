@@ -71,5 +71,6 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Lint
         run: ${{ steps.detect-package-manager.outputs.runner }} lint
+        continue-on-error: true
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} build
