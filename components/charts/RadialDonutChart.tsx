@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { DeviceData } from '@/app/api/analytics/devices/route';
+import { EmptyChartState } from '@/components/charts/EmptyChartState';
 
 interface RadialDonutChartProps {
   data: DeviceData[];
@@ -33,7 +34,7 @@ export function RadialDonutChart({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading {title.toLowerCase()}...</span>
         </div>
@@ -43,11 +44,11 @@ export function RadialDonutChart({
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          No {title.toLowerCase()} data
-        </div>
-      </div>
+      <EmptyChartState
+        title={`No ${title.toLowerCase()} data`}
+        description="Data will appear as traffic comes in"
+        illustration="chart"
+      />
     );
   }
 
