@@ -293,15 +293,12 @@ export default async function handler(
       utmContent,
     }
 
-    // Broadcast pageview event concurrently to all active storage and HTTP streaming backends
-    await broadcastPageView(pageviewEvent)
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log(
-        'Record processed and broadcasted successfully',
-        pageviewEvent
-      )
-    }
+    // Fire-and-forget: broadcast to all adapters in the background.
+    // Analytics collection endpoints must respond fast — replication to
+    // ClickHouse/DuckDB/Webhook happens asynchronously.
+    broadcastPageView(pageviewEvent).catch((err) => {
+      console.error('Background broadcast error:', err)
+    })
 
     return res.json({ msg: 'Pageview recorded successfully', id: eventId })
   } catch (err) {
