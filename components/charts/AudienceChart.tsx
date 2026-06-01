@@ -39,7 +39,7 @@ export function AudienceListChart({ data, title, loading }: AudienceListProps) {
   const maxVal = Math.max(...displayItems.map((item) => item.value)) || 1
 
   return (
-    <div className="scrollbar-thin scrollbar-thumb-neutral-200 h-72 overflow-y-auto pr-1">
+    <div className="h-72 overflow-y-auto pr-1">
       <div className="space-y-3.5">
         {displayItems.map((item, index) => {
           const barWidth = Math.round((item.value / maxVal) * 100)

@@ -72,7 +72,7 @@ async function run() {
     parsed = new URL(targetUrlString!)
   } catch (err) {
     console.error('❌ ERROR: Invalid ClickHouse URL format:', targetUrlString)
-    process.exit(1) as never
+    process.exit(1)
   }
 
   const pathDb = parsed.pathname.replace(/^\//, '')

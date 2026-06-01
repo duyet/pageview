@@ -123,7 +123,7 @@ export const DataSourceSelector = () => {
                       source.color
                     )}
                   >
-                    <source.icon className="size-4.5" />
+                    <source.icon className="size-[18px]" />
                   </span>
 
                   <div className="min-w-0 flex-1">
