@@ -56,6 +56,15 @@ export class ClickHouseAdapter implements PageViewAdapter {
       `ClickHouse HTTP Adapter configured for database: "${this.database}", table: "${this.table}"`
     )
 
+    // In production, the schema is already provisioned — skip DDL to avoid
+    // slow cold-start latency (5-8s) that causes Prisma transaction timeouts.
+    if (process.env.NODE_ENV === 'production') {
+      console.log(
+        `[ClickHouse] Production mode: skipping DDL initialization. Schema assumed to be pre-provisioned.`
+      )
+      return
+    }
+
     try {
       const parsed = new URL(this.connectionUrl)
       const targetUrl = new URL(parsed.origin)
