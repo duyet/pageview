@@ -12,7 +12,9 @@ import {
 } from '@/components/charts/BotChart';
 import { ChartTitle } from '@/components/charts/ChartTitle';
 import { DeviceChart } from '@/components/charts/DeviceChart';
+import GradientOrb from '@/components/charts/GradientOrb';
 import { LocationChart } from '@/components/charts/LocationChart';
+import { RadialDonutChart } from '@/components/charts/RadialDonutChart';
 import { MetricToggle, TrendsChart } from '@/components/charts/TrendsChart';
 import { DateRangePicker } from '@/components/DateRangePicker';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -99,9 +101,17 @@ export function AnalyticsClient() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
-        <div className="flex flex-col space-y-4">
+        <div className="relative flex flex-col space-y-4">
+          {/* Ambient background */}
+          <GradientOrb
+            variant="amber"
+            size={300}
+            className="-top-20 -right-20"
+          />
+          <GradientOrb variant="teal" size={250} className="-top-10 -left-16" />
+
           {/* Header */}
-          <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
+          <div className="relative flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
                 Analytics
@@ -200,10 +210,11 @@ export function AnalyticsClient() {
                     description="Desktop, mobile, tablet"
                     loading={fetchingDevices}
                   />
-                  <DeviceChart
+                  <RadialDonutChart
                     data={devicesData.devices}
                     title="Device Types"
                     loading={loadingDevices}
+                    centerLabel="Devices"
                   />
                 </div>
               </div>

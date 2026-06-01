@@ -1,12 +1,13 @@
 import { Loader2 } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { DeviceData } from '@/app/api/analytics/devices/route';
-import { EmptyChartState } from '@/components/charts/EmptyChartState';
 
-interface DeviceChartProps {
+interface RadialDonutChartProps {
   data: DeviceData[];
   title: string;
   loading?: boolean;
+  centerLabel?: string;
+  centerValue?: string;
 }
 
 const COLORS = [
@@ -22,7 +23,13 @@ const COLORS = [
   '#4F46E5', // indigo
 ];
 
-export function DeviceChart({ data, title, loading }: DeviceChartProps) {
+export function RadialDonutChart({
+  data,
+  title,
+  loading,
+  centerLabel,
+  centerValue,
+}: RadialDonutChartProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
@@ -36,17 +43,17 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <EmptyChartState
-        title={`No ${title.toLowerCase()} data`}
-        description="Data will appear as traffic comes in"
-        illustration="chart"
-      />
+      <div className="flex h-80 items-center justify-center">
+        <div className="text-neutral-600 dark:text-neutral-400">
+          No {title.toLowerCase()} data
+        </div>
+      </div>
     );
   }
 
-  // Take top 8 items and group the rest as "Others"
-  const topItems = data.slice(0, 8);
-  const otherItems = data.slice(8);
+  // Take top 6 items and group the rest as "Others"
+  const topItems = data.slice(0, 6);
+  const otherItems = data.slice(6);
 
   const chartData = [...topItems];
 
@@ -64,6 +71,10 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
     });
   }
 
+  const total =
+    centerValue ??
+    chartData.reduce((sum, item) => sum + item.value, 0).toLocaleString();
+
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -72,11 +83,15 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
             data={chartData}
             cx="50%"
             cy="50%"
-            labelLine={false}
-            label={(entry: any) => `${entry.name} (${entry.percentage}%)`}
+            innerRadius={60}
             outerRadius={80}
+            cornerRadius={4}
+            paddingAngle={2}
+            labelLine={false}
+            label={false}
             fill="#D97706"
             dataKey="value"
+            stroke="none"
           >
             {chartData.map((_entry, index) => (
               <Cell
@@ -85,16 +100,40 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
               />
             ))}
           </Pie>
+          <text
+            x="50%"
+            y="50%"
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="fill-foreground"
+          >
+            {centerLabel && (
+              <tspan
+                x="50%"
+                dy={centerValue || total ? -10 : 0}
+                className="text-xs fill-muted-foreground"
+              >
+                {centerLabel}
+              </tspan>
+            )}
+            <tspan
+              x="50%"
+              dy={centerLabel ? 18 : 0}
+              className="text-lg font-semibold fill-foreground"
+            >
+              {centerValue ?? total}
+            </tspan>
+          </text>
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload?.length) {
                 const data = payload[0].payload;
                 return (
-                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
-                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
+                    <p className="mb-1 text-sm font-medium text-foreground">
                       {data.name}
                     </p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p className="text-xs text-muted-foreground">
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>

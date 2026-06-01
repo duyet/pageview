@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
+import { EmptyChartState } from '@/components/charts/EmptyChartState';
 
 interface LocationMapProps {
   data: Array<{
@@ -95,11 +96,11 @@ export function LocationMap({ data, loading }: LocationMapProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-80 items-center justify-center">
-        <div className="text-muted-foreground dark:text-muted-foreground">
-          No location data
-        </div>
-      </div>
+      <EmptyChartState
+        title="No location data"
+        description="Geographic data will appear as visitors arrive"
+        illustration="globe"
+      />
     );
   }
 

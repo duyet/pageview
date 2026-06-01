@@ -7,6 +7,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { EmptyChartState } from '@/components/charts/EmptyChartState';
 import type { RealtimeMetrics } from '../../types/socket';
 
 interface RealtimeChartProps {
@@ -27,11 +28,11 @@ export function RealtimeChart({ data, loading }: RealtimeChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-muted-foreground dark:text-muted-foreground">
-          No real-time data available
-        </div>
-      </div>
+      <EmptyChartState
+        title="No real-time data"
+        description="Traffic patterns will appear as visitors arrive"
+        illustration="activity"
+      />
     );
   }
 

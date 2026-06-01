@@ -2,6 +2,7 @@
 
 import { RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import GradientOrb from '@/components/charts/GradientOrb';
 import { LocationMap } from '@/components/charts/LocationMap';
 import { RealtimeChart } from '@/components/charts/RealtimeChart';
 import {
@@ -36,7 +37,14 @@ export function RealtimeClient() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl p-4 sm:px-6">
-        <div className="flex flex-col space-y-4">
+        <div className="relative flex flex-col space-y-4">
+          {/* Ambient background */}
+          <GradientOrb
+            variant="teal"
+            size={280}
+            className="-top-16 -right-16"
+          />
+
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
