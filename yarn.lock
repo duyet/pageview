@@ -3427,9 +3427,9 @@ highlightjs-vue@^1.0.0:
   integrity sha512-PDEfEF102G23vHmPhLyPboFCD+BkMGu+GuJe2d9/eH4FsCwvgBpnc9n0pGE+ffKdph38s6foEZiEjdgHdzp+IA==
 
 hono@^4.12.8:
-  version "4.12.23"
-  resolved "https://registry.yarnpkg.com/hono/-/hono-4.12.23.tgz#998b91651686149f0e6edbb8564d604da04f3cf8"
-  integrity sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==
+  version "4.12.30"
+  resolved "https://registry.yarnpkg.com/hono/-/hono-4.12.30.tgz#4d57b051c66617b003b7ba318910cb5b79c4c7ac"
+  integrity sha512-emn+JoJjrN9YTpRDS5it/UI2SO9BAE37T6I3d963RxcZ81G9A4pr2SZTEiiaiKbzx+NKRg5BZ89fCL7gCJCUog==
 
 html-encoding-sniffer@^6.0.0:
   version "6.0.0"
