@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
+  // `.dark` never appears literally in content files (it's applied at runtime
+  // by the theme toggle), so safelist it or Tailwind tree-shakes the
+  // `.dark { --background: ... }` token block out of the compiled CSS.
+  safelist: ['dark'],
   content: [
     'pages/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
