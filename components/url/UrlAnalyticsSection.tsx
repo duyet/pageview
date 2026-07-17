@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import type { DateRange } from 'react-day-picker';
-import { ChartTitle } from '@/components/charts/ChartTitle';
 import { DeviceHorizontalChart } from '@/components/charts/DeviceHorizontalChart';
 import { LocationChart } from '@/components/charts/LocationChart';
+import { SectionCard } from '@/components/SectionCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useDevicesData, useLocationsData } from '@/hooks/useAnalytics';
 
@@ -61,74 +61,74 @@ export function UrlAnalyticsSection({
 
       <TabsContent value="devices" className="space-y-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
-            <ChartTitle
-              title="Browsers"
-              description="Most popular"
-              loading={fetchingDevices}
-            />
+          <SectionCard
+            padding="md"
+            title="Browsers"
+            description="Most popular"
+            loading={fetchingDevices}
+          >
             <DeviceHorizontalChart
               data={devicesData.browsers}
               title="Browsers"
               loading={loadingDevices}
             />
-          </div>
+          </SectionCard>
 
-          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
-            <ChartTitle
-              title="Operating Systems"
-              description="Device OS"
-              loading={fetchingDevices}
-            />
+          <SectionCard
+            padding="md"
+            title="Operating Systems"
+            description="Device OS"
+            loading={fetchingDevices}
+          >
             <DeviceHorizontalChart
               data={devicesData.os}
               title="Operating Systems"
               loading={loadingDevices}
             />
-          </div>
+          </SectionCard>
 
-          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
-            <ChartTitle
-              title="Device Types"
-              description="Desktop, mobile, tablet"
-              loading={fetchingDevices}
-            />
+          <SectionCard
+            padding="md"
+            title="Device Types"
+            description="Desktop, mobile, tablet"
+            loading={fetchingDevices}
+          >
             <DeviceHorizontalChart
               data={devicesData.devices}
               title="Device Types"
               loading={loadingDevices}
             />
-          </div>
+          </SectionCard>
         </div>
       </TabsContent>
 
       <TabsContent value="locations" className="space-y-4">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
-            <ChartTitle
-              title="Top Countries"
-              description="Visitors by country"
-              loading={fetchingLocations}
-            />
+          <SectionCard
+            padding="md"
+            title="Top Countries"
+            description="Visitors by country"
+            loading={fetchingLocations}
+          >
             <LocationChart
               data={locationsData.countries}
               title="Countries"
               loading={loadingLocations}
             />
-          </div>
+          </SectionCard>
 
-          <div className="rounded-lg border bg-border bg-card p-4 dark:bg-border ">
-            <ChartTitle
-              title="Top Cities"
-              description="Visitors by city"
-              loading={fetchingLocations}
-            />
+          <SectionCard
+            padding="md"
+            title="Top Cities"
+            description="Visitors by city"
+            loading={fetchingLocations}
+          >
             <LocationChart
               data={locationsData.cities}
               title="Cities"
               loading={loadingLocations}
             />
-          </div>
+          </SectionCard>
         </div>
       </TabsContent>
     </Tabs>
