@@ -1,5 +1,6 @@
 import { Activity, Eye, Globe, Users } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { SectionCard } from '@/components/SectionCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MetricCardProps {
   title: string;
@@ -18,43 +19,33 @@ export function RealtimeMetricCard({
   trend = 'neutral',
   loading,
 }: MetricCardProps) {
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          {icon}
-        </CardHeader>
-        <CardContent>
-          <div className="h-6 animate-pulse rounded bg-muted"></div>
-          {change && (
-            <div className="mt-1 h-4 animate-pulse rounded bg-muted"></div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
   const trendColor =
     trend === 'up'
-      ? 'text-teal-700'
+      ? 'text-chart-2'
       : trend === 'down'
-        ? 'text-orange-700'
+        ? 'text-chart-3'
         : 'text-muted-foreground';
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+    <SectionCard padding="md">
+      <div className="mb-2 flex items-center gap-2">
         {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
-          {typeof value === 'number' ? value.toLocaleString() : value}
-        </div>
-        {change && <p className={`text-xs ${trendColor} mt-1`}>{change}</p>}
-      </CardContent>
-    </Card>
+        <span className="text-sm text-muted-foreground">{title}</span>
+      </div>
+      {loading ? (
+        <>
+          <Skeleton className="h-7 w-20 sm:h-8" />
+          {change && <Skeleton className="mt-1 h-4 w-14" />}
+        </>
+      ) : (
+        <>
+          <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </div>
+          {change && <p className={`mt-1 text-xs ${trendColor}`}>{change}</p>}
+        </>
+      )}
+    </SectionCard>
   );
 }
 
