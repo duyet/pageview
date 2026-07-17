@@ -44,7 +44,7 @@ export function ActivityHeatmap({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading activity...</span>
         </div>
@@ -55,9 +55,7 @@ export function ActivityHeatmap({
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          No activity data
-        </div>
+        <div className="text-muted-foreground">No activity data</div>
       </div>
     );
   }

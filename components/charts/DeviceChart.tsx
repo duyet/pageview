@@ -10,11 +10,11 @@ interface DeviceChartProps {
 }
 
 const COLORS = [
-  '#D97706', // amber (primary)
-  '#0F766E', // teal
-  '#E09145', // warm orange
-  '#7C6FA0', // muted purple
-  '#2B6CB0', // steel blue
+  'hsl(var(--chart-1))', // orange (primary)
+  'hsl(var(--chart-2))', // teal
+  'hsl(var(--chart-3))', // amber
+  'hsl(var(--chart-4))', // muted purple
+  'hsl(var(--chart-5))', // steel blue
   '#65A30D', // lime green
   '#C2410C', // deep orange
   '#0891B2', // cyan
@@ -26,7 +26,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading {title.toLowerCase()}...</span>
         </div>
@@ -75,7 +75,7 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
             labelLine={false}
             label={(entry: any) => `${entry.name} (${entry.percentage}%)`}
             outerRadius={80}
-            fill="#D97706"
+            fill="hsl(var(--chart-1))"
             dataKey="value"
           >
             {chartData.map((_entry, index) => (
@@ -90,11 +90,11 @@ export function DeviceChart({ data, title, loading }: DeviceChartProps) {
               if (active && payload?.length) {
                 const data = payload[0].payload;
                 return (
-                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
-                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg border border-border bg-popover p-3 shadow-lg">
+                    <p className="mb-1 text-sm font-medium text-foreground">
                       {data.name}
                     </p>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p className="text-xs text-muted-foreground">
                       {data.value.toLocaleString()} visits ({data.percentage}%)
                     </p>
                   </div>

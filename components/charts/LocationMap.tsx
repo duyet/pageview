@@ -86,7 +86,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading location data...</span>
         </div>
@@ -130,26 +130,22 @@ export function LocationMap({ data, loading }: LocationMapProps) {
         {colorScale.map((item, index) => (
           <div
             key={index}
-            className={`group relative cursor-default rounded-lg border border-border p-3 transition-all hover:scale-105 hover:shadow-md dark:border-border ${getColor(item.intensity)}`}
+            className={`group relative cursor-default rounded-lg border border-border p-3 transition-[transform,box-shadow] hover:scale-105 hover:shadow-md ${getColor(item.intensity)}`}
           >
             <div className="flex flex-col items-center gap-1">
-              <div className="text-lg font-bold text-foreground dark:text-foreground">
+              <div className="text-lg font-bold text-foreground">
                 {item.country}
               </div>
-              <div className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
+              <div className="text-2xl font-bold tabular-nums text-foreground">
                 {item.count.toLocaleString()}
               </div>
-              <div className="text-xs text-foreground dark:text-muted-foreground">
-                views
-              </div>
+              <div className="text-xs text-muted-foreground">views</div>
             </div>
 
             {/* Tooltip on hover */}
-            <div className="pointer-events-none absolute -top-12 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg border border-border bg-card px-3 py-2 text-sm shadow-lg group-hover:block dark:border-border bg-card">
-              <div className="font-medium text-foreground dark:text-foreground">
-                {item.name}
-              </div>
-              <div className="text-xs text-muted-foreground dark:text-muted-foreground">
+            <div className="pointer-events-none absolute -top-12 left-1/2 z-10 hidden -translate-x-1/2 rounded-lg border border-border bg-popover px-3 py-2 text-sm shadow-lg group-hover:block">
+              <div className="font-medium text-foreground">{item.name}</div>
+              <div className="text-xs text-muted-foreground">
                 {item.count.toLocaleString()} visits
               </div>
             </div>
@@ -158,7 +154,7 @@ export function LocationMap({ data, loading }: LocationMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground dark:text-muted-foreground">
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
         <span>Less traffic</span>
         <div className="flex gap-1">
           {[0, 1, 2, 3, 4, 5, 6].map((i) => (

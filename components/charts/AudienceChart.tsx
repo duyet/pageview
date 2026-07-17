@@ -16,7 +16,7 @@ export function AudienceListChart({ data, title, loading }: AudienceListProps) {
   if (loading) {
     return (
       <div className="flex h-72 items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading {title.toLowerCase()}...</span>
         </div>
@@ -27,7 +27,7 @@ export function AudienceListChart({ data, title, loading }: AudienceListProps) {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-72 items-center justify-center">
-        <div className="text-sm text-muted-foreground dark:text-muted-foreground">
+        <div className="text-sm text-muted-foreground">
           No {title.toLowerCase()} data in this period
         </div>
       </div>
@@ -46,10 +46,10 @@ export function AudienceListChart({ data, title, loading }: AudienceListProps) {
           return (
             <div key={item.name + index} className="space-y-1">
               <div className="flex items-center justify-between text-xs font-medium">
-                <span className="max-w-[70%] truncate text-foreground dark:text-muted-foreground">
+                <span className="max-w-[70%] truncate text-foreground">
                   {item.name}
                 </span>
-                <span className="shrink-0 text-foreground dark:text-foreground">
+                <span className="shrink-0 text-foreground">
                   {item.value.toLocaleString()}{' '}
                   <span className="font-normal text-muted-foreground">
                     ({item.percentage}%)
@@ -57,9 +57,9 @@ export function AudienceListChart({ data, title, loading }: AudienceListProps) {
                 </span>
               </div>
 
-              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary bg-card">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                 <div
-                  className="h-full rounded-full bg-amber-600/80 transition-all duration-500 ease-out"
+                  className="h-full rounded-full bg-chart-3/80 transition-[width] duration-500 ease-out"
                   style={{ width: `${barWidth}%` }}
                 />
               </div>

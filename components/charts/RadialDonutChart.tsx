@@ -12,11 +12,11 @@ interface RadialDonutChartProps {
 }
 
 const COLORS = [
-  '#D97706', // amber (primary)
-  '#0F766E', // teal
-  '#E09145', // warm orange
-  '#7C6FA0', // muted purple
-  '#2B6CB0', // steel blue
+  'hsl(var(--chart-1))', // orange (primary)
+  'hsl(var(--chart-2))', // teal
+  'hsl(var(--chart-3))', // amber
+  'hsl(var(--chart-4))', // muted purple
+  'hsl(var(--chart-5))', // steel blue
   '#65A30D', // lime green
   '#C2410C', // deep orange
   '#0891B2', // cyan
@@ -90,7 +90,7 @@ export function RadialDonutChart({
             paddingAngle={2}
             labelLine={false}
             label={false}
-            fill="#D97706"
+            fill="hsl(var(--chart-1))"
             dataKey="value"
             stroke="none"
           >
