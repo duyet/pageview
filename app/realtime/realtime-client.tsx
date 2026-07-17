@@ -22,7 +22,9 @@ import { Button } from '@/components/ui/button';
 import { useRealtimeMetrics } from '@/hooks/useRealtimeMetrics';
 
 export function RealtimeClient() {
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  // Starts null so the server and first client render match (a Date created
+  // during render differs between them and caused a hydration failure).
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { metrics, loading, error, isConnected, refetch } =
     useRealtimeMetrics(30000); // 30 seconds
 
@@ -153,7 +155,9 @@ export function RealtimeClient() {
           {/* Status Footer */}
           <SectionCard padding="md">
             <div className="flex items-center justify-between text-sm text-muted-foreground">
-              <div>Updated: {lastUpdated.toLocaleTimeString()}</div>
+              <div>
+                Updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : '—'}
+              </div>
               <div>Auto-refresh: 30s</div>
             </div>
           </SectionCard>
