@@ -10,14 +10,16 @@ import {
   BotTypeChart,
   TopBotsChart,
 } from '@/components/charts/BotChart';
-import { ChartTitle } from '@/components/charts/ChartTitle';
 import { DeviceChart } from '@/components/charts/DeviceChart';
 import GradientOrb from '@/components/charts/GradientOrb';
 import { LocationChart } from '@/components/charts/LocationChart';
 import { RadialDonutChart } from '@/components/charts/RadialDonutChart';
 import { MetricToggle, TrendsChart } from '@/components/charts/TrendsChart';
 import { DateRangePicker } from '@/components/DateRangePicker';
+import { PageHeader } from '@/components/PageHeader';
+import { SectionCard } from '@/components/SectionCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Toggle } from '@/components/ui/toggle';
 import {
   useAudienceData,
   useBotsData,
@@ -111,45 +113,40 @@ export function AnalyticsClient() {
           <GradientOrb variant="teal" size={250} className="-top-10 -left-16" />
 
           {/* Header */}
-          <div className="relative flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0">
-            <div>
-              <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
-                Analytics
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {dateRange?.from && dateRange?.to && formatDateRange()}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setExcludeBots(!excludeBots)}
-                className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
-                  excludeBots
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300'
-                    : 'border-border bg-card text-foreground hover:bg-accent'
-                }`}
-              >
-                <Bot className="size-4" />
-                <span>{excludeBots ? 'Bots Excluded' : 'Include Bots'}</span>
-              </button>
-              <DateRangePicker value={dateRange} onChange={setDateRange} />
-            </div>
-          </div>
+          <PageHeader
+            title="Analytics"
+            description={dateRange?.from && dateRange?.to && formatDateRange()}
+            actions={
+              <>
+                <Toggle
+                  variant="outline"
+                  pressed={excludeBots}
+                  onPressedChange={setExcludeBots}
+                  aria-label="Exclude bot traffic"
+                  className="h-9 gap-2 bg-card px-3 shadow-none data-[state=on]:border-primary/40 data-[state=on]:bg-primary/10 data-[state=on]:text-primary"
+                >
+                  <Bot className="size-4" />
+                  <span>{excludeBots ? 'Bots Excluded' : 'Include Bots'}</span>
+                </Toggle>
+                <DateRangePicker value={dateRange} onChange={setDateRange} />
+              </>
+            }
+          />
 
           {/* Trends Chart */}
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ChartTitle
-              title="Traffic Trends"
-              description="Page views and unique visitors over time"
-              loading={fetchingTrends}
-            >
+          <SectionCard
+            title="Traffic Trends"
+            description="Page views and unique visitors over time"
+            loading={fetchingTrends}
+            actions={
               <MetricToggle
                 activeMetric={activeMetric}
                 onMetricChange={setActiveMetric}
                 totalPageviews={trendsTotals.totalPageviews}
                 totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
               />
-            </ChartTitle>
+            }
+          >
             <TrendsChart
               data={trendsData}
               loading={loadingTrends}
@@ -157,7 +154,7 @@ export function AnalyticsClient() {
               totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
               activeMetric={activeMetric}
             />
-          </div>
+          </SectionCard>
 
           {/* Device, Location & Bot Analytics */}
           <Tabs defaultValue="devices" className="space-y-4">
@@ -178,149 +175,148 @@ export function AnalyticsClient() {
 
             <TabsContent value="devices" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Browsers"
-                    description="Most popular"
-                    loading={fetchingDevices}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Browsers"
+                  description="Most popular"
+                  loading={fetchingDevices}
+                >
                   <DeviceChart
                     data={devicesData.browsers}
                     title="Browsers"
                     loading={loadingDevices}
                   />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Operating Systems"
-                    description="Device OS"
-                    loading={fetchingDevices}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Operating Systems"
+                  description="Device OS"
+                  loading={fetchingDevices}
+                >
                   <DeviceChart
                     data={devicesData.os}
                     title="Operating Systems"
                     loading={loadingDevices}
                   />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Device Types"
-                    description="Desktop, mobile, tablet"
-                    loading={fetchingDevices}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Device Types"
+                  description="Desktop, mobile, tablet"
+                  loading={fetchingDevices}
+                >
                   <RadialDonutChart
                     data={devicesData.devices}
                     title="Device Types"
                     loading={loadingDevices}
                     centerLabel="Devices"
                   />
-                </div>
+                </SectionCard>
               </div>
             </TabsContent>
 
             <TabsContent value="locations" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Top Countries"
-                    description="Visitors by country"
-                    loading={fetchingLocations}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Top Countries"
+                  description="Visitors by country"
+                  loading={fetchingLocations}
+                >
                   <LocationChart
                     data={locationsData.countries}
                     title="Countries"
                     loading={loadingLocations}
                   />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Top Cities"
-                    description="Visitors by city"
-                    loading={fetchingLocations}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Top Cities"
+                  description="Visitors by city"
+                  loading={fetchingLocations}
+                >
                   <LocationChart
                     data={locationsData.cities}
                     title="Cities"
                     loading={loadingLocations}
                   />
-                </div>
+                </SectionCard>
               </div>
             </TabsContent>
 
             <TabsContent value="audience" className="space-y-4">
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="UTM Campaigns"
-                    description="Traffic by UTM campaign"
-                    loading={fetchingAudience}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="UTM Campaigns"
+                  description="Traffic by UTM campaign"
+                  loading={fetchingAudience}
+                >
                   <AudienceListChart
                     data={audienceResult?.utmCampaigns || []}
                     title="Campaigns"
                     loading={loadingAudience}
                   />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Languages"
-                    description="Browser locale preferences"
-                    loading={fetchingAudience}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Languages"
+                  description="Browser locale preferences"
+                  loading={fetchingAudience}
+                >
                   <AudienceListChart
                     data={audienceResult?.languages || []}
                     title="Languages"
                     loading={loadingAudience}
                   />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Screen Resolutions"
-                    description="Viewport width & height"
-                    loading={fetchingAudience}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Screen Resolutions"
+                  description="Viewport width & height"
+                  loading={fetchingAudience}
+                >
                   <AudienceListChart
                     data={audienceResult?.viewports || []}
                     title="Resolutions"
                     loading={loadingAudience}
                   />
-                </div>
+                </SectionCard>
               </div>
             </TabsContent>
 
             <TabsContent value="bots" className="space-y-4">
-              <div className="rounded-lg border border-border bg-card p-6">
-                <ChartTitle
-                  title="Bot vs Human Traffic"
-                  description="Traffic breakdown by source type"
-                  loading={fetchingBots}
-                />
+              <SectionCard
+                title="Bot vs Human Traffic"
+                description="Traffic breakdown by source type"
+                loading={fetchingBots}
+              >
                 <BotOverviewChart data={botsResult} loading={loadingBots} />
-              </div>
+              </SectionCard>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Bot Types"
-                    description="Distribution by bot category"
-                    loading={fetchingBots}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Bot Types"
+                  description="Distribution by bot category"
+                  loading={fetchingBots}
+                >
                   <BotTypeChart data={botsResult} loading={loadingBots} />
-                </div>
+                </SectionCard>
 
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <ChartTitle
-                    title="Top Bots"
-                    description="Most active bot agents"
-                    loading={fetchingBots}
-                  />
+                <SectionCard
+                  padding="md"
+                  title="Top Bots"
+                  description="Most active bot agents"
+                  loading={fetchingBots}
+                >
                   <TopBotsChart data={botsResult} loading={loadingBots} />
-                </div>
+                </SectionCard>
               </div>
             </TabsContent>
           </Tabs>

@@ -8,7 +8,6 @@ import {
   ArrowUpDown,
   BarChart3,
   ChevronDown,
-  ChevronUp,
   Clock,
   Globe,
   Link as LinkIcon,
@@ -20,9 +19,9 @@ import {
 import Link from 'next/link';
 import { useState } from 'react';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
-import { ChartTitle } from '@/components/charts/ChartTitle';
 import { MetricToggle, TrendsChart } from '@/components/charts/TrendsChart';
 import { EmptyState } from '@/components/EmptyState';
+import { SectionCard } from '@/components/SectionCard';
 import { Usage } from '@/components/Usage';
 import { Input } from '@/components/ui/input';
 import {
@@ -34,6 +33,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useTrendsData } from '@/hooks/useAnalytics';
+import { cn } from '@/lib/utils';
 
 type DomainStat = {
   hostId: number;
@@ -207,45 +207,50 @@ export function HomepageClient({
             className="grid grid-cols-1 gap-4 sm:grid-cols-3"
           >
             <motion.div variants={item}>
-              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
+              <SectionCard
+                padding="md"
+                className="transition-colors hover:border-border/80"
+              >
                 <div className="mb-2 flex items-center gap-2">
                   <BarChart3 className="size-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">
                     Total Views
                   </span>
                 </div>
-                <div className="text-xl font-medium text-foreground sm:text-2xl">
+                <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
                   <AnimatedNumber value={totalPageViews} separator="," />
                 </div>
-              </div>
+              </SectionCard>
             </motion.div>
 
             <motion.div variants={item}>
-              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
+              <SectionCard
+                padding="md"
+                className="transition-colors hover:border-border/80"
+              >
                 <div className="mb-2 flex items-center gap-2">
                   <Globe className="size-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Domains
-                  </span>
+                  <span className="text-sm text-muted-foreground">Domains</span>
                 </div>
-                <div className="text-xl font-medium text-foreground sm:text-2xl">
+                <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
                   <AnimatedNumber value={domainStats.length} />
                 </div>
-              </div>
+              </SectionCard>
             </motion.div>
 
             <motion.div variants={item}>
-              <div className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-border/80">
+              <SectionCard
+                padding="md"
+                className="transition-colors hover:border-border/80"
+              >
                 <div className="mb-2 flex items-center gap-2">
                   <LinkIcon className="size-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    URLs
-                  </span>
+                  <span className="text-sm text-muted-foreground">URLs</span>
                 </div>
-                <div className="text-xl font-medium text-foreground sm:text-2xl">
+                <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
                   <AnimatedNumber value={totalUrls} separator="," />
                 </div>
-              </div>
+              </SectionCard>
             </motion.div>
           </motion.div>
         </div>
@@ -254,19 +259,19 @@ export function HomepageClient({
       {/* Traffic Trends Chart */}
       <section>
         <div className="mx-auto max-w-4xl p-4 sm:px-6">
-          <div className="rounded-lg border border-border bg-card p-6">
-            <ChartTitle
-              title="Traffic Trends"
-              description="Page views and unique visitors over the last 30 days"
-              loading={fetchingTrends}
-            >
+          <SectionCard
+            title="Traffic Trends"
+            description="Page views and unique visitors over the last 30 days"
+            loading={fetchingTrends}
+            actions={
               <MetricToggle
                 activeMetric={activeMetric}
                 onMetricChange={setActiveMetric}
                 totalPageviews={trendsTotals.totalPageviews}
                 totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
               />
-            </ChartTitle>
+            }
+          >
             <TrendsChart
               data={trendsData}
               loading={loadingTrends}
@@ -274,7 +279,7 @@ export function HomepageClient({
               totalUniqueVisitors={trendsTotals.totalUniqueVisitors}
               activeMetric={activeMetric}
             />
-          </div>
+          </SectionCard>
         </div>
       </section>
 
@@ -284,7 +289,11 @@ export function HomepageClient({
           <div className="rounded-lg border border-border bg-card">
             <button
               onClick={() => setIsIntegrationOpen(!isIntegrationOpen)}
-              className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-accent"
+              aria-expanded={isIntegrationOpen}
+              className={cn(
+                'flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                isIntegrationOpen ? 'rounded-t-lg' : 'rounded-lg',
+              )}
             >
               <div>
                 <h2 className="text-sm font-medium text-foreground sm:text-base">
@@ -296,11 +305,12 @@ export function HomepageClient({
                   backend
                 </p>
               </div>
-              {isIntegrationOpen ? (
-                <ChevronUp className="size-5 shrink-0 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="size-5 shrink-0 text-muted-foreground" />
-              )}
+              <ChevronDown
+                className={cn(
+                  'size-5 shrink-0 text-muted-foreground transition-transform',
+                  isIntegrationOpen && 'rotate-180',
+                )}
+              />
             </button>
             {isIntegrationOpen && (
               <div className="border-t border-border p-6 pt-4">
@@ -361,7 +371,7 @@ export function HomepageClient({
                     <TableHead className="h-10 text-sm">
                       <button
                         onClick={() => handleSort('domain')}
-                        className="inline-flex items-center font-medium hover:text-foreground"
+                        className="-mx-1.5 inline-flex items-center rounded-md px-1.5 py-1.5 font-medium hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Domain
                         <SortIcon column="domain" />
@@ -370,7 +380,7 @@ export function HomepageClient({
                     <TableHead className="h-10 text-right text-sm">
                       <button
                         onClick={() => handleSort('urls')}
-                        className="ml-auto inline-flex items-center font-medium hover:text-foreground"
+                        className="-mx-1.5 ml-auto inline-flex items-center rounded-md px-1.5 py-1.5 font-medium hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         URLs
                         <SortIcon column="urls" />
@@ -379,7 +389,7 @@ export function HomepageClient({
                     <TableHead className="h-10 text-right text-sm">
                       <button
                         onClick={() => handleSort('pageviews')}
-                        className="ml-auto inline-flex items-center font-medium hover:text-foreground"
+                        className="-mx-1.5 ml-auto inline-flex items-center rounded-md px-1.5 py-1.5 font-medium hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         Pageviews
                         <SortIcon column="pageviews" />
@@ -402,8 +412,8 @@ export function HomepageClient({
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={`https://www.google.com/s2/favicons?sz=128&domain=${hostName}`}
-                              alt={hostName}
-                              className="size-5 rounded"
+                              alt=""
+                              className="size-5 rounded outline outline-1 -outline-offset-1 outline-black/10 dark:outline-white/10"
                             />
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-foreground hover:text-primary">
@@ -418,10 +428,10 @@ export function HomepageClient({
                             </div>
                           </Link>
                         </TableCell>
-                        <TableCell className="py-3 text-right text-sm text-muted-foreground">
+                        <TableCell className="py-3 text-right text-sm tabular-nums text-muted-foreground">
                           {row._count}
                         </TableCell>
-                        <TableCell className="py-3 text-right text-sm font-medium text-foreground">
+                        <TableCell className="py-3 text-right text-sm font-medium tabular-nums text-foreground">
                           {row.pageViews?.toLocaleString() || 0}
                         </TableCell>
                         <TableCell className="py-3 text-right">

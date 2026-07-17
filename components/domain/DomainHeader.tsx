@@ -1,6 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/PageHeader';
 
 interface DomainHeaderProps {
   domain: string;
@@ -16,46 +14,36 @@ export function DomainHeader({
   previewCount,
 }: DomainHeaderProps) {
   return (
-    <div>
-      <Link href="/">
-        <Button variant="ghost" size="sm" className="mb-4 h-8 px-2 text-sm">
-          <ArrowLeft className="mr-2 size-4" />
-          Back
-        </Button>
-      </Link>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-normal tracking-tight text-foreground sm:text-2xl">
-            {domain}
-          </h1>
-          <div className="mt-1 flex flex-col gap-1">
-            <p className="text-sm text-muted-foreground">
-              Domain analytics and URL breakdown
-            </p>
-            {previewCount > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Including {previewCount} preview deployment
-                {previewCount > 1 ? 's' : ''}
-              </p>
-            )}
-          </div>
-        </div>
+    <PageHeader
+      title={domain}
+      description={
+        <>
+          Domain analytics and URL breakdown
+          {previewCount > 0 && (
+            <span className="mt-1 block text-xs">
+              Including {previewCount} preview deployment
+              {previewCount > 1 ? 's' : ''}
+            </span>
+          )}
+        </>
+      }
+      backHref="/"
+      actions={
         <div className="flex gap-6 text-right">
           <div>
-            <div className="text-xl font-medium text-foreground sm:text-2xl">
+            <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
               {totalUrls}
             </div>
             <div className="text-sm text-muted-foreground">Total URLs</div>
           </div>
           <div>
-            <div className="text-xl font-medium text-foreground sm:text-2xl">
+            <div className="text-xl font-medium tabular-nums text-foreground sm:text-2xl">
               {totalPageviews.toLocaleString()}
             </div>
             <div className="text-sm text-muted-foreground">Total Views</div>
           </div>
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 }

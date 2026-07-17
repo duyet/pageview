@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ['class'],
+  // `.dark` never appears literally in content files (it's applied at runtime
+  // by the theme toggle), so safelist it or Tailwind tree-shakes the
+  // `.dark { --background: ... }` token block out of the compiled CSS.
+  safelist: ['dark'],
   content: [
     'pages/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
@@ -51,6 +55,13 @@ module.exports = {
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
+        },
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
         },
       },
       borderRadius: {

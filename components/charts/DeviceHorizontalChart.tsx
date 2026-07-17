@@ -7,11 +7,11 @@ interface DeviceHorizontalChartProps {
 }
 
 const COLORS = [
-  '#D97706', // amber (primary)
-  '#0F766E', // teal
-  '#E09145', // warm orange
-  '#7C6FA0', // muted purple
-  '#2B6CB0', // steel blue
+  'hsl(var(--chart-1))', // orange (primary)
+  'hsl(var(--chart-2))', // teal
+  'hsl(var(--chart-3))', // amber
+  'hsl(var(--chart-4))', // muted purple
+  'hsl(var(--chart-5))', // steel blue
   '#65A30D', // lime green
   '#C2410C', // deep orange
   '#0891B2', // cyan
@@ -27,7 +27,7 @@ export function DeviceHorizontalChart({
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground">
           Loading {title.toLowerCase()}...
         </div>
       </div>
@@ -37,7 +37,7 @@ export function DeviceHorizontalChart({
   if (!data || data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
+        <div className="text-muted-foreground">
           No {title.toLowerCase()} data
         </div>
       </div>
@@ -60,19 +60,15 @@ export function DeviceHorizontalChart({
         // If bar is wide enough, value might be on colored background
         const valueOnBar = percentage > 75;
 
-        const labelColor = labelOnBar
-          ? 'text-white'
-          : 'text-neutral-900 dark:text-neutral-100';
-        const valueColor = valueOnBar
-          ? 'text-white'
-          : 'text-neutral-900 dark:text-neutral-100';
+        const labelColor = labelOnBar ? 'text-white' : 'text-foreground';
+        const valueColor = valueOnBar ? 'text-white' : 'text-foreground';
 
         return (
           <div key={index} className="group">
-            <div className="relative h-9 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-800">
+            <div className="relative h-9 overflow-hidden rounded-md bg-muted">
               {/* Colored background bar */}
               <div
-                className="absolute inset-0 transition-all"
+                className="absolute inset-0 transition-[width]"
                 style={{
                   width: `${percentage}%`,
                   backgroundColor: color,

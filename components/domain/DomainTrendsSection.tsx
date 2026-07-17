@@ -2,9 +2,9 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 import type { TrendData } from '@/app/api/analytics/trends/route';
-import { ChartTitle } from '@/components/charts/ChartTitle';
 import { DomainTrendsBarChart } from '@/components/charts/DomainTrendsBarChart';
 import { DateRangePicker } from '@/components/DateRangePicker';
+import { SectionCard } from '@/components/SectionCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export type MetricView = 'pageviews' | 'visitors';
@@ -36,20 +36,17 @@ export function DomainTrendsSection({
   return (
     <>
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground dark:text-muted-foreground">
-            {dateRange?.from && dateRange?.to && formatDateRange()}
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          {dateRange?.from && dateRange?.to && formatDateRange()}
+        </p>
         <DateRangePicker value={dateRange} onChange={onDateRangeChange} />
       </div>
 
-      <div className="rounded-lg border bg-border bg-card p-6 dark:bg-border ">
-        <ChartTitle
-          title="Traffic Trends"
-          description={`Page views and unique visitors for ${domain}`}
-          loading={fetching}
-        >
+      <SectionCard
+        title="Traffic Trends"
+        description={`Page views and unique visitors for ${domain}`}
+        loading={fetching}
+        actions={
           <Tabs
             value={metricView}
             onValueChange={(value) => setMetricView(value as MetricView)}
@@ -63,13 +60,14 @@ export function DomainTrendsSection({
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </ChartTitle>
+        }
+      >
         <DomainTrendsBarChart
           data={trendsData}
           loading={loading}
           metricView={metricView}
         />
-      </div>
+      </SectionCard>
     </>
   );
 }

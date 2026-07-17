@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { DataSourceSelector } from './DataSourceSelector';
+import { ThemeToggle } from './ThemeToggle';
 
 export const Header = () => {
   const pathname = usePathname();
@@ -67,6 +68,8 @@ export const Header = () => {
 
             {/* Global database source selector */}
             <DataSourceSelector />
+
+            <ThemeToggle />
           </div>
         </div>
       </div>

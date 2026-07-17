@@ -24,9 +24,7 @@ export function DomainTrendsBarChart({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          Loading trends...
-        </div>
+        <div className="text-muted-foreground">Loading trends...</div>
       </div>
     );
   }
@@ -34,9 +32,7 @@ export function DomainTrendsBarChart({
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-neutral-600 dark:text-neutral-400">
-          No data available
-        </div>
+        <div className="text-muted-foreground">No data available</div>
       </div>
     );
   }
@@ -55,13 +51,13 @@ export function DomainTrendsBarChart({
           <XAxis
             dataKey="formattedDate"
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-neutral-600 dark:text-neutral-400"
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
@@ -69,21 +65,18 @@ export function DomainTrendsBarChart({
             content={({ active, payload, label }) => {
               if (active && payload?.length) {
                 return (
-                  <div className="rounded-lg border border-neutral-200 bg-white p-3 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
-                    <p className="mb-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                  <div className="rounded-lg border border-border bg-popover p-3 shadow-lg">
+                    <p className="mb-1 text-sm font-medium text-foreground">
                       {label}
                     </p>
                     {payload.map((entry, index) => (
-                      <p
-                        key={index}
-                        className="text-xs text-neutral-600 dark:text-neutral-400"
-                      >
+                      <p key={index} className="text-xs text-muted-foreground">
                         <span
                           className="mr-1.5 inline-block size-3 rounded-sm"
                           style={{ backgroundColor: entry.color }}
                         ></span>
                         {entry.name}:{' '}
-                        <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                        <span className="font-medium text-foreground">
                           {entry.value?.toLocaleString()}
                         </span>
                       </p>
@@ -97,7 +90,9 @@ export function DomainTrendsBarChart({
           />
           <Bar
             dataKey={isPageViewsMode ? 'pageviews' : 'uniqueVisitors'}
-            fill={isPageViewsMode ? '#D97706' : '#0F766E'}
+            fill={
+              isPageViewsMode ? 'hsl(var(--chart-1))' : 'hsl(var(--chart-2))'
+            }
             radius={[4, 4, 0, 0]}
             name={isPageViewsMode ? 'Page Views' : 'Unique Visitors'}
             isAnimationActive={false}

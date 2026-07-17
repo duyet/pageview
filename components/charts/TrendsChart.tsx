@@ -44,7 +44,7 @@ export function TrendsChart({
   if (loading) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground dark:text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
           <span>Loading trends...</span>
         </div>
@@ -55,9 +55,7 @@ export function TrendsChart({
   if (!data || data.length === 0) {
     return (
       <div className="flex h-80 items-center justify-center">
-        <div className="text-muted-foreground dark:text-muted-foreground">
-          No data available
-        </div>
+        <div className="text-muted-foreground">No data available</div>
       </div>
     );
   }
@@ -70,12 +68,12 @@ export function TrendsChart({
   const metricConfig = {
     pageviews: {
       label: 'Page Views',
-      color: '#D97706',
+      color: 'hsl(var(--chart-1))',
       dataKey: 'pageviews',
     },
     uniqueVisitors: {
       label: 'Unique Visitors',
-      color: '#0F766E',
+      color: 'hsl(var(--chart-2))',
       dataKey: 'uniqueVisitors',
     },
   };
@@ -88,19 +86,19 @@ export function TrendsChart({
         <BarChart data={chartData}>
           <CartesianGrid
             strokeDasharray="3 3"
-            className="stroke-neutral-200 dark:stroke-neutral-700"
+            className="stroke-border"
             opacity={0.5}
           />
           <XAxis
             dataKey="formattedDate"
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-muted-foreground dark:text-muted-foreground"
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
           <YAxis
             tick={{ fontSize: 12, fill: 'currentColor' }}
-            className="text-muted-foreground dark:text-muted-foreground"
+            className="text-muted-foreground"
             tickLine={false}
             axisLine={false}
           />
@@ -108,17 +106,17 @@ export function TrendsChart({
             content={({ active, payload, label }) => {
               if (active && payload?.length) {
                 return (
-                  <div className="rounded-lg border border-border bg-card p-3 shadow-lg dark:border-border bg-card">
-                    <p className="mb-1 text-sm font-medium text-foreground dark:text-foreground">
+                  <div className="rounded-lg border border-border bg-popover p-3 shadow-lg">
+                    <p className="mb-1 text-sm font-medium text-foreground">
                       {label}
                     </p>
-                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <span
                         className="mr-1.5 inline-block size-3 rounded-sm"
                         style={{ backgroundColor: currentConfig.color }}
                       ></span>
                       {currentConfig.label}:{' '}
-                      <span className="font-medium text-foreground dark:text-foreground">
+                      <span className="font-medium text-foreground">
                         {payload[0]?.value?.toLocaleString()}
                       </span>
                     </p>
@@ -155,13 +153,13 @@ export function MetricToggle({
   totalUniqueVisitors,
 }: MetricToggleProps) {
   return (
-    <div className="inline-flex items-center gap-1 rounded-md border border-border bg-muted p-0.5 dark:border-border ">
+    <div className="inline-flex items-center gap-1 rounded-md border border-border bg-muted p-0.5">
       <button
         onClick={() => onMetricChange('pageviews')}
         className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
           activeMetric === 'pageviews'
-            ? 'bg-card text-foreground shadow-sm dark:bg-neutral-700 dark:text-foreground'
-            : 'text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+            ? 'bg-card text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
       >
         Page Views
@@ -175,8 +173,8 @@ export function MetricToggle({
         onClick={() => onMetricChange('uniqueVisitors')}
         className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
           activeMetric === 'uniqueVisitors'
-            ? 'bg-card text-foreground shadow-sm dark:bg-neutral-700 dark:text-foreground'
-            : 'text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+            ? 'bg-card text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
       >
         Unique Visitors
