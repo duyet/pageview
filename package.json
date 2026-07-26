@@ -56,7 +56,7 @@
     "lucide-react": "^0.577.0",
     "nanoid": "^5.1.6",
     "next": "16",
-    "next-auth": "^4.24.13",
+    "next-auth": "^4.24.15",
     "next-swagger-doc": "^0.4.1",
     "normalize-url": "^8.0.2",
     "react": "19",
